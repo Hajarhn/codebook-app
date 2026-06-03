@@ -1194,6 +1194,21 @@
     margin-left: 2px;
   }
 </style>
+<style id="cloud-v660-styles">
+  /* v6.6: History log */
+  .hist-row { display: flex; gap: 0.75rem; padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; align-items: flex-start; }
+  .hist-row:hover { background: var(--surface-2); }
+  .hist-icon { font-size: 1rem; width: 24px; text-align: center; flex-shrink: 0; }
+  .hist-main { flex: 1; min-width: 0; }
+  .hist-action { font-weight: 600; }
+  .hist-detail { color: var(--text-muted); margin-top: 2px; word-break: break-word; }
+  .hist-detail .hist-old { color: #B71C1C; text-decoration: line-through; opacity: 0.75; }
+  .hist-detail .hist-arrow { margin: 0 5px; color: var(--text-faint); }
+  .hist-detail .hist-new { color: #1B5E20; font-weight: 500; }
+  .hist-detail code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; }
+  .hist-meta { color: var(--text-faint); font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; text-align: right; }
+  .hist-day-header { font-weight: 600; font-size: 0.8rem; color: var(--text-muted); padding: 0.6rem 0.5rem 0.3rem; border-bottom: 2px solid var(--border-strong); margin-top: 0.5rem; }
+</style>
 </head>
 <body class="cloud-not-ready">
 <div id="cloud-save-toast"></div>
@@ -1537,7 +1552,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.5 cloud</span>
+      <span class="version">v6.6 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1598,6 +1613,7 @@
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')">🔍 Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
     <button class="tab" data-tab="activity" role="tab" onclick="switchTab('activity')">📜 Activity <span class="count" id="tab-count-activity">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
+    <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 History</button>
     <button class="tab" data-tab="settings" role="tab" onclick="switchTab('settings')">⚙️ Settings</button>
   </div>
 
@@ -1738,6 +1754,28 @@
     <div id="pending-list">
       <div class="empty-state"><p>Loading…</p></div>
     </div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-history" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">History</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">A dated log of every change made to the codebook.</p>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <select id="history-filter" class="btn-mini" style="padding: 5px 8px;">
+          <option value="all">All actions</option>
+          <option value="update_field">Field edits</option>
+          <option value="create">New variables</option>
+          <option value="delete">Deletions</option>
+          <option value="restore">Restores</option>
+          <option value="approve_change">Approvals</option>
+          <option value="reject_change">Rejections</option>
+        </select>
+        <button class="btn-mini" id="history-refresh-btn">↻ Refresh</button>
+      </div>
+    </div>
+    <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
@@ -4168,6 +4206,132 @@ window.addEventListener('cloud-authenticated', (e) => {
 });
 
 // ====== END v6.0 pending UI ======
+
+// ====== v6.6: History / Audit Log tab ======
+const HISTORY_STATE = { items: [], filter: 'all' };
+
+(function patchSwitchTabHistory() {
+  function tryPatch() {
+    if (typeof window.switchTab !== 'function') { setTimeout(tryPatch, 200); return; }
+    if (window.switchTab.__cloudHistoryPatched) return;
+    const orig = window.switchTab;
+    window.switchTab = function(name) {
+      orig.apply(this, arguments);
+      if (name === 'history') loadHistory();
+    };
+    window.switchTab.__cloudHistoryPatched = true;
+  }
+  window.addEventListener('cloud-authenticated', tryPatch);
+})();
+
+function histEscape(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadHistory() {
+  const listEl = document.getElementById('history-list');
+  if (!listEl || !window.cloudAuth || window.cloudAuth.role !== 'admin') return;
+  listEl.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try {
+    const client = window.cloudAuth.client;
+    let query = client.from('audit_log').select('*').order('performed_at', { ascending: false }).limit(500);
+    if (HISTORY_STATE.filter !== 'all') query = query.eq('action', HISTORY_STATE.filter);
+    const { data, error } = await query;
+    if (error) throw error;
+
+    // Resolve performer names + variable names
+    const userIds = [...new Set((data || []).map(d => d.performed_by).filter(Boolean))];
+    let userMap = {};
+    if (userIds.length > 0) {
+      const { data: profs } = await client.from('profiles').select('id, email, display_name').in('id', userIds);
+      (profs || []).forEach(p => { userMap[p.id] = p.display_name || p.email; });
+    }
+    const varIds = [...new Set((data || []).map(d => d.variable_id).filter(Boolean))];
+    let varMap = {};
+    if (varIds.length > 0) {
+      const { data: vars } = await client.from('variables').select('id, variable_name_CBS, "Instrument"').in('id', varIds);
+      (vars || []).forEach(v => { varMap[v.id] = v; });
+    }
+    HISTORY_STATE.items = data || [];
+    HISTORY_STATE.userMap = userMap;
+    HISTORY_STATE.varMap = varMap;
+    renderHistory();
+  } catch (err) {
+    console.error('loadHistory failed:', err);
+    listEl.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Error: ' + (err.message || err) + '</p></div>';
+  }
+}
+
+function renderHistory() {
+  const listEl = document.getElementById('history-list');
+  const items = HISTORY_STATE.items || [];
+  const userMap = HISTORY_STATE.userMap || {};
+  const varMap = HISTORY_STATE.varMap || {};
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><p>No history yet.</p></div>';
+    return;
+  }
+
+  const ICON = { create: '➕', update_field: '✏️', delete: '🗑️', restore: '♻️', approve_change: '✅', reject_change: '❌' };
+  const ACTION_LABEL = { create: 'Created variable', update_field: 'Edited field', delete: 'Deleted variable', restore: 'Restored variable', approve_change: 'Approved change', reject_change: 'Rejected change' };
+
+  let out = '';
+  let lastDay = '';
+  items.forEach(it => {
+    const dt = it.performed_at ? new Date(it.performed_at) : null;
+    const day = dt ? dt.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '';
+    if (day !== lastDay) {
+      out += '<div class="hist-day-header">' + histEscape(day) + '</div>';
+      lastDay = day;
+    }
+    const who = userMap[it.performed_by] || 'unknown';
+    const time = dt ? dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
+    const v = varMap[it.variable_id];
+    const vname = v ? (v.variable_name_CBS || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
+    const vinst = v && v.Instrument ? ' · ' + histEscape(v.Instrument) : '';
+
+    let detail = '';
+    if (it.action === 'update_field' && it.field_name) {
+      detail = 'Field <code>' + histEscape(it.field_name) + '</code> on <strong>' + histEscape(vname) + '</strong>' + vinst
+        + '<br><span class="hist-old">' + (histEscape(it.old_value) || '(empty)') + '</span>'
+        + '<span class="hist-arrow">→</span>'
+        + '<span class="hist-new">' + (histEscape(it.new_value) || '(empty)') + '</span>';
+    } else if (it.action === 'create') {
+      detail = 'New variable <strong>' + histEscape(vname) + '</strong>' + vinst;
+    } else if (it.action === 'delete') {
+      detail = 'Deleted <strong>' + histEscape(vname) + '</strong>' + vinst;
+    } else if (it.action === 'restore') {
+      detail = 'Restored <strong>' + histEscape(vname) + '</strong>' + vinst;
+    } else if (it.action === 'approve_change' || it.action === 'reject_change') {
+      detail = 'On <strong>' + histEscape(vname) + '</strong>' + vinst
+        + (it.field_name ? ' · field <code>' + histEscape(it.field_name) + '</code>' : '')
+        + (it.new_value ? ' → <span class="hist-new">' + histEscape(it.new_value) + '</span>' : '');
+    }
+
+    out += '<div class="hist-row">'
+      + '<div class="hist-icon">' + (ICON[it.action] || '•') + '</div>'
+      + '<div class="hist-main">'
+      + '<div class="hist-action">' + (ACTION_LABEL[it.action] || it.action) + '</div>'
+      + '<div class="hist-detail">' + detail + '</div>'
+      + '</div>'
+      + '<div class="hist-meta">' + histEscape(who) + '<br>' + histEscape(time) + '</div>'
+      + '</div>';
+  });
+  listEl.innerHTML = out;
+}
+
+window.addEventListener('cloud-authenticated', (e) => {
+  if (e.detail.profile.role !== 'admin') return;
+  setTimeout(() => {
+    const f = document.getElementById('history-filter');
+    if (f && !f.__wired) { f.addEventListener('change', ev => { HISTORY_STATE.filter = ev.target.value; loadHistory(); }); f.__wired = true; }
+    const r = document.getElementById('history-refresh-btn');
+    if (r && !r.__wired) { r.addEventListener('click', loadHistory); r.__wired = true; }
+  }, 500);
+});
+// ====== END v6.6 history tab ======
+
 
 
 
