@@ -1222,6 +1222,9 @@
   .fm-fname { font-family:monospace; font-size:0.72rem; color:var(--text-faint); width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .fm-group-header { font-weight:600; font-size:0.78rem; color:var(--text-muted); padding:0.6rem 0.3rem 0.25rem; text-transform:uppercase; letter-spacing:0.03em; }
 </style>
+<style id="cloud-v681-styles">
+  .fm-group-sel { width:120px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.78rem; }
+</style>
 </head>
 <body class="cloud-not-ready">
 <div id="cloud-save-toast"></div>
@@ -1565,7 +1568,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.8 cloud</span>
+      <span class="version">v6.8.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4443,6 +4446,7 @@ function renderFieldManager() {
         + '</div>'
         + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
+        + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
         + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
         + '</div>';
     });
@@ -4489,6 +4493,22 @@ function fmGroupRename(gi, val) {
   // propagate to its fields
   FM_STATE.groups[gi].fields.forEach(f => { f.group = val; });
   FM_STATE.dirty = true;
+}
+
+function fmGroupOptions(currentGroup) {
+  const names = FM_STATE.groups.map(g => g.name);
+  return names.map(n => '<option value="' + escapeAttr(n) + '"' + (n === currentGroup ? ' selected' : '') + '>' + escapeHtml(n) + '</option>').join('');
+}
+
+function fmMoveToGroup(gi, fi, targetGroupName) {
+  const groups = FM_STATE.groups;
+  if (groups[gi].name === targetGroupName) return;
+  const moved = groups[gi].fields.splice(fi, 1)[0];
+  moved.group = targetGroupName;
+  const tgt = groups.find(g => g.name === targetGroupName);
+  if (tgt) tgt.fields.push(moved);
+  FM_STATE.dirty = true;
+  renderFieldManager();
 }
 
 function fmEdit(gi, fi, val) {
@@ -4552,10 +4572,14 @@ async function saveFieldManager() {
         const cf = (window.cloudCustomFields || []).find(d => d.field_name === fld.field_name);
         if (cf) cf.display_order = newOrder;
       } else {
-        const { error } = await client.from('field_metadata')
+        const { data: upRows, error } = await client.from('field_metadata')
           .update({ display_label: fld.label, field_group: fld.group, display_order: newOrder })
-          .eq('field_name', fld.field_name);
+          .eq('field_name', fld.field_name)
+          .select('field_name');
         if (error) throw error;
+        if (!upRows || upRows.length === 0) {
+          throw new Error('No rows updated for "' + fld.field_name + '". This usually means the database is blocking the write (RLS/permission). Run 04_rls_policies field_metadata grants.');
+        }
         if (window.cloudFieldMeta[fld.field_name]) {
           window.cloudFieldMeta[fld.field_name].display_label = fld.label;
           window.cloudFieldMeta[fld.field_name].field_group = fld.group;
