@@ -465,6 +465,7 @@
      after login. Use that to gate UI. */
   body:not(.role-admin) .admin-only { display: none !important; }
   body:not(.role-admin):not(.role-editor) .editor-and-up-only { display: none !important; }
+  body.role-ontology_engineer .oe-hide { display: none !important; }
 
   /* Cloud error banner (when DB load fails) */
   #cloud-error-banner {
@@ -1569,7 +1570,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.10.0 cloud</span>
+      <span class="version">v6.11.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1626,7 +1627,7 @@
   <!-- Tabs -->
   <div class="tabs" role="tablist" id="tabs-bar">
     <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')">📋 Variables <span class="count" id="tab-count-vars">0</span></button>
-    <button class="tab" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
+    <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')">🔍 Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
     <button class="tab" data-tab="activity" role="tab" onclick="switchTab('activity')">📜 Activity <span class="count" id="tab-count-activity">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
@@ -3564,21 +3565,33 @@ window.addEventListener('cloud-authenticated', async (e) => {
   await loadFieldPermissions();
 });
 
-// ====== Feature 4+5: ontology_engineer per-field access ======
+// ====== Feature 4+5: per-role, per-field access ======
 // role_field_access stores REAL DB column names; the app uses mixed-case names.
-// oeDbName() converts app -> DB; oeAccessOf() returns the access for an app field.
-window.cloudRoleAccess = {};  // db_column_name -> 'read' | 'write' (current user's role)
+// oeDbName() converts app -> DB. accessOf() returns the CURRENT user's access
+// ('none'|'read'|'propose'|'write') for an app field.
+window.cloudRoleAccess = {};  // db_column_name -> access (current user's role)
 function oeDbName(appField) { return CLOUD_FIELD_CASE_REVERSE[appField] || appField; }
-function oeAccessOf(appField) {
-  // For any role other than ontology_engineer, do not restrict (returns 'write'
-  // so existing admin/editor gating is untouched).
-  if (!window.cloudAuth || window.cloudAuth.role !== 'ontology_engineer') return 'write';
-  return window.cloudRoleAccess[oeDbName(appField)] || 'none';
+function accessOf(appField) {
+  const role = window.cloudAuth && window.cloudAuth.role;
+  if (!role || role === 'admin') return 'write';           // admin: unrestricted
+  const explicit = window.cloudRoleAccess[oeDbName(appField)];
+  if (explicit) return explicit;
+  // Backward-compatible fallbacks when admin has not configured this field/role:
+  if (role === 'editor') {
+    const perm = window.cloudFieldPerms[appField];
+    if (perm === 'pending_approval') return 'propose';
+    if (perm === 'admin_only') return 'none';
+    return 'write';                                        // editors editable by default
+  }
+  if (role === 'ontology_engineer') return 'none';         // OE: only what admin grants
+  return 'read';                                           // any other role: view only
 }
+// Back-compat alias (older call sites)
+function oeAccessOf(appField) { return accessOf(appField); }
 async function loadRoleFieldAccess() {
   if (!window.cloudAuth || !window.cloudAuth.client) return;
   const role = window.cloudAuth.role;
-  if (role !== 'ontology_engineer') return;  // only this restricted role needs it client-side
+  if (!role || role === 'admin') return;                   // admin needs no map
   const { data, error } = await window.cloudAuth.client
     .from('role_field_access').select('field_name, access').eq('role', role);
   if (error) { console.error('role_field_access load failed', error); return; }
@@ -3587,7 +3600,8 @@ async function loadRoleFieldAccess() {
   window.cloudRoleAccess = m;
 }
 window.addEventListener('cloud-authenticated', async (e) => {
-  if (e.detail.profile.role === 'ontology_engineer') await loadRoleFieldAccess();
+  const role = e.detail.profile.role;
+  if (role && role !== 'admin' && role !== 'researcher') await loadRoleFieldAccess();
 });
 // ====== END feature 4+5 access helpers ======
 
@@ -3615,19 +3629,14 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
   const immediate = {};
   const pending = {};
   for (const [field, ch] of Object.entries(fieldChanges)) {
-    // Get permission class. Default: treat unknown as immediate for editor too.
-    const perm = window.cloudFieldPerms[field] || 'immediate';
     if (role === 'admin') {
-      // Admin sees everything as immediate
-      immediate[field] = ch;
-    } else if (role === 'editor') {
-      if (perm === 'immediate') immediate[field] = ch;
-      else if (perm === 'pending_approval') pending[field] = ch;
-      // admin_only: editor shouldn't be able to edit it; skip silently
-    } else if (role === 'ontology_engineer') {
-      // Only 'write' fields are persisted; read/none are skipped (the DB RPC
-      // would reject them anyway). The bulk editor already hides non-write fields.
-      if (oeAccessOf(field) === 'write') immediate[field] = ch;
+      immediate[field] = ch;                 // admin: everything immediate
+    } else {
+      // editor / ontology_engineer / others: per-field access decides.
+      const acc = accessOf(field);
+      if (acc === 'write') immediate[field] = ch;        // applied now (+ audited)
+      else if (acc === 'propose') pending[field] = ch;   // -> admin approval queue
+      // 'read' / 'none': not editable; skip silently.
     }
   }
 
@@ -4456,12 +4465,16 @@ let FM_STATE = { fields: [], dirty: false };
 
 async function openFieldManager() {
   if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
-  // Load current ontology_engineer per-field access (DB column name -> access).
-  let oeMap = {};
+  // Load current per-field access for the configurable roles (DB column name -> access).
+  const FM_ROLES = ['editor', 'ontology_engineer'];
+  const accessByRole = { editor: {}, ontology_engineer: {} };
   try {
     const { data } = await window.cloudAuth.client
-      .from('role_field_access').select('field_name, access').eq('role', 'ontology_engineer');
-    (data || []).forEach(r => { oeMap[r.field_name] = r.access; });
+      .from('role_field_access').select('role, field_name, access').in('role', FM_ROLES);
+    (data || []).forEach(r => {
+      if (!accessByRole[r.role]) accessByRole[r.role] = {};
+      accessByRole[r.role][r.field_name] = r.access;
+    });
   } catch (e) { console.error('Could not load role_field_access', e); }
   // Build a group-centric structure: ordered list of groups, each with ordered fields.
   // System / non-metadata fields that must NOT appear in the manager (no
@@ -4482,8 +4495,7 @@ async function openFieldManager() {
         orig_name: f,
         label: fieldDisplayLabel(f),
         isCustom: isCustom,
-        group: fieldGroupOf(f) || 'other',
-        oe: oeMap[oeDbName(f)] || 'none'   // ontology_engineer access for this field
+        group: fieldGroupOf(f) || 'other'
       };
     });
   // Bucket into groups, preserving first-seen order (which follows display_order).
@@ -4494,7 +4506,8 @@ async function openFieldManager() {
     buckets[fld.group].push(fld);
   });
   const groups = groupOrder.map(g => ({ name: g, orig_name: g, fields: buckets[g] }));
-  FM_STATE = { groups: groups, dirty: false };
+  const sel = document.getElementById('fm-access-role');
+  FM_STATE = { groups: groups, dirty: false, access: accessByRole, accessRole: (sel && sel.value) || 'editor' };
   renderFieldManager();
   document.getElementById('fm-error').style.display = 'none';
   document.getElementById('fm-status').textContent = '';
@@ -4529,11 +4542,15 @@ function renderFieldManager() {
         + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
         + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
-        + '<select class="fm-group-sel" onchange="fmSetOe(' + gi + ',' + fi + ',this.value)" title="Ontology Engineer access to this field" style="min-width:78px;">'
-        +   '<option value="none"' + (fld.oe === 'none' ? ' selected' : '') + '>OE: none</option>'
-        +   '<option value="read"' + (fld.oe === 'read' ? ' selected' : '') + '>OE: read</option>'
-        +   '<option value="write"' + (fld.oe === 'write' ? ' selected' : '') + '>OE: write</option>'
-        + '</select>'
+        + (fld.isCustom
+            ? '<span class="fm-fname" title="Per-role access is not available for custom fields">(n/a)</span>'
+            : (function(){ var a = fmAccessOf(fld); return ''
+              + '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Access for the selected role" style="min-width:92px;">'
+              +   '<option value="none"' + (a === 'none' ? ' selected' : '') + '>none</option>'
+              +   '<option value="read"' + (a === 'read' ? ' selected' : '') + '>read</option>'
+              +   '<option value="propose"' + (a === 'propose' ? ' selected' : '') + '>propose</option>'
+              +   '<option value="write"' + (a === 'write' ? ' selected' : '') + '>write</option>'
+              + '</select>'; })())
         + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
         + '</div>';
     });
@@ -4603,9 +4620,23 @@ function fmEdit(gi, fi, val) {
   FM_STATE.dirty = true;
 }
 
-function fmSetOe(gi, fi, val) {
-  FM_STATE.groups[gi].fields[fi].oe = val;
+function fmDefaultAccess(role) { return role === 'editor' ? 'write' : 'none'; }
+function fmAccessOf(fld) {
+  const role = FM_STATE.accessRole;
+  const m = (FM_STATE.access && FM_STATE.access[role]) || {};
+  const db = oeDbName(fld.field_name);
+  return (db in m) ? m[db] : fmDefaultAccess(role);
+}
+function fmSetAccess(gi, fi, val) {
+  const fld = FM_STATE.groups[gi].fields[fi];
+  const role = FM_STATE.accessRole;
+  if (!FM_STATE.access[role]) FM_STATE.access[role] = {};
+  FM_STATE.access[role][oeDbName(fld.field_name)] = val;
   FM_STATE.dirty = true;
+}
+function fmChangeAccessRole(role) {
+  FM_STATE.accessRole = role;
+  renderFieldManager();
 }
 
 async function saveFieldManager() {
@@ -4687,16 +4718,20 @@ async function saveFieldManager() {
       }
     }
 
-    // 3) persist ontology_engineer per-field access (built-in fields only;
-    //    custom-field access would need extra RPC support and is out of scope).
-    const oeRows = flat
-      .filter(fld => !fld.isCustom)
-      .map(fld => ({ role: 'ontology_engineer', field_name: oeDbName(fld.field_name), access: fld.oe || 'none' }));
-    if (oeRows.length > 0) {
-      const { error: oeErr } = await client
+    // 3) persist per-role field access (built-in fields only; custom fields are
+    //    not server-enforceable yet). Upsert every entry the admin touched.
+    const accessRows = [];
+    Object.keys(FM_STATE.access || {}).forEach(role => {
+      const m = FM_STATE.access[role] || {};
+      Object.keys(m).forEach(dbField => {
+        accessRows.push({ role: role, field_name: dbField, access: m[dbField] || 'none' });
+      });
+    });
+    if (accessRows.length > 0) {
+      const { error: accErr } = await client
         .from('role_field_access')
-        .upsert(oeRows, { onConflict: 'role,field_name' });
-      if (oeErr) throw oeErr;
+        .upsert(accessRows, { onConflict: 'role,field_name' });
+      if (accErr) throw accErr;
     }
 
     applyFieldOrdering();
@@ -5363,11 +5398,14 @@ function refreshVariablesTab() {
       isDeleted ? `<span class="row-badge deleted-badge">deleted</span>` : "",
       isRestricted && !isDeleted ? `<span class="row-badge restricted" title="Hidden in non-admin Excel exports">🔒</span>` : "",
     ].join("");
+    const role = window.cloudAuth && window.cloudAuth.role;
+    const canEdit = role === 'admin' || role === 'editor' || role === 'ontology_engineer';
+    const canDelete = role === 'admin' || role === 'editor';
     const actions = isDeleted
       ? `<button class="btn-mini" onclick="restoreVariable('${escapeAttr(v._uid)}')">Restore</button>`
-      : `<button class="btn-mini" onclick="openViewDialog('${escapeAttr(v._uid)}')">View</button>
-         <button class="btn-mini editor-and-up-only" onclick="openEditDialog('${escapeAttr(v._uid)}')">Edit</button>
-         <button class="btn-mini editor-and-up-only" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>`;
+      : `<button class="btn-mini" onclick="openViewDialog('${escapeAttr(v._uid)}')">View</button>`
+        + (canEdit ? `<button class="btn-mini" onclick="openEditDialog('${escapeAttr(v._uid)}')">Edit</button>` : '')
+        + (canDelete ? `<button class="btn-mini" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>` : '');
     return `<div class="browse-row ${isDeleted ? 'deleted' : ''}">
       <span class="row-idx">${i + 1}</span>
       <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}</span>
@@ -5415,9 +5453,10 @@ function populateFieldChips() {
   state.allFields.forEach(f => {
     if (filter && !f.toLowerCase().includes(filter)) return;
     if (f === "id" || f.startsWith("_")) return;
-    // ontology_engineer may only bulk-edit fields it has 'write' access to
-    // (read-only fields remain visible in Browse/Search). Other roles: unaffected.
-    if (oeAccessOf(f) !== 'write') return;
+    // Only editable fields appear in the bulk editor (write or propose).
+    // Read-only/hidden fields are excluded. Non-restricted roles: unaffected.
+    const _acc = accessOf(f);
+    if (_acc === 'none' || _acc === 'read') return;
     const isChecked = state.selectedFields.includes(f);
     const chip = document.createElement("label");
     chip.className = "field-chip" + (isChecked ? " checked" : "");
@@ -6369,18 +6408,26 @@ function openEditDialog(uid) {
     return `<div class="field-group">
       <div class="field-group-title">${groupLabels[gKey]}</div>
       ${fields.map(f => {
+        const acc = accessOf(f);
+        if (acc === 'none') return "";                 // not visible to this role
+        const editable = (acc === 'write' || acc === 'propose');
         const isInstrumentField = f === state.instrumentField;
         if (isInstrumentField) {
+          if (!editable) {
+            return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div class="field-readonly-value">${escapeHtml(v[f] || "—")}</div></div>`;
+          }
           return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)} <span style="color: var(--accent); font-size: 10px;">(this row only)</span></div><div>${buildInstrumentCheckboxes(curAtoms, "data-inst")}</div></div>`;
         }
         const cur = v[f] !== undefined && v[f] !== null ? String(v[f]) : "";
         const isLong = cur.length > 80 || cur.includes("\n");
         const isRequired = f === state.identifierField;
         const requiredMark = isRequired ? ' <span style="color: var(--danger);">*</span>' : '';
+        const proposeMark = (acc === 'propose') ? ' <span style="color: var(--accent); font-size: 10px;">(needs admin approval)</span>' : '';
+        const ro = editable ? "" : " readonly style=\"background: var(--surface-2); color: var(--text-muted);\"";
         const input = isLong
-          ? `<textarea data-field="${escapeAttr(f)}" rows="${Math.min(8, Math.max(2, cur.split('\n').length))}">${escapeHtml(cur)}</textarea>`
-          : `<input type="text" data-field="${escapeAttr(f)}" value="${escapeAttr(cur)}">`;
-        return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}${requiredMark}</div><div>${input}</div></div>`;
+          ? `<textarea data-field="${escapeAttr(f)}" rows="${Math.min(8, Math.max(2, cur.split('\n').length))}"${ro}>${escapeHtml(cur)}</textarea>`
+          : `<input type="text" data-field="${escapeAttr(f)}" value="${escapeAttr(cur)}"${ro}>`;
+        return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}${requiredMark}${proposeMark}</div><div>${input}</div></div>`;
       }).join("")}
     </div>`;
   }).join("");
@@ -6395,19 +6442,28 @@ function submitEditVariable() {
   const newValues = {};
   inputs.forEach(el => newValues[el.dataset.field] = el.value);
 
-  // Read Instrument checkboxes
-  const checkedAtoms = [];
-  body.querySelectorAll("input[data-inst]:checked").forEach(cb => checkedAtoms.push(cb.dataset.inst));
-  if (checkedAtoms.length === 0) { showModalError("edit", "Pick at least one questionnaire"); return; }
-  newValues[state.instrumentField] = checkedAtoms.join(" + ");
+  // Read Instrument checkboxes (only present when the instrument field is editable).
+  const instInputs = body.querySelectorAll("input[data-inst]");
+  if (instInputs.length > 0) {
+    const checkedAtoms = [];
+    body.querySelectorAll("input[data-inst]:checked").forEach(cb => checkedAtoms.push(cb.dataset.inst));
+    if (checkedAtoms.length === 0) { showModalError("edit", "Pick at least one questionnaire"); return; }
+    newValues[state.instrumentField] = checkedAtoms.join(" + ");
+  }
 
+  // Identifier is only validated/edited when the role can edit it.
   const idField = state.identifierField;
-  const newId = newValues[idField];
-  if (!newId || !String(newId).trim()) { showModalError("edit", `${idField} cannot be empty`); return; }
-  const dup = state.codebook.find(x => x._uid !== v._uid && getId(x) === newId && !x._deleted && getId(v) !== newId);
-  if (dup) { showModalError("edit", `Another variable already has ${idField} = "${newId}"`); return; }
+  if ((accessOf(idField) === 'write' || accessOf(idField) === 'propose') && (idField in newValues)) {
+    const newId = newValues[idField];
+    if (!newId || !String(newId).trim()) { showModalError("edit", `${idField} cannot be empty`); return; }
+    const dup = state.codebook.find(x => x._uid !== v._uid && getId(x) === newId && !x._deleted && getId(v) !== newId);
+    if (dup) { showModalError("edit", `Another variable already has ${idField} = "${newId}"`); return; }
+  }
   const fieldChanges = {};
   state.allFields.forEach(f => {
+    const acc = accessOf(f);
+    if (acc !== 'write' && acc !== 'propose') return;   // only editable fields
+    if (!(f in newValues)) return;                       // input not in this form
     const oldVal = v[f] !== undefined && v[f] !== null ? v[f] : "";
     const newVal = newValues[f] !== undefined ? newValues[f] : "";
     if (String(oldVal) !== String(newVal)) fieldChanges[f] = { old: oldVal, new: newVal };
@@ -7265,6 +7321,14 @@ function resetAll() {
       </div>
     </div>
     <div id="fm-error" class="msg msg-error" style="display:none; margin: 0 16px;"></div>
+    <div style="margin: 8px 16px; padding: 8px 10px; background: var(--surface-2); border-radius: 6px; display:flex; align-items:center; gap:8px; font-size:0.82rem;">
+      <span>Per-field access for role:</span>
+      <select id="fm-access-role" onchange="fmChangeAccessRole(this.value)" style="padding:4px 6px; border:1px solid var(--border); border-radius:4px;">
+        <option value="editor">Editor</option>
+        <option value="ontology_engineer">Ontology Engineer</option>
+      </select>
+      <span style="color: var(--text-faint);">none = hidden · read = view only · propose = edit needs approval · write = edit directly</span>
+    </div>
     <div class="modal-body" id="fm-list" style="overflow-y:auto; flex:1;"></div>
     <div class="modal-footer" style="justify-content:space-between;">
       <span id="fm-status" style="font-size:0.8rem; color: var(--text-muted);"></span>
