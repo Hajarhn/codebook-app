@@ -1565,7 +1565,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.7 cloud</span>
+      <span class="version">v6.8 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4390,19 +4390,26 @@ let FM_STATE = { fields: [], dirty: false };
 
 function openFieldManager() {
   if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
-  // Build working list from state.allFields with metadata
-  const list = (state.allFields || []).map((f, i) => {
+  // Build a group-centric structure: ordered list of groups, each with ordered fields.
+  const fieldList = (state.allFields || []).map((f) => {
     const isCustom = (window.cloudCustomFields || []).some(d => d.field_name === f);
     return {
       field_name: f,
       orig_name: f,
       label: fieldDisplayLabel(f),
-      group: fieldGroupOf(f),
       isCustom: isCustom,
-      order: i
+      group: fieldGroupOf(f) || 'other'
     };
   });
-  FM_STATE = { fields: list, dirty: false };
+  // Bucket into groups, preserving first-seen order (which follows display_order).
+  const groupOrder = [];
+  const buckets = {};
+  fieldList.forEach(fld => {
+    if (!buckets[fld.group]) { buckets[fld.group] = []; groupOrder.push(fld.group); }
+    buckets[fld.group].push(fld);
+  });
+  const groups = groupOrder.map(g => ({ name: g, orig_name: g, fields: buckets[g] }));
+  FM_STATE = { groups: groups, dirty: false };
   renderFieldManager();
   document.getElementById('fm-error').style.display = 'none';
   document.getElementById('fm-status').textContent = '';
@@ -4411,48 +4418,81 @@ function openFieldManager() {
 
 function renderFieldManager() {
   const el = document.getElementById('fm-list');
-  const fields = FM_STATE.fields;
+  const groups = FM_STATE.groups;
   let out = '';
-  let lastGroup = null;
-  fields.forEach((fld, idx) => {
-    if (fld.group !== lastGroup) {
-      out += '<div class="fm-group-header">' + escapeHtml(fld.group || 'other') + '</div>';
-      lastGroup = fld.group;
-    }
-    // For custom fields the label input edits the REAL name (rename). For built-in,
-    // the label input edits the display label only.
-    const labelTitle = fld.isCustom
-      ? 'Custom field — editing this renames the actual field everywhere'
-      : 'Built-in field — display label only (underlying name unchanged)';
-    out += '<div class="fm-row" data-idx="' + idx + '">'
+  groups.forEach((grp, gi) => {
+    // Group header with rename input + group up/down
+    out += '<div class="fm-group-header" style="display:flex;align-items:center;gap:6px;">'
       + '<div class="fm-arrows">'
-      + '<button onclick="fmMove(' + idx + ',-1)" ' + (idx === 0 ? 'disabled' : '') + '>▲</button>'
-      + '<button onclick="fmMove(' + idx + ',1)" ' + (idx === fields.length - 1 ? 'disabled' : '') + '>▼</button>'
+      + '<button onclick="fmGroupMove(' + gi + ',-1)" ' + (gi === 0 ? 'disabled' : '') + '>▲</button>'
+      + '<button onclick="fmGroupMove(' + gi + ',1)" ' + (gi === groups.length - 1 ? 'disabled' : '') + '>▼</button>'
       + '</div>'
-      + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
-      + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + idx + ',\'label\',this.value)" title="' + escapeAttr(labelTitle) + '">'
-      + '<input class="fm-group-in" value="' + escapeAttr(fld.group) + '" oninput="fmEdit(' + idx + ',\'group\',this.value)" list="fm-groups">'
-      + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
+      + '<input class="fm-group-name-in" value="' + escapeAttr(grp.name) + '" oninput="fmGroupRename(' + gi + ',this.value)" '
+      + 'style="font-weight:600;font-size:0.8rem;padding:3px 6px;border:1px solid var(--border);border-radius:4px;text-transform:none;letter-spacing:0;" '
+      + 'title="Rename this group (applies to all its fields)">'
+      + '<span style="color:var(--text-faint);font-size:0.72rem;">' + grp.fields.length + ' field' + (grp.fields.length === 1 ? '' : 's') + '</span>'
       + '</div>';
+    grp.fields.forEach((fld, fi) => {
+      const labelTitle = fld.isCustom
+        ? 'Custom field — editing this renames the actual field everywhere'
+        : 'Built-in field — display label only (underlying name unchanged)';
+      out += '<div class="fm-row">'
+        + '<div class="fm-arrows">'
+        + '<button onclick="fmMove(' + gi + ',' + fi + ',-1)" ' + (gi === 0 && fi === 0 ? 'disabled' : '') + '>▲</button>'
+        + '<button onclick="fmMove(' + gi + ',' + fi + ',1)" ' + (gi === groups.length - 1 && fi === grp.fields.length - 1 ? 'disabled' : '') + '>▼</button>'
+        + '</div>'
+        + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
+        + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
+        + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
+        + '</div>';
+    });
   });
-  const groups = [...new Set(fields.map(f => f.group))];
-  out += '<datalist id="fm-groups">' + groups.map(g => '<option value="' + escapeAttr(g) + '">').join('') + '</datalist>';
   el.innerHTML = out;
 }
 
-function fmMove(idx, dir) {
-  const f = FM_STATE.fields;
-  const j = idx + dir;
-  if (j < 0 || j >= f.length) return;
-  // When moving across a group boundary, adopt the target neighbor's group
-  const tmp = f[idx]; f[idx] = f[j]; f[j] = tmp;
-  // Re-sort so group headers stay coherent: assign sequential order
+// Move a field up/down. Within a group it reorders; at a group edge it hops to the
+// adjacent group (adopting that group).
+function fmMove(gi, fi, dir) {
+  const groups = FM_STATE.groups;
+  const grp = groups[gi];
+  const ni = fi + dir;
+  if (ni >= 0 && ni < grp.fields.length) {
+    const t = grp.fields[fi]; grp.fields[fi] = grp.fields[ni]; grp.fields[ni] = t;
+  } else if (dir === -1 && gi > 0) {
+    // move to end of previous group
+    const moved = grp.fields.splice(fi, 1)[0];
+    moved.group = groups[gi - 1].name;
+    groups[gi - 1].fields.push(moved);
+  } else if (dir === 1 && gi < groups.length - 1) {
+    // move to start of next group
+    const moved = grp.fields.splice(fi, 1)[0];
+    moved.group = groups[gi + 1].name;
+    groups[gi + 1].fields.unshift(moved);
+  } else {
+    return;
+  }
   FM_STATE.dirty = true;
   renderFieldManager();
 }
 
-function fmEdit(idx, key, val) {
-  FM_STATE.fields[idx][key] = val;
+function fmGroupMove(gi, dir) {
+  const groups = FM_STATE.groups;
+  const ni = gi + dir;
+  if (ni < 0 || ni >= groups.length) return;
+  const t = groups[gi]; groups[gi] = groups[ni]; groups[ni] = t;
+  FM_STATE.dirty = true;
+  renderFieldManager();
+}
+
+function fmGroupRename(gi, val) {
+  FM_STATE.groups[gi].name = val;
+  // propagate to its fields
+  FM_STATE.groups[gi].fields.forEach(f => { f.group = val; });
+  FM_STATE.dirty = true;
+}
+
+function fmEdit(gi, fi, val) {
+  FM_STATE.groups[gi].fields[fi].label = val;
   FM_STATE.dirty = true;
 }
 
@@ -4461,12 +4501,17 @@ async function saveFieldManager() {
   const statusEl = document.getElementById('fm-status');
   errEl.style.display = 'none';
   const client = window.cloudAuth.client;
-  const fields = FM_STATE.fields;
 
-  // --- Validate custom-field renames ---
-  const customRenames = [];  // {oldName, newName}
+  // Flatten groups -> ordered field list, carrying the (possibly renamed) group.
+  const flat = [];
+  FM_STATE.groups.forEach(grp => {
+    grp.fields.forEach(fld => flat.push({ ...fld, group: grp.name }));
+  });
+
+  // Validate custom-field renames
+  const customRenames = [];
   const usedNames = new Set();
-  for (const fld of fields) {
+  for (const fld of flat) {
     if (fld.isCustom) {
       const newName = (fld.label || '').trim();
       if (!newName) { showFmError('Custom field name cannot be empty.'); return; }
@@ -4480,51 +4525,30 @@ async function saveFieldManager() {
   statusEl.textContent = 'Saving…';
   const saveBtn = document.getElementById('fm-save-btn');
   saveBtn.disabled = true;
-
   try {
-    // 1) Apply custom-field renames first (JSONB key + def name)
+    // 1) custom-field real renames
     for (const ren of customRenames) {
-      // a) rename the key inside each variable's custom_fields
       const targets = (state.codebook || []).filter(v => v.id && v.custom_fields && (ren.oldName in (v.custom_fields || {})));
-      // We can't easily do JSONB key rename via the RPC per-variable without reading;
-      // do it client-side: read current value, write new key, null the old.
       for (const v of targets) {
         const val = v.custom_fields[ren.oldName];
-        await client.rpc('admin_update_variable', {
-          p_variable_id: v.id,
-          p_updates: { custom_fields: { [ren.newName]: val } }
-        });
-        // remove old key by setting it to null then pruning — store null (kept but empty)
-        await client.rpc('admin_update_variable', {
-          p_variable_id: v.id,
-          p_updates: { custom_fields: { [ren.oldName]: null } }
-        });
-        // update local
-        v[ren.newName] = val;
-        delete v[ren.oldName];
+        await client.rpc('admin_update_variable', { p_variable_id: v.id, p_updates: { custom_fields: { [ren.newName]: val } } });
+        await client.rpc('admin_update_variable', { p_variable_id: v.id, p_updates: { custom_fields: { [ren.oldName]: null } } });
+        v[ren.newName] = val; delete v[ren.oldName];
         if (v.custom_fields) { v.custom_fields[ren.newName] = val; delete v.custom_fields[ren.oldName]; }
       }
-      // b) rename the definition
-      const { error: defErr } = await client.from('custom_field_defs')
-        .update({ field_name: ren.newName })
-        .eq('field_name', ren.oldName);
+      const { error: defErr } = await client.from('custom_field_defs').update({ field_name: ren.newName }).eq('field_name', ren.oldName);
       if (defErr) throw defErr;
-      // update local caches
       (window.cloudCustomFields || []).forEach(d => { if (d.field_name === ren.oldName) d.field_name = ren.newName; });
-      const ai = state.allFields.indexOf(ren.oldName);
-      if (ai !== -1) state.allFields[ai] = ren.newName;
-      // reflect in FM_STATE so subsequent order write uses new name
-      fields.forEach(f => { if (f.isCustom && f.orig_name === ren.oldName) { f.field_name = ren.newName; f.orig_name = ren.newName; } });
+      const ai = state.allFields.indexOf(ren.oldName); if (ai !== -1) state.allFields[ai] = ren.newName;
+      flat.forEach(f => { if (f.isCustom && f.orig_name === ren.oldName) { f.field_name = ren.newName; f.orig_name = ren.newName; } });
     }
 
-    // 2) Persist order + group/label
-    for (let i = 0; i < fields.length; i++) {
-      const fld = fields[i];
+    // 2) persist order + group + label
+    for (let i = 0; i < flat.length; i++) {
+      const fld = flat[i];
       const newOrder = i + 1;
       if (fld.isCustom) {
-        await client.from('custom_field_defs')
-          .update({ display_order: newOrder })
-          .eq('field_name', fld.field_name);
+        await client.from('custom_field_defs').update({ display_order: newOrder }).eq('field_name', fld.field_name);
         const cf = (window.cloudCustomFields || []).find(d => d.field_name === fld.field_name);
         if (cf) cf.display_order = newOrder;
       } else {
