@@ -1568,7 +1568,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.8.3 cloud</span>
+      <span class="version">v6.9 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -3411,7 +3411,7 @@ async function loadCustomFieldDefs() {
   if (!window.cloudAuth || !window.cloudAuth.client) return;
   const { data, error } = await window.cloudAuth.client
     .from('custom_field_defs')
-    .select('field_name, display_order')
+    .select('field_name, display_order, field_group, display_label')
     .order('display_order', { ascending: true });
   if (error) { console.error('custom_field_defs load failed', error); return; }
   window.cloudCustomFields = data || [];
@@ -3461,10 +3461,12 @@ window.addEventListener('cloud-authenticated', async (e) => {
           const { error: defErr } = await client.from('custom_field_defs').insert({
             field_name: fname,
             display_order: maxOrder + 1,
+            field_group: 'custom',
+            display_label: fname,
             created_by: userId
           });
           if (defErr && !String(defErr.message || '').includes('duplicate')) throw defErr;
-          window.cloudCustomFields.push({ field_name: fname, display_order: maxOrder + 1 });
+          window.cloudCustomFields.push({ field_name: fname, display_order: maxOrder + 1, field_group: 'custom', display_label: fname });
 
           // 2) write the default value into each affected variable's custom_fields
           //    The editor already set v[fname] locally on the target variables.
@@ -3529,8 +3531,8 @@ function applyFieldOrdering() {
   const orderOf = (f) => {
     if (window.cloudFieldMeta[f]) return window.cloudFieldMeta[f].display_order;
     const cf = (window.cloudCustomFields || []).find(d => d.field_name === f);
-    if (cf) return 1000 + (cf.display_order || 0);
-    return 2000;  // unknown fields last
+    if (cf) return (cf.display_order || 0);  // same scale as built-ins
+    return 100000;  // unknown/system fields last
   };
   state.allFields.sort((a, b) => orderOf(a) - orderOf(b));
 }
@@ -3538,11 +3540,14 @@ function applyFieldOrdering() {
 // Display label resolver used by the field-management UI.
 function fieldDisplayLabel(f) {
   if (window.cloudFieldMeta[f] && window.cloudFieldMeta[f].display_label) return window.cloudFieldMeta[f].display_label;
+  const cf = (window.cloudCustomFields || []).find(d => d.field_name === f);
+  if (cf && cf.display_label) return cf.display_label;
   return f;
 }
 function fieldGroupOf(f) {
   if (window.cloudFieldMeta[f]) return window.cloudFieldMeta[f].field_group;
-  if ((window.cloudCustomFields || []).some(d => d.field_name === f)) return 'custom';
+  const cf = (window.cloudCustomFields || []).find(d => d.field_name === f);
+  if (cf) return cf.field_group || 'custom';
   return 'other';
 }
 
@@ -4583,9 +4588,16 @@ async function saveFieldManager() {
       const fld = flat[i];
       const newOrder = i + 1;
       if (fld.isCustom) {
-        await client.from('custom_field_defs').update({ display_order: newOrder }).eq('field_name', fld.field_name);
+        const { data: cRows, error: cErr } = await client.from('custom_field_defs')
+          .update({ display_order: newOrder, field_group: fld.group, display_label: fld.label })
+          .eq('field_name', fld.field_name)
+          .select('field_name');
+        if (cErr) throw cErr;
+        if (!cRows || cRows.length === 0) {
+          throw new Error('No rows updated for custom field "' + fld.field_name + '". Did you run 10_custom_field_group_label.sql?');
+        }
         const cf = (window.cloudCustomFields || []).find(d => d.field_name === fld.field_name);
-        if (cf) cf.display_order = newOrder;
+        if (cf) { cf.display_order = newOrder; cf.field_group = fld.group; cf.display_label = fld.label; }
       } else {
         const { data: upRows, error } = await client.from('field_metadata')
           .update({ display_label: fld.label, field_group: fld.group, display_order: newOrder })
