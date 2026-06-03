@@ -1209,6 +1209,19 @@
   .hist-meta { color: var(--text-faint); font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; text-align: right; }
   .hist-day-header { font-weight: 600; font-size: 0.8rem; color: var(--text-muted); padding: 0.6rem 0.5rem 0.3rem; border-bottom: 2px solid var(--border-strong); margin-top: 0.5rem; }
 </style>
+<style id="cloud-v670-styles">
+  /* v6.7: Field manager */
+  .fm-row { display:flex; align-items:center; gap:0.5rem; padding:0.45rem 0.3rem; border-bottom:1px solid var(--border); }
+  .fm-row:hover { background: var(--surface-2); }
+  .fm-arrows { display:flex; flex-direction:column; gap:1px; }
+  .fm-arrows button { padding:0 5px; font-size:0.7rem; line-height:1.1; cursor:pointer; border:1px solid var(--border); background:var(--surface); border-radius:3px; }
+  .fm-arrows button:disabled { opacity:0.3; cursor:default; }
+  .fm-label-in { flex:1; min-width:80px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.85rem; }
+  .fm-group-in { width:130px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.82rem; }
+  .fm-star { color:#E8A33D; font-size:0.8rem; width:14px; }
+  .fm-fname { font-family:monospace; font-size:0.72rem; color:var(--text-faint); width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fm-group-header { font-weight:600; font-size:0.78rem; color:var(--text-muted); padding:0.6rem 0.3rem 0.25rem; text-transform:uppercase; letter-spacing:0.03em; }
+</style>
 </head>
 <body class="cloud-not-ready">
 <div id="cloud-save-toast"></div>
@@ -1552,7 +1565,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.6 cloud</span>
+      <span class="version">v6.7 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1779,6 +1792,11 @@
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
+    <div class="admin-only" id="field-mgmt-section" style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+      <h3 style="margin: 0 0 0.3rem; font-size: 1rem;">Field management</h3>
+      <p style="margin: 0 0 0.7rem; color: var(--text-muted); font-size: 0.85rem;">Reorder fields, organize them into groups, and rename them. Changes are saved to the cloud and apply for everyone.</p>
+      <button class="btn-primary" onclick="openFieldManager()">⚙️ Manage fields</button>
+    </div>
 
     <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Your identity</h2>
     <div class="info-box" style="margin-top: 0;">
@@ -3475,15 +3493,50 @@ window.addEventListener('cloud-authenticated', async (e) => {
 // Map of field_name -> permission_class, populated after login.
 window.cloudFieldPerms = {};
 
+window.cloudFieldMeta = {};  // field_name -> {display_label, field_group, display_order, permission_class}
 async function loadFieldPermissions() {
   if (!window.cloudAuth || !window.cloudAuth.client) return;
   const { data, error } = await window.cloudAuth.client
     .from('field_metadata')
-    .select('field_name, permission_class');
+    .select('field_name, permission_class, display_label, field_group, display_order');
   if (error) { console.error('Could not load field_metadata:', error); return; }
   const map = {};
-  data.forEach(r => { map[r.field_name] = r.permission_class; });
+  const meta = {};
+  data.forEach(r => {
+    map[r.field_name] = r.permission_class;
+    meta[r.field_name] = {
+      display_label: r.display_label || r.field_name,
+      field_group: r.field_group || 'other',
+      display_order: r.display_order != null ? r.display_order : 999,
+      permission_class: r.permission_class
+    };
+  });
   window.cloudFieldPerms = map;
+  window.cloudFieldMeta = meta;
+  applyFieldOrdering();
+}
+
+// Sort state.allFields by display_order from field_metadata + custom defs.
+function applyFieldOrdering() {
+  if (!Array.isArray(state.allFields)) return;
+  const orderOf = (f) => {
+    if (window.cloudFieldMeta[f]) return window.cloudFieldMeta[f].display_order;
+    const cf = (window.cloudCustomFields || []).find(d => d.field_name === f);
+    if (cf) return 1000 + (cf.display_order || 0);
+    return 2000;  // unknown fields last
+  };
+  state.allFields.sort((a, b) => orderOf(a) - orderOf(b));
+}
+
+// Display label resolver used by the field-management UI.
+function fieldDisplayLabel(f) {
+  if (window.cloudFieldMeta[f] && window.cloudFieldMeta[f].display_label) return window.cloudFieldMeta[f].display_label;
+  return f;
+}
+function fieldGroupOf(f) {
+  if (window.cloudFieldMeta[f]) return window.cloudFieldMeta[f].field_group;
+  if ((window.cloudCustomFields || []).some(d => d.field_name === f)) return 'custom';
+  return 'other';
 }
 
 window.addEventListener('cloud-authenticated', async (e) => {
@@ -4331,6 +4384,185 @@ window.addEventListener('cloud-authenticated', (e) => {
   }, 500);
 });
 // ====== END v6.6 history tab ======
+
+// ====== v6.7: Field Manager ======
+let FM_STATE = { fields: [], dirty: false };
+
+function openFieldManager() {
+  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
+  // Build working list from state.allFields with metadata
+  const list = (state.allFields || []).map((f, i) => {
+    const isCustom = (window.cloudCustomFields || []).some(d => d.field_name === f);
+    return {
+      field_name: f,
+      orig_name: f,
+      label: fieldDisplayLabel(f),
+      group: fieldGroupOf(f),
+      isCustom: isCustom,
+      order: i
+    };
+  });
+  FM_STATE = { fields: list, dirty: false };
+  renderFieldManager();
+  document.getElementById('fm-error').style.display = 'none';
+  document.getElementById('fm-status').textContent = '';
+  document.getElementById('modal-field-manager').style.display = 'flex';
+}
+
+function renderFieldManager() {
+  const el = document.getElementById('fm-list');
+  const fields = FM_STATE.fields;
+  let out = '';
+  let lastGroup = null;
+  fields.forEach((fld, idx) => {
+    if (fld.group !== lastGroup) {
+      out += '<div class="fm-group-header">' + escapeHtml(fld.group || 'other') + '</div>';
+      lastGroup = fld.group;
+    }
+    // For custom fields the label input edits the REAL name (rename). For built-in,
+    // the label input edits the display label only.
+    const labelTitle = fld.isCustom
+      ? 'Custom field — editing this renames the actual field everywhere'
+      : 'Built-in field — display label only (underlying name unchanged)';
+    out += '<div class="fm-row" data-idx="' + idx + '">'
+      + '<div class="fm-arrows">'
+      + '<button onclick="fmMove(' + idx + ',-1)" ' + (idx === 0 ? 'disabled' : '') + '>▲</button>'
+      + '<button onclick="fmMove(' + idx + ',1)" ' + (idx === fields.length - 1 ? 'disabled' : '') + '>▼</button>'
+      + '</div>'
+      + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
+      + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + idx + ',\'label\',this.value)" title="' + escapeAttr(labelTitle) + '">'
+      + '<input class="fm-group-in" value="' + escapeAttr(fld.group) + '" oninput="fmEdit(' + idx + ',\'group\',this.value)" list="fm-groups">'
+      + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
+      + '</div>';
+  });
+  const groups = [...new Set(fields.map(f => f.group))];
+  out += '<datalist id="fm-groups">' + groups.map(g => '<option value="' + escapeAttr(g) + '">').join('') + '</datalist>';
+  el.innerHTML = out;
+}
+
+function fmMove(idx, dir) {
+  const f = FM_STATE.fields;
+  const j = idx + dir;
+  if (j < 0 || j >= f.length) return;
+  // When moving across a group boundary, adopt the target neighbor's group
+  const tmp = f[idx]; f[idx] = f[j]; f[j] = tmp;
+  // Re-sort so group headers stay coherent: assign sequential order
+  FM_STATE.dirty = true;
+  renderFieldManager();
+}
+
+function fmEdit(idx, key, val) {
+  FM_STATE.fields[idx][key] = val;
+  FM_STATE.dirty = true;
+}
+
+async function saveFieldManager() {
+  const errEl = document.getElementById('fm-error');
+  const statusEl = document.getElementById('fm-status');
+  errEl.style.display = 'none';
+  const client = window.cloudAuth.client;
+  const fields = FM_STATE.fields;
+
+  // --- Validate custom-field renames ---
+  const customRenames = [];  // {oldName, newName}
+  const usedNames = new Set();
+  for (const fld of fields) {
+    if (fld.isCustom) {
+      const newName = (fld.label || '').trim();
+      if (!newName) { showFmError('Custom field name cannot be empty.'); return; }
+      if (/\s/.test(newName)) { showFmError('Custom field name "' + newName + '" cannot contain spaces.'); return; }
+      if (usedNames.has(newName)) { showFmError('Duplicate field name: ' + newName); return; }
+      usedNames.add(newName);
+      if (newName !== fld.orig_name) customRenames.push({ oldName: fld.orig_name, newName });
+    }
+  }
+
+  statusEl.textContent = 'Saving…';
+  const saveBtn = document.getElementById('fm-save-btn');
+  saveBtn.disabled = true;
+
+  try {
+    // 1) Apply custom-field renames first (JSONB key + def name)
+    for (const ren of customRenames) {
+      // a) rename the key inside each variable's custom_fields
+      const targets = (state.codebook || []).filter(v => v.id && v.custom_fields && (ren.oldName in (v.custom_fields || {})));
+      // We can't easily do JSONB key rename via the RPC per-variable without reading;
+      // do it client-side: read current value, write new key, null the old.
+      for (const v of targets) {
+        const val = v.custom_fields[ren.oldName];
+        await client.rpc('admin_update_variable', {
+          p_variable_id: v.id,
+          p_updates: { custom_fields: { [ren.newName]: val } }
+        });
+        // remove old key by setting it to null then pruning — store null (kept but empty)
+        await client.rpc('admin_update_variable', {
+          p_variable_id: v.id,
+          p_updates: { custom_fields: { [ren.oldName]: null } }
+        });
+        // update local
+        v[ren.newName] = val;
+        delete v[ren.oldName];
+        if (v.custom_fields) { v.custom_fields[ren.newName] = val; delete v.custom_fields[ren.oldName]; }
+      }
+      // b) rename the definition
+      const { error: defErr } = await client.from('custom_field_defs')
+        .update({ field_name: ren.newName })
+        .eq('field_name', ren.oldName);
+      if (defErr) throw defErr;
+      // update local caches
+      (window.cloudCustomFields || []).forEach(d => { if (d.field_name === ren.oldName) d.field_name = ren.newName; });
+      const ai = state.allFields.indexOf(ren.oldName);
+      if (ai !== -1) state.allFields[ai] = ren.newName;
+      // reflect in FM_STATE so subsequent order write uses new name
+      fields.forEach(f => { if (f.isCustom && f.orig_name === ren.oldName) { f.field_name = ren.newName; f.orig_name = ren.newName; } });
+    }
+
+    // 2) Persist order + group/label
+    for (let i = 0; i < fields.length; i++) {
+      const fld = fields[i];
+      const newOrder = i + 1;
+      if (fld.isCustom) {
+        await client.from('custom_field_defs')
+          .update({ display_order: newOrder })
+          .eq('field_name', fld.field_name);
+        const cf = (window.cloudCustomFields || []).find(d => d.field_name === fld.field_name);
+        if (cf) cf.display_order = newOrder;
+      } else {
+        const { error } = await client.from('field_metadata')
+          .update({ display_label: fld.label, field_group: fld.group, display_order: newOrder })
+          .eq('field_name', fld.field_name);
+        if (error) throw error;
+        if (window.cloudFieldMeta[fld.field_name]) {
+          window.cloudFieldMeta[fld.field_name].display_label = fld.label;
+          window.cloudFieldMeta[fld.field_name].field_group = fld.group;
+          window.cloudFieldMeta[fld.field_name].display_order = newOrder;
+        }
+      }
+    }
+
+    applyFieldOrdering();
+    if (typeof refreshAllPanels === 'function') refreshAllPanels();
+    cloudShowToast('success', 'Field settings saved' + (customRenames.length ? ' (' + customRenames.length + ' renamed)' : ''));
+    FM_STATE.dirty = false;
+    closeModal('field-manager');
+  } catch (err) {
+    console.error('saveFieldManager failed:', err);
+    showFmError('Could not save: ' + (err.message || err));
+    statusEl.textContent = '';
+  } finally {
+    saveBtn.disabled = false;
+  }
+}
+
+function showFmError(msg) {
+  const errEl = document.getElementById('fm-error');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+  document.getElementById('fm-status').textContent = '';
+}
+
+// ====== END v6.7 field manager ======
+
 
 
 
@@ -6840,5 +7072,27 @@ function resetAll() {
   setStatus("Ready", "info");
 }
 </script>
+
+<!-- v6.7: Field Manager modal -->
+<div class="modal-overlay" id="modal-field-manager" style="display: none;">
+  <div class="modal" style="max-width: 640px; max-height: 85vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Manage fields</div>
+        <div class="modal-sub">Reorder with ▲▼, edit label and group inline. ★ = custom field (renaming changes the real field); built-in fields change display label only.</div>
+      </div>
+    </div>
+    <div id="fm-error" class="msg msg-error" style="display:none; margin: 0 16px;"></div>
+    <div class="modal-body" id="fm-list" style="overflow-y:auto; flex:1;"></div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <span id="fm-status" style="font-size:0.8rem; color: var(--text-muted);"></span>
+      <div>
+        <button class="btn-ghost" onclick="closeModal('field-manager')">Close</button>
+        <button class="btn-primary" id="fm-save-btn" onclick="saveFieldManager()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
