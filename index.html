@@ -1568,7 +1568,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.8.2 cloud</span>
+      <span class="version">v6.8.3 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -3517,6 +3517,10 @@ async function loadFieldPermissions() {
   window.cloudFieldPerms = map;
   window.cloudFieldMeta = meta;
   applyFieldOrdering();
+  // If the codebook is already loaded, re-render so new labels/order show.
+  if (state.codebook && typeof refreshAllPanels === 'function') {
+    try { refreshAllPanels(); } catch(e) {}
+  }
 }
 
 // Sort state.allFields by display_order from field_metadata + custom defs.
@@ -4924,6 +4928,8 @@ function handleFile(file) {
         if (!fieldSeen.has(k)) { fieldSeen.add(k); fieldList.push(k); }
       }));
       state.allFields = fieldList;
+      // Apply any saved field ordering from field_metadata/custom defs.
+      if (typeof applyFieldOrdering === 'function') applyFieldOrdering();
 
       state.codebook = data;
       state.fileName = file.name;
