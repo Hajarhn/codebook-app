@@ -1568,7 +1568,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.8.1 cloud</span>
+      <span class="version">v6.8.2 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4394,16 +4394,27 @@ let FM_STATE = { fields: [], dirty: false };
 function openFieldManager() {
   if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
   // Build a group-centric structure: ordered list of groups, each with ordered fields.
-  const fieldList = (state.allFields || []).map((f) => {
-    const isCustom = (window.cloudCustomFields || []).some(d => d.field_name === f);
-    return {
-      field_name: f,
-      orig_name: f,
-      label: fieldDisplayLabel(f),
-      isCustom: isCustom,
-      group: fieldGroupOf(f) || 'other'
-    };
-  });
+  // System / non-metadata fields that must NOT appear in the manager (no
+  // field_metadata row exists for them, so they can't be reordered/renamed).
+  const SYSTEM_FIELDS = new Set(['id','variable_name','created_at','updated_at','created_by','updated_by','is_deleted','deleted_at','deleted_by','custom_fields','_uid','_deleted','_added','_edited','_customKeys']);
+  const fieldList = (state.allFields || [])
+    .filter(f => {
+      if (SYSTEM_FIELDS.has(f)) return false;
+      if (f.startsWith('_')) return false;
+      const isCustom = (window.cloudCustomFields || []).some(d => d.field_name === f);
+      // keep only fields that have metadata OR are custom
+      return isCustom || !!window.cloudFieldMeta[f];
+    })
+    .map((f) => {
+      const isCustom = (window.cloudCustomFields || []).some(d => d.field_name === f);
+      return {
+        field_name: f,
+        orig_name: f,
+        label: fieldDisplayLabel(f),
+        isCustom: isCustom,
+        group: fieldGroupOf(f) || 'other'
+      };
+    });
   // Bucket into groups, preserving first-seen order (which follows display_order).
   const groupOrder = [];
   const buckets = {};
