@@ -1306,8 +1306,8 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.12.0
-      <!-- build: v6.12.0 / theme refresh + instrument fix -->
+      Codebook Editor — Cloud edition · v6.13.0
+      <!-- build: v6.13.0 / user management
     </div>
   </div>
 </div>
@@ -1599,7 +1599,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.12.0 cloud</span>
+      <span class="version">v6.13.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1661,6 +1661,7 @@
     <button class="tab" data-tab="activity" role="tab" onclick="switchTab('activity')">📜 Activity <span class="count" id="tab-count-activity">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 History</button>
+    <button class="tab admin-only" data-tab="users" role="tab" onclick="switchTab('users')">👥 Users</button>
     <button class="tab" data-tab="settings" role="tab" onclick="switchTab('settings')">⚙️ Settings</button>
   </div>
 
@@ -1823,6 +1824,17 @@
       </div>
     </div>
     <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-users" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Users</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Assign roles and activate/deactivate accounts. New accounts are created via sign-up or the Supabase dashboard, then appear here.</p>
+      </div>
+      <button class="btn-mini" id="users-refresh-btn" onclick="loadUsers()">↻ Refresh</button>
+    </div>
+    <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
@@ -2315,7 +2327,7 @@
   async function fetchProfile(userId) {
     const { data, error } = await client
       .from('profiles')
-      .select('email, display_name, role')
+      .select('id, email, display_name, role, active')
       .eq('id', userId)
       .single();
     if (error) {
@@ -2332,6 +2344,12 @@
       // No profile row — shouldn't happen because of trigger.
       showMessage('cloud-login-message', 'error',
         'Your account is missing a profile row. Contact the administrator.');
+      await client.auth.signOut();
+      return;
+    }
+    if (profile.active === false) {
+      showMessage('cloud-login-message', 'error',
+        'This account has been deactivated. Contact the administrator.');
       await client.auth.signOut();
       return;
     }
@@ -5389,6 +5407,66 @@ function getVarsForInstrument(name, includeDeleted = false) {
 }
 
 // ============ TABS ============
+// ============ USERS TAB (admin) ============
+const USER_ROLES = ['admin', 'editor', 'researcher', 'ontology_engineer'];
+const USER_ROLE_LABELS = { admin: 'Admin', editor: 'Editor', researcher: 'Researcher', ontology_engineer: 'Ontology Engineer' };
+async function loadUsers() {
+  const host = document.getElementById('users-list');
+  if (!host) return;
+  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') {
+    host.innerHTML = '<div class="empty-state"><p>Admins only.</p></div>';
+    return;
+  }
+  host.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  const { data, error } = await window.cloudAuth.client
+    .from('profiles').select('id, email, display_name, role, active').order('email');
+  if (error) {
+    host.innerHTML = '<div class="empty-state"><p>Could not load users: ' + escapeHtml(error.message) + '</p></div>';
+    return;
+  }
+  const me = window.cloudAuth.user && window.cloudAuth.user.id;
+  const rows = (data || []).map(u => {
+    const isSelf = u.id === me;
+    const opts = USER_ROLES.map(r =>
+      '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + USER_ROLE_LABELS[r] + '</option>'
+    ).join('');
+    const name = u.display_name ? (escapeHtml(u.display_name) + ' · ' + escapeHtml(u.email)) : escapeHtml(u.email);
+    const selfTag = isSelf ? ' <span class="row-badge">you</span>' : '';
+    const dis = isSelf ? ' disabled title="You cannot change your own account"' : '';
+    return '<tr style="border-bottom:1px solid var(--border);">'
+      + '<td style="padding:9px 12px; font-size:13px;">' + name + selfTag + '</td>'
+      + '<td style="padding:9px 12px;"><select class="btn-mini" style="padding:5px 8px;" onchange="setUserRole(\'' + u.id + '\', this.value, this)"' + dis + '>' + opts + '</select></td>'
+      + '<td style="padding:9px 12px; text-align:center;">'
+        + '<label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; color:var(--text-muted);">'
+        + '<input type="checkbox"' + (u.active !== false ? ' checked' : '') + dis + ' onchange="setUserActive(\'' + u.id + '\', this.checked, this)" style="width:auto;"> '
+        + (u.active !== false ? 'Active' : 'Inactive')
+        + '</label></td>'
+      + '</tr>';
+  }).join('');
+  host.innerHTML = '<div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow-sm);">'
+    + '<table style="width:100%; border-collapse:collapse;">'
+    + '<thead><tr style="background:var(--surface-2); border-bottom:1px solid var(--border);">'
+    + '<th style="text-align:left; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">USER</th>'
+    + '<th style="text-align:left; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">ROLE</th>'
+    + '<th style="text-align:center; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">STATUS</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
+async function setUserRole(id, role, el) {
+  if (el) el.disabled = true;
+  const { error } = await window.cloudAuth.client.from('profiles').update({ role: role }).eq('id', id);
+  if (el) el.disabled = false;
+  if (error) { cloudShowToast('error', 'Could not change role: ' + error.message); loadUsers(); return; }
+  cloudShowToast('success', 'Role updated');
+}
+async function setUserActive(id, active, el) {
+  if (el) el.disabled = true;
+  const { error } = await window.cloudAuth.client.from('profiles').update({ active: active }).eq('id', id);
+  if (el) el.disabled = false;
+  if (error) { cloudShowToast('error', 'Could not change status: ' + error.message); loadUsers(); return; }
+  cloudShowToast('success', active ? 'User activated' : 'User deactivated');
+  loadUsers();
+}
+
 function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
@@ -5398,6 +5476,7 @@ function switchTab(name) {
   else if (name === "search") refreshSearchTab();
   else if (name === "activity") refreshActivityTab();
   else if (name === "settings") refreshSettingsTab();
+  else if (name === "users") loadUsers();
 }
 
 // ============ VARIABLES TAB ============
