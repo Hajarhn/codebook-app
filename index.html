@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.13.2
+      Codebook Editor — Cloud edition · v6.14.0
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.13.2 cloud</span>
+      <span class="version">v6.14.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1832,6 +1832,12 @@
         <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Assign roles and activate/deactivate accounts. New accounts are created via sign-up or the Supabase dashboard, then appear here.</p>
       </div>
       <button class="btn-mini" id="users-refresh-btn" onclick="loadUsers()">↻ Refresh</button>
+    </div>
+    <div style="margin: 0 0 1rem; padding: 0.85rem 1rem; border:1px solid var(--border); border-radius:8px; background:var(--surface); display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+      <div><label style="margin-bottom:4px;">New user email</label><input type="email" id="newuser-email" placeholder="name@org.com" style="min-width:220px;"></div>
+      <div><label style="margin-bottom:4px;">Temporary password</label><input type="text" id="newuser-pw" placeholder="at least 6 characters" style="min-width:180px;"></div>
+      <button class="btn-primary" id="newuser-create-btn" onclick="addNewUser()" style="padding:8px 14px;">+ Add user</button>
+      <span id="newuser-msg" style="font-size:12px; color:var(--text-muted); flex:1; min-width:200px;"></span>
     </div>
     <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
@@ -5474,6 +5480,38 @@ async function setUserActive(id, active, el) {
   loadUsers();
 }
 
+async function addNewUser() {
+  const email = (document.getElementById('newuser-email')?.value || '').trim();
+  const pw = (document.getElementById('newuser-pw')?.value || '').trim();
+  const msg = document.getElementById('newuser-msg');
+  const show = (t, ok) => { if (msg) { msg.style.color = ok ? 'var(--success)' : 'var(--danger)'; msg.textContent = t; } };
+  if (!email || !pw) { show('Enter an email and a temporary password.'); return; }
+  if (pw.length < 6) { show('Password must be at least 6 characters.'); return; }
+  const btn = document.getElementById('newuser-create-btn');
+  if (btn) btn.disabled = true;
+  show('Creating…', true);
+  try {
+    // Use a SEPARATE, non-persisting client so signUp does NOT replace the
+    // admin's own session. (Anon key only — RLS still protects all data.)
+    const tmp = window.supabase.createClient(
+      'https://aajgbgoqomghngwfzqmz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhamdiZ29xb21naG5nd2Z6cW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODE0NjIsImV4cCI6MjA5NTQ1NzQ2Mn0.cNDqenHtTZdPNERghQGwN9_UcPCx34MKqwkrd6OKABE',
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+    const { data, error } = await tmp.auth.signUp({ email: email, password: pw });
+    if (error) { show('Could not create user: ' + error.message); return; }
+    document.getElementById('newuser-email').value = '';
+    document.getElementById('newuser-pw').value = '';
+    show('User created (' + email + '). Temp password: ' + pw + '. If email confirmation is on, they must confirm before logging in. Set their role below.', true);
+    // Give the profiles trigger a moment, then refresh the list.
+    setTimeout(loadUsers, 1500);
+  } catch (e) {
+    show('Error: ' + (e.message || e));
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
@@ -6553,7 +6591,7 @@ function openEditDialog(uid) {
   document.getElementById("modal-edit").style.display = "flex";
 }
 
-function submitEditVariable() {
+async function submitEditVariable() {
   const v = findVarByUid(editingUid);
   if (!v) return;
   const body = document.getElementById("modal-edit-body");
@@ -6588,6 +6626,19 @@ function submitEditVariable() {
     if (String(oldVal) !== String(newVal)) fieldChanges[f] = { old: oldVal, new: newVal };
   });
   if (Object.keys(fieldChanges).length === 0) { showModalError("edit", "No changes detected"); return; }
+  // Concurrency guard: warn if this row changed since it was loaded. Admin/editor
+  // can read the table directly; ontology_engineer can't (RLS) so the check is
+  // skipped for them via try/catch.
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client;
+    if (c && v.id && v.updated_at) {
+      const { data, error } = await c.from('variables').select('updated_at').eq('id', v.id).single();
+      if (!error && data && data.updated_at && data.updated_at !== v.updated_at) {
+        const ok = confirm('Heads up: someone else changed this variable since you opened it. Saving now will overwrite their change.\n\nOK = overwrite anyway   ·   Cancel = stop (reload to see their version).');
+        if (!ok) return;
+      }
+    }
+  } catch (e) { /* no direct read access (e.g. ontology_engineer): skip */ }
   state.pendingChanges = [{ globalIndex: state.codebook.indexOf(v), variable_name: getId(v), fieldChanges }];
   state.selectedFields = Object.keys(fieldChanges);
   closeModal("edit");
