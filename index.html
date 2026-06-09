@@ -32,39 +32,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Codebook Editor — Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fafaf7;
+    --bg: #eef0f4;
     --surface: #ffffff;
-    --surface-2: #f4f3ee;
-    --border: #e3e1d8;
-    --border-strong: #c8c5b8;
-    --text: #1f1e1a;
-    --text-muted: #6a685f;
-    --text-faint: #9a988e;
-    --accent: #185FA5;
-    --accent-bg: #E6F1FB;
-    --accent-text: #0C447C;
+    --surface-2: #f1f3f7;
+    --border: #e0e4ec;
+    --border-strong: #c6ccd8;
+    --text: #161a22;
+    --text-muted: #5c6472;
+    --text-faint: #9aa1ae;
+    --accent: #0f766e;
+    --accent-bg: #e4f1ef;
+    --accent-text: #0a564f;
     --success: #0F6E56;
     --success-bg: #E1F5EE;
-    --danger: #A32D2D;
-    --danger-bg: #FCEBEB;
-    --warn: #854F0B;
+    --danger: #b42318;
+    --danger-bg: #fdeceb;
+    --warn: #92500c;
     --warn-bg: #FAEEDA;
     --green: #2E7D32;
-    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --shadow-sm: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+    --shadow-md: 0 4px 12px rgba(16,24,40,0.06), 0 2px 4px rgba(16,24,40,0.04);
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --serif: "IBM Plex Serif", Georgia, serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
   .app { max-width: 1200px; margin: 0 auto; padding: 0 1rem 4rem; }
 
   /* ============ TOP TOOLBAR ============ */
-  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1rem; position: sticky; top: 0; z-index: 50; margin-bottom: 1.5rem; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.7rem 1rem; position: sticky; top: 0; z-index: 50; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); }
   .topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-  .brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500; }
-  .brand .logo { width: 26px; height: 26px; background: var(--accent); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-  .brand .version { font-size: 11px; color: var(--text-faint); font-weight: 400; padding: 2px 6px; background: var(--surface-2); border-radius: 10px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-family: var(--serif); font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand .logo { width: 30px; height: 30px; background: linear-gradient(145deg, var(--accent), #0b5a54); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; box-shadow: var(--shadow-sm); }
+  .brand .version { font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); font-weight: 500; padding: 3px 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; letter-spacing: 0.02em; }
   .topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .topbar-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
@@ -98,7 +104,7 @@
   .upload-area .icon { font-size: 36px; margin-bottom: 8px; opacity: 0.55; }
 
   /* ============ INFO BAR ============ */
-  .infobar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; font-size: 12.5px; }
+  .infobar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; font-size: 12.5px; box-shadow: var(--shadow-sm); }
   .infobar-item { display: flex; align-items: center; gap: 6px; }
   .infobar-item .label { color: var(--text-muted); font-size: 11px; }
   .infobar-item .value { font-family: var(--mono); font-size: 12px; color: var(--text); }
@@ -258,75 +264,98 @@
   #cloud-auth-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg, #f5f5f4);
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(15,118,110,0.10), transparent 60%),
+      radial-gradient(800px 500px at 110% 110%, rgba(15,118,110,0.08), transparent 55%),
+      var(--bg, #eef0f4);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10000;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--sans);
+    padding: 1rem;
   }
   #cloud-auth-overlay.hidden {
     display: none;
   }
   .cloud-auth-card {
-    background: white;
-    padding: 2.5rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    position: relative;
+    background: var(--surface);
+    padding: 2.75rem 2.25rem 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(16,24,40,0.12), 0 4px 12px rgba(16,24,40,0.06);
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     box-sizing: border-box;
+    overflow: hidden;
+  }
+  .cloud-auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), #14b8a6);
   }
   .cloud-auth-card h1 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1.4rem;
-    color: #1c1917;
+    margin: 0 0 0.3rem 0;
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
   }
   .cloud-auth-card .subtitle {
-    margin: 0 0 1.5rem 0;
-    color: #78716c;
+    margin: 0 0 1.75rem 0;
+    color: var(--text-muted);
     font-size: 0.9rem;
   }
   .cloud-auth-card label {
     display: block;
-    font-size: 0.85rem;
-    color: #44403c;
-    margin-bottom: 0.35rem;
-    margin-top: 0.9rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    margin-top: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
   .cloud-auth-card input[type="email"],
   .cloud-auth-card input[type="password"] {
     width: 100%;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid #d6d3d1;
-    border-radius: 6px;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
     font-size: 0.95rem;
     box-sizing: border-box;
     font-family: inherit;
+    background: var(--surface);
+    transition: border-color 0.12s, box-shadow 0.12s;
   }
   .cloud-auth-card input:focus {
-    outline: 2px solid #6366f1;
-    outline-offset: -1px;
-    border-color: transparent;
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
   }
   .cloud-auth-card button {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     width: 100%;
-    padding: 0.7rem;
-    background: #1c1917;
+    padding: 0.75rem;
+    background: var(--accent);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.95rem;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: background 0.12s, transform 0.04s;
   }
   .cloud-auth-card button:hover {
-    background: #292524;
+    background: var(--accent-text);
   }
+  .cloud-auth-card button:active { transform: translateY(1px); }
   .cloud-auth-card button:disabled {
-    background: #a8a29e;
+    background: var(--border-strong);
     cursor: not-allowed;
   }
   .cloud-auth-message {
@@ -404,6 +433,7 @@
   }
   #cloud-user-banner .role-badge.role-editor { background: #f59e0b; }
   #cloud-user-banner .role-badge.role-researcher { background: #10b981; }
+  #cloud-user-banner .role-badge.role-ontology_engineer { background: #9333ea; }
   #cloud-user-banner button {
     background: transparent;
     color: #f5f5f4;
@@ -464,6 +494,7 @@
      after login. Use that to gate UI. */
   body:not(.role-admin) .admin-only { display: none !important; }
   body:not(.role-admin):not(.role-editor) .editor-and-up-only { display: none !important; }
+  body.role-ontology_engineer .oe-hide { display: none !important; }
 
   /* Cloud error banner (when DB load fails) */
   #cloud-error-banner {
@@ -621,24 +652,24 @@
   :root {
     /* The viewer uses slightly different colors than the editor.
        Use prefixed vars so they don't collide. */
-    --rv-bg: #fafaf7;
+    --rv-bg: #eef0f4;
     --rv-surface: #ffffff;
-    --rv-surface-2: #f4f3ee;
-    --rv-border: #e3e1d8;
-    --rv-border-strong: #c8c5b8;
-    --rv-text: #1f1e1a;
-    --rv-text-muted: #6a685f;
-    --rv-text-faint: #9a988e;
-    --rv-accent: #185FA5;
-    --rv-accent-bg: #E6F1FB;
-    --rv-accent-text: #0C447C;
-    --rv-warn: #854F0B;
+    --rv-surface-2: #f1f3f7;
+    --rv-border: #e0e4ec;
+    --rv-border-strong: #c6ccd8;
+    --rv-text: #161a22;
+    --rv-text-muted: #5c6472;
+    --rv-text-faint: #9aa1ae;
+    --rv-accent: #0f766e;
+    --rv-accent-bg: #e4f1ef;
+    --rv-accent-text: #0a564f;
+    --rv-warn: #92500c;
     --rv-warn-bg: #FAEEDA;
   }
   body.role-researcher { background: var(--rv-bg); }
 
   #rv-app {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--sans);
     color: var(--rv-text);
     font-size: 14px;
     line-height: 1.5;
@@ -1275,8 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v5.0<br>
-      © 2026 Hajar Hasannejadasl
+      Codebook Editor — Cloud edition · v6.14.1
     </div>
   </div>
 </div>
@@ -1345,7 +1375,7 @@
     <div class="rv-filter-row">
       <label for="rv-instrument-filter" style="font-size: 13px; font-weight: 500;">Instrument:</label>
       <select id="rv-instrument-filter">
-        <option value="">— All instruments —</option>
+        <option value="">— Select an instrument —</option>
       </select>
     </div>
 
@@ -1568,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.9.1 cloud</span>
+      <span class="version">v6.14.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1625,11 +1655,12 @@
   <!-- Tabs -->
   <div class="tabs" role="tablist" id="tabs-bar">
     <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')">📋 Variables <span class="count" id="tab-count-vars">0</span></button>
-    <button class="tab" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
+    <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')">🔍 Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
     <button class="tab" data-tab="activity" role="tab" onclick="switchTab('activity')">📜 Activity <span class="count" id="tab-count-activity">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 History</button>
+    <button class="tab admin-only" data-tab="users" role="tab" onclick="switchTab('users')">👥 Users</button>
     <button class="tab" data-tab="settings" role="tab" onclick="switchTab('settings')">⚙️ Settings</button>
   </div>
 
@@ -1794,20 +1825,29 @@
     <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
 
+  <div class="tab-panel admin-only" id="panel-users" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Users</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Assign roles and activate/deactivate accounts. New accounts are created via sign-up or the Supabase dashboard, then appear here.</p>
+      </div>
+      <button class="btn-mini" id="users-refresh-btn" onclick="loadUsers()">↻ Refresh</button>
+    </div>
+    <div style="margin: 0 0 1rem; padding: 0.85rem 1rem; border:1px solid var(--border); border-radius:8px; background:var(--surface); display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+      <div><label style="margin-bottom:4px;">New user email</label><input type="email" id="newuser-email" placeholder="name@org.com" style="min-width:220px;"></div>
+      <div><label style="margin-bottom:4px;">Temporary password</label><input type="text" id="newuser-pw" placeholder="at least 6 characters" style="min-width:180px;"></div>
+      <button class="btn-primary" id="newuser-create-btn" onclick="addNewUser()" style="padding:8px 14px;">+ Add user</button>
+      <span id="newuser-msg" style="font-size:12px; color:var(--text-muted); flex:1; min-width:200px;"></span>
+    </div>
+    <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
+  </div>
+
   <div class="tab-panel" id="panel-settings" role="tabpanel">
     <div class="admin-only" id="field-mgmt-section" style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
       <h3 style="margin: 0 0 0.3rem; font-size: 1rem;">Field management</h3>
       <p style="margin: 0 0 0.7rem; color: var(--text-muted); font-size: 0.85rem;">Reorder fields, organize them into groups, and rename them. Changes are saved to the cloud and apply for everyone.</p>
       <button class="btn-primary" onclick="openFieldManager()">⚙️ Manage fields</button>
     </div>
-
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Your identity</h2>
-    <div class="info-box" style="margin-top: 0;">
-      Your name is recorded in the audit trail of every change (added to <code>checked_by</code>, <code>check_date</code>, and the <code>change_log</code> field of each edited variable). This is stored only in the codebook JSON — never sent anywhere.
-    </div>
-    <label>Your name (or initials)</label>
-    <input type="text" id="settings-user-name" placeholder="Your name or initials" style="max-width: 460px;">
-    <div class="hint">If empty, audit entries use "(anonymous)". Set this once per session.</div>
 
     <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
 
@@ -2292,7 +2332,7 @@
   async function fetchProfile(userId) {
     const { data, error } = await client
       .from('profiles')
-      .select('email, display_name, role')
+      .select('id, email, display_name, role, active')
       .eq('id', userId)
       .single();
     if (error) {
@@ -2312,6 +2352,12 @@
       await client.auth.signOut();
       return;
     }
+    if (profile.active === false) {
+      showMessage('cloud-login-message', 'error',
+        'This account has been deactivated. Contact the administrator.');
+      await client.auth.signOut();
+      return;
+    }
     window.cloudAuth.user = session.user;
     window.cloudAuth.profile = profile;
     window.cloudAuth.role = profile.role;
@@ -2319,7 +2365,7 @@
     // Update banner
     el('cloud-banner-email').textContent = profile.email;
     const roleBadge = el('cloud-banner-role');
-    roleBadge.textContent = profile.role;
+    roleBadge.textContent = profile.role === 'ontology_engineer' ? 'Ontology Engineer' : profile.role;
     roleBadge.className = 'role-badge role-' + profile.role;
 
     // Hide overlay, reveal app
@@ -2380,12 +2426,26 @@
     });
 
     // Auth state listener
+    let cloudCurrentUserId = null;
     client.auth.onAuthStateChange((event, session) => {
       console.log('[cloud-auth] event:', event);
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        if (session) onSignedIn(session);
-        else onSignedOut();
+        if (session) {
+          // If it's the SAME user we already signed in (e.g. a token refresh or
+          // returning to the browser tab), don't re-run startup — that would
+          // reload data and snap back to the first tab. Just keep the session.
+          if (session.user && session.user.id === cloudCurrentUserId) {
+            window.cloudAuth.user = session.user;
+            return;
+          }
+          cloudCurrentUserId = session.user ? session.user.id : null;
+          onSignedIn(session);
+        } else {
+          cloudCurrentUserId = null;
+          onSignedOut();
+        }
       } else if (event === 'SIGNED_OUT') {
+        cloudCurrentUserId = null;
         onSignedOut();
       } else if (event === 'PASSWORD_RECOVERY') {
         // User clicked a reset link. For now we just inform them.
@@ -2821,7 +2881,7 @@ function rvPopulateInstruments() {
   select.innerHTML = '';
   const optAll = document.createElement('option');
   optAll.value = '';
-  optAll.textContent = '— All instruments —';
+  optAll.textContent = '— Select an instrument —';
   select.appendChild(optAll);
 
   // Orphans (single instruments) first, alphabetical
@@ -2859,10 +2919,15 @@ function rvApplyFilter() {
   const instrument = RV_STATE.filter;
   const restricted = RV_STATE.restrictedAtoms;
 
-  // Step 1: rows that match the selected instrument (or all)
+  // Step 1: rows that match the selected instrument.
+  // Match admin behaviour: with no instrument selected, show nothing (prompt the
+  // user to pick one) instead of dumping every variable.
   let matched;
   if (!instrument) {
-    matched = RV_STATE.allRows.slice();
+    RV_STATE.filteredRows = [];
+    RV_STATE.page = 1;
+    rvRenderTable();
+    return;
   } else {
     matched = RV_STATE.allRows.filter(row => {
       const parts = rvSplitInstrument(row.Instrument);
@@ -3563,6 +3628,55 @@ window.addEventListener('cloud-authenticated', async (e) => {
   await loadFieldPermissions();
 });
 
+// ====== Feature 4+5: per-role, per-field access ======
+// role_field_access stores REAL DB column names; the app uses mixed-case names.
+// oeDbName() converts app -> DB. accessOf() returns the CURRENT user's access
+// ('none'|'read'|'propose'|'write') for an app field.
+window.cloudRoleAccess = {};  // db_column_name -> access (current user's role)
+function oeDbName(appField) { return CLOUD_FIELD_CASE_REVERSE[appField] || appField; }
+function accessOf(appField) {
+  const role = window.cloudAuth && window.cloudAuth.role;
+  if (!role || role === 'admin') return 'write';           // admin: unrestricted
+  const explicit = window.cloudRoleAccess[oeDbName(appField)];
+  if (explicit) return explicit;
+  // Backward-compatible fallbacks when admin has not configured this field/role:
+  if (role === 'editor') {
+    const perm = window.cloudFieldPerms[appField];
+    if (perm === 'pending_approval') return 'propose';
+    if (perm === 'admin_only') return 'none';
+    return 'write';                                        // editors editable by default
+  }
+  if (role === 'ontology_engineer') return 'none';         // OE: only what admin grants
+  return 'read';                                           // any other role: view only
+}
+// Back-compat alias (older call sites)
+function oeAccessOf(appField) { return accessOf(appField); }
+async function loadRoleFieldAccess() {
+  if (!window.cloudAuth || !window.cloudAuth.client) return;
+  const role = window.cloudAuth.role;
+  if (!role || role === 'admin') return;                   // admin needs no map
+  const { data, error } = await window.cloudAuth.client
+    .from('role_field_access').select('field_name, access').eq('role', role);
+  if (error) { console.error('role_field_access load failed', error); return; }
+  const m = {};
+  (data || []).forEach(r => { m[r.field_name] = r.access; });
+  window.cloudRoleAccess = m;
+}
+window.addEventListener('cloud-authenticated', async (e) => {
+  const role = e.detail.profile.role;
+  if (role && role !== 'admin' && role !== 'researcher') await loadRoleFieldAccess();
+});
+// ====== END feature 4+5 access helpers ======
+
+// Audit author name is taken automatically from the signed-in account
+// (display name if set, otherwise email). No manual "identity" field needed.
+window.addEventListener('cloud-authenticated', (e) => {
+  const p = e.detail.profile || {};
+  if (typeof state !== 'undefined') {
+    state.userName = p.display_name || p.email || '(anonymous)';
+  }
+});
+
 function cloudShowToast(kind, text, ms) {
   const t = document.getElementById('cloud-save-toast');
   if (!t) return;
@@ -3587,15 +3701,14 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
   const immediate = {};
   const pending = {};
   for (const [field, ch] of Object.entries(fieldChanges)) {
-    // Get permission class. Default: treat unknown as immediate for editor too.
-    const perm = window.cloudFieldPerms[field] || 'immediate';
     if (role === 'admin') {
-      // Admin sees everything as immediate
-      immediate[field] = ch;
-    } else if (role === 'editor') {
-      if (perm === 'immediate') immediate[field] = ch;
-      else if (perm === 'pending_approval') pending[field] = ch;
-      // admin_only: editor shouldn't be able to edit it; skip silently
+      immediate[field] = ch;                 // admin: everything immediate
+    } else {
+      // editor / ontology_engineer / others: per-field access decides.
+      const acc = accessOf(field);
+      if (acc === 'write') immediate[field] = ch;        // applied now (+ audited)
+      else if (acc === 'propose') pending[field] = ch;   // -> admin approval queue
+      // 'read' / 'none': not editable; skip silently.
     }
   }
 
@@ -3610,6 +3723,18 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
         p_updates: dbUpdates
       });
       if (error) throw error;
+    } else if (role === 'ontology_engineer') {
+      // Direct write via a SECURITY DEFINER RPC that re-checks per-field 'write'
+      // access AND writes the audit_log rows itself (so the trail can't be
+      // skipped and the admin can always review what this user changed).
+      const updates = {};
+      for (const [f, ch] of Object.entries(immediate)) updates[f] = ch.new;
+      const dbUpdates = cloudDenormalizeRow(updates);
+      const { error } = await client.rpc('oe_update_variable', {
+        p_variable_id: dbId,
+        p_updates: dbUpdates
+      });
+      if (error) throw error;
     } else {
       const updates = {};
       for (const [f, ch] of Object.entries(immediate)) updates[f] = ch.new;
@@ -3619,16 +3744,19 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
       const { error } = await client.from('variables').update(dbUpdates).eq('id', dbId);
       if (error) throw error;
     }
-    // Audit log entries (one per field)
-    const auditRows = Object.entries(immediate).map(([f, ch]) => ({
-      variable_id: dbId,
-      action: 'update_field',
-      field_name: CLOUD_FIELD_CASE_REVERSE[f] || f,
-      old_value: ch.old == null ? null : String(ch.old),
-      new_value: ch.new == null ? null : String(ch.new),
-      performed_by: userId
-    }));
-    await client.from('audit_log').insert(auditRows);
+    // Audit log entries (one per field) — admin & editor only.
+    // ontology_engineer writes are audited inside oe_update_variable().
+    if (role !== 'ontology_engineer') {
+      const auditRows = Object.entries(immediate).map(([f, ch]) => ({
+        variable_id: dbId,
+        action: 'update_field',
+        field_name: CLOUD_FIELD_CASE_REVERSE[f] || f,
+        old_value: ch.old == null ? null : String(ch.old),
+        new_value: ch.new == null ? null : String(ch.new),
+        performed_by: userId
+      }));
+      await client.from('audit_log').insert(auditRows);
+    }
   }
 
   // ---- Submit pending changes ----
@@ -4407,8 +4535,19 @@ window.addEventListener('cloud-authenticated', (e) => {
 // ====== v6.7: Field Manager ======
 let FM_STATE = { fields: [], dirty: false };
 
-function openFieldManager() {
+async function openFieldManager() {
   if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
+  // Load current per-field access for the configurable roles (DB column name -> access).
+  const FM_ROLES = ['editor', 'ontology_engineer'];
+  const accessByRole = { editor: {}, ontology_engineer: {} };
+  try {
+    const { data } = await window.cloudAuth.client
+      .from('role_field_access').select('role, field_name, access').in('role', FM_ROLES);
+    (data || []).forEach(r => {
+      if (!accessByRole[r.role]) accessByRole[r.role] = {};
+      accessByRole[r.role][r.field_name] = r.access;
+    });
+  } catch (e) { console.error('Could not load role_field_access', e); }
   // Build a group-centric structure: ordered list of groups, each with ordered fields.
   // System / non-metadata fields that must NOT appear in the manager (no
   // field_metadata row exists for them, so they can't be reordered/renamed).
@@ -4439,7 +4578,8 @@ function openFieldManager() {
     buckets[fld.group].push(fld);
   });
   const groups = groupOrder.map(g => ({ name: g, orig_name: g, fields: buckets[g] }));
-  FM_STATE = { groups: groups, dirty: false };
+  const sel = document.getElementById('fm-access-role');
+  FM_STATE = { groups: groups, dirty: false, access: accessByRole, accessRole: (sel && sel.value) || 'editor' };
   renderFieldManager();
   document.getElementById('fm-error').style.display = 'none';
   document.getElementById('fm-status').textContent = '';
@@ -4474,6 +4614,15 @@ function renderFieldManager() {
         + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
         + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
+        + (fld.isCustom
+            ? '<span class="fm-fname" title="Per-role access is not available for custom fields">(n/a)</span>'
+            : (function(){ var a = fmAccessOf(fld); return ''
+              + '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Access for the selected role" style="min-width:92px;">'
+              +   '<option value="none"' + (a === 'none' ? ' selected' : '') + '>none</option>'
+              +   '<option value="read"' + (a === 'read' ? ' selected' : '') + '>read</option>'
+              +   '<option value="propose"' + (a === 'propose' ? ' selected' : '') + '>propose</option>'
+              +   '<option value="write"' + (a === 'write' ? ' selected' : '') + '>write</option>'
+              + '</select>'; })())
         + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
         + '</div>';
     });
@@ -4541,6 +4690,25 @@ function fmMoveToGroup(gi, fi, targetGroupName) {
 function fmEdit(gi, fi, val) {
   FM_STATE.groups[gi].fields[fi].label = val;
   FM_STATE.dirty = true;
+}
+
+function fmDefaultAccess(role) { return role === 'editor' ? 'write' : 'none'; }
+function fmAccessOf(fld) {
+  const role = FM_STATE.accessRole;
+  const m = (FM_STATE.access && FM_STATE.access[role]) || {};
+  const db = oeDbName(fld.field_name);
+  return (db in m) ? m[db] : fmDefaultAccess(role);
+}
+function fmSetAccess(gi, fi, val) {
+  const fld = FM_STATE.groups[gi].fields[fi];
+  const role = FM_STATE.accessRole;
+  if (!FM_STATE.access[role]) FM_STATE.access[role] = {};
+  FM_STATE.access[role][oeDbName(fld.field_name)] = val;
+  FM_STATE.dirty = true;
+}
+function fmChangeAccessRole(role) {
+  FM_STATE.accessRole = role;
+  renderFieldManager();
 }
 
 async function saveFieldManager() {
@@ -4620,6 +4788,22 @@ async function saveFieldManager() {
           window.cloudFieldMeta[fld.field_name].display_order = newOrder;
         }
       }
+    }
+
+    // 3) persist per-role field access (built-in fields only; custom fields are
+    //    not server-enforceable yet). Upsert every entry the admin touched.
+    const accessRows = [];
+    Object.keys(FM_STATE.access || {}).forEach(role => {
+      const m = FM_STATE.access[role] || {};
+      Object.keys(m).forEach(dbField => {
+        accessRows.push({ role: role, field_name: dbField, access: m[dbField] || 'none' });
+      });
+    });
+    if (accessRows.length > 0) {
+      const { error: accErr } = await client
+        .from('role_field_access')
+        .upsert(accessRows, { onConflict: 'role,field_name' });
+      if (accErr) throw accErr;
     }
 
     applyFieldOrdering();
@@ -4719,6 +4903,16 @@ function applyCloudCodebook(rows, opts) {
   if (typeof populateIdentifierPicker === 'function') populateIdentifierPicker();
   if (typeof populateInstruments === 'function') populateInstruments();
 
+  // FIX (reorder bug): the cloud auto-load sets state.allFields in raw insertion
+  // order. The metadata loaders (loadFieldPermissions / loadCustomFieldDefs) usually
+  // finish BEFORE the large variables query, so their maybeApplyOrdering() runs while
+  // allFields is still empty and no-ops. Since this loader was the ONLY one that set
+  // allFields without re-sorting, the saved display_order was never applied on login.
+  // Calling maybeApplyOrdering() here (mirroring the manual-upload path) makes
+  // whichever loader finishes LAST trigger the sort, once both state.allFields and
+  // window.cloudFieldMeta are present.
+  if (typeof maybeApplyOrdering === 'function') maybeApplyOrdering();
+
   // Reset search state so picker uses fresh schema
   if (typeof SEARCH_STATE !== 'undefined') {
     SEARCH_STATE.searchInFields = new Set();
@@ -4736,6 +4930,14 @@ async function loadCodebookFromCloud() {
   }
   const role = window.cloudAuth.role;
   const client = window.cloudAuth.client;
+
+  // ontology_engineer reads through a SECURITY DEFINER RPC that returns only the
+  // fields this role may read/write, with copyright blanking applied server-side.
+  if (role === 'ontology_engineer') {
+    const { data, error } = await client.rpc('get_variables_for_role');
+    if (error) throw error;
+    return normalizeCloudRows(Array.isArray(data) ? data : (data || []));
+  }
 
   let tableOrView;
   if (role === 'researcher') {
@@ -4800,11 +5002,21 @@ async function bootstrapCloudCodebook() {
     const role = window.cloudAuth.role;
     const label = role === 'researcher'
       ? 'cloud://variables_public'
-      : 'cloud://variables';
+      : (role === 'ontology_engineer'
+          ? 'cloud://variables (ontology)'
+          : 'cloud://variables');
     applyCloudCodebook(rows, { fileLabel: label });
   } catch (err) {
     console.error('Cloud load failed:', err);
-    showCloudError('Could not load the codebook: ' + (err.message || err));
+    // Surface the REAL underlying error (Postgres/PostgREST code, message, hint)
+    // so a failure is diagnosable at a glance instead of a generic message.
+    const parts = [];
+    if (err && err.message) parts.push(err.message);
+    if (err && err.code) parts.push('[' + err.code + ']');
+    if (err && err.hint) parts.push('hint: ' + err.hint);
+    if (err && err.details) parts.push(err.details);
+    const detail = parts.length ? parts.join(' ') : String(err);
+    showCloudError('Could not load the codebook: ' + detail + '  — try reloading (Cmd/Ctrl+Shift+R).');
   } finally {
     setCloudLoading(false);
   }
@@ -4814,7 +5026,7 @@ async function bootstrapCloudCodebook() {
 window.addEventListener('cloud-authenticated', (e) => {
   const profile = e.detail.profile;
   // Tag the body with the role so CSS can hide/show UI bits
-  document.body.classList.remove('role-admin', 'role-editor', 'role-researcher');
+  document.body.classList.remove('role-admin', 'role-editor', 'role-researcher', 'role-ontology_engineer');
   document.body.classList.add('role-' + profile.role);
 
   // Kick off the data load
@@ -5222,6 +5434,98 @@ function getVarsForInstrument(name, includeDeleted = false) {
 }
 
 // ============ TABS ============
+// ============ USERS TAB (admin) ============
+const USER_ROLES = ['admin', 'editor', 'researcher', 'ontology_engineer'];
+const USER_ROLE_LABELS = { admin: 'Admin', editor: 'Editor', researcher: 'Researcher', ontology_engineer: 'Ontology Engineer' };
+async function loadUsers() {
+  const host = document.getElementById('users-list');
+  if (!host) return;
+  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') {
+    host.innerHTML = '<div class="empty-state"><p>Admins only.</p></div>';
+    return;
+  }
+  host.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  const { data, error } = await window.cloudAuth.client
+    .from('profiles').select('id, email, display_name, role, active').order('email');
+  if (error) {
+    host.innerHTML = '<div class="empty-state"><p>Could not load users: ' + escapeHtml(error.message) + '</p></div>';
+    return;
+  }
+  const me = window.cloudAuth.user && window.cloudAuth.user.id;
+  const rows = (data || []).map(u => {
+    const isSelf = u.id === me;
+    const opts = USER_ROLES.map(r =>
+      '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + USER_ROLE_LABELS[r] + '</option>'
+    ).join('');
+    const name = u.display_name ? (escapeHtml(u.display_name) + ' · ' + escapeHtml(u.email)) : escapeHtml(u.email);
+    const selfTag = isSelf ? ' <span class="row-badge">you</span>' : '';
+    const dis = isSelf ? ' disabled title="You cannot change your own account"' : '';
+    return '<tr style="border-bottom:1px solid var(--border);">'
+      + '<td style="padding:9px 12px; font-size:13px;">' + name + selfTag + '</td>'
+      + '<td style="padding:9px 12px;"><select class="btn-mini" style="padding:5px 8px;" onchange="setUserRole(\'' + u.id + '\', this.value, this)"' + dis + '>' + opts + '</select></td>'
+      + '<td style="padding:9px 12px; text-align:center;">'
+        + '<label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; color:var(--text-muted);">'
+        + '<input type="checkbox"' + (u.active !== false ? ' checked' : '') + dis + ' onchange="setUserActive(\'' + u.id + '\', this.checked, this)" style="width:auto;"> '
+        + (u.active !== false ? 'Active' : 'Inactive')
+        + '</label></td>'
+      + '</tr>';
+  }).join('');
+  host.innerHTML = '<div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow-sm);">'
+    + '<table style="width:100%; border-collapse:collapse;">'
+    + '<thead><tr style="background:var(--surface-2); border-bottom:1px solid var(--border);">'
+    + '<th style="text-align:left; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">USER</th>'
+    + '<th style="text-align:left; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">ROLE</th>'
+    + '<th style="text-align:center; padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:600;">STATUS</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
+async function setUserRole(id, role, el) {
+  if (el) el.disabled = true;
+  const { error } = await window.cloudAuth.client.from('profiles').update({ role: role }).eq('id', id);
+  if (el) el.disabled = false;
+  if (error) { cloudShowToast('error', 'Could not change role: ' + error.message); loadUsers(); return; }
+  cloudShowToast('success', 'Role updated');
+}
+async function setUserActive(id, active, el) {
+  if (el) el.disabled = true;
+  const { error } = await window.cloudAuth.client.from('profiles').update({ active: active }).eq('id', id);
+  if (el) el.disabled = false;
+  if (error) { cloudShowToast('error', 'Could not change status: ' + error.message); loadUsers(); return; }
+  cloudShowToast('success', active ? 'User activated' : 'User deactivated');
+  loadUsers();
+}
+
+async function addNewUser() {
+  const email = (document.getElementById('newuser-email')?.value || '').trim();
+  const pw = (document.getElementById('newuser-pw')?.value || '').trim();
+  const msg = document.getElementById('newuser-msg');
+  const show = (t, ok) => { if (msg) { msg.style.color = ok ? 'var(--success)' : 'var(--danger)'; msg.textContent = t; } };
+  if (!email || !pw) { show('Enter an email and a temporary password.'); return; }
+  if (pw.length < 6) { show('Password must be at least 6 characters.'); return; }
+  const btn = document.getElementById('newuser-create-btn');
+  if (btn) btn.disabled = true;
+  show('Creating…', true);
+  try {
+    // Use a SEPARATE, non-persisting client so signUp does NOT replace the
+    // admin's own session. (Anon key only — RLS still protects all data.)
+    const tmp = window.supabase.createClient(
+      'https://aajgbgoqomghngwfzqmz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhamdiZ29xb21naG5nd2Z6cW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODE0NjIsImV4cCI6MjA5NTQ1NzQ2Mn0.cNDqenHtTZdPNERghQGwN9_UcPCx34MKqwkrd6OKABE',
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+    const { data, error } = await tmp.auth.signUp({ email: email, password: pw });
+    if (error) { show('Could not create user: ' + error.message); return; }
+    document.getElementById('newuser-email').value = '';
+    document.getElementById('newuser-pw').value = '';
+    show('User created (' + email + '). Temp password: ' + pw + '. If email confirmation is on, they must confirm before logging in. Set their role below.', true);
+    // Give the profiles trigger a moment, then refresh the list.
+    setTimeout(loadUsers, 1500);
+  } catch (e) {
+    show('Error: ' + (e.message || e));
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
@@ -5231,6 +5535,7 @@ function switchTab(name) {
   else if (name === "search") refreshSearchTab();
   else if (name === "activity") refreshActivityTab();
   else if (name === "settings") refreshSettingsTab();
+  else if (name === "users") loadUsers();
 }
 
 // ============ VARIABLES TAB ============
@@ -5266,11 +5571,14 @@ function refreshVariablesTab() {
       isDeleted ? `<span class="row-badge deleted-badge">deleted</span>` : "",
       isRestricted && !isDeleted ? `<span class="row-badge restricted" title="Hidden in non-admin Excel exports">🔒</span>` : "",
     ].join("");
+    const role = window.cloudAuth && window.cloudAuth.role;
+    const canEdit = role === 'admin' || role === 'editor' || role === 'ontology_engineer';
+    const canDelete = role === 'admin' || role === 'editor';
     const actions = isDeleted
       ? `<button class="btn-mini" onclick="restoreVariable('${escapeAttr(v._uid)}')">Restore</button>`
-      : `<button class="btn-mini" onclick="openViewDialog('${escapeAttr(v._uid)}')">View</button>
-         <button class="btn-mini editor-and-up-only" onclick="openEditDialog('${escapeAttr(v._uid)}')">Edit</button>
-         <button class="btn-mini editor-and-up-only" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>`;
+      : `<button class="btn-mini" onclick="openViewDialog('${escapeAttr(v._uid)}')">View</button>`
+        + (canEdit ? `<button class="btn-mini" onclick="openEditDialog('${escapeAttr(v._uid)}')">Edit</button>` : '')
+        + (canDelete ? `<button class="btn-mini" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>` : '');
     return `<div class="browse-row ${isDeleted ? 'deleted' : ''}">
       <span class="row-idx">${i + 1}</span>
       <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}</span>
@@ -5318,6 +5626,10 @@ function populateFieldChips() {
   state.allFields.forEach(f => {
     if (filter && !f.toLowerCase().includes(filter)) return;
     if (f === "id" || f.startsWith("_")) return;
+    // Only editable fields appear in the bulk editor (write or propose).
+    // Read-only/hidden fields are excluded. Non-restricted roles: unaffected.
+    const _acc = accessOf(f);
+    if (_acc === 'none' || _acc === 'read') return;
     const isChecked = state.selectedFields.includes(f);
     const chip = document.createElement("label");
     chip.className = "field-chip" + (isChecked ? " checked" : "");
@@ -6090,10 +6402,8 @@ function refreshActivityTab() {
 function refreshSettingsTab() {
   populateIdentifierPicker();
   document.getElementById("settings-contact-email").value = state.contactEmail || "";
-  document.getElementById("settings-user-name").value = state.userName || "";
 }
 document.getElementById("settings-contact-email")?.addEventListener("input", function() { state.contactEmail = this.value; });
-document.getElementById("settings-user-name")?.addEventListener("input", function() { state.userName = this.value.trim(); });
 
 function populateIdentifierPicker() {
   const select = document.getElementById("identifier-select");
@@ -6269,25 +6579,33 @@ function openEditDialog(uid) {
     return `<div class="field-group">
       <div class="field-group-title">${groupLabels[gKey]}</div>
       ${fields.map(f => {
+        const acc = accessOf(f);
+        if (acc === 'none') return "";                 // not visible to this role
+        const editable = (acc === 'write' || acc === 'propose');
         const isInstrumentField = f === state.instrumentField;
         if (isInstrumentField) {
+          if (!editable) {
+            return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div class="field-readonly-value">${escapeHtml(v[f] || "—")}</div></div>`;
+          }
           return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)} <span style="color: var(--accent); font-size: 10px;">(this row only)</span></div><div>${buildInstrumentCheckboxes(curAtoms, "data-inst")}</div></div>`;
         }
         const cur = v[f] !== undefined && v[f] !== null ? String(v[f]) : "";
         const isLong = cur.length > 80 || cur.includes("\n");
         const isRequired = f === state.identifierField;
         const requiredMark = isRequired ? ' <span style="color: var(--danger);">*</span>' : '';
+        const proposeMark = (acc === 'propose') ? ' <span style="color: var(--accent); font-size: 10px;">(needs admin approval)</span>' : '';
+        const ro = editable ? "" : " readonly style=\"background: var(--surface-2); color: var(--text-muted);\"";
         const input = isLong
-          ? `<textarea data-field="${escapeAttr(f)}" rows="${Math.min(8, Math.max(2, cur.split('\n').length))}">${escapeHtml(cur)}</textarea>`
-          : `<input type="text" data-field="${escapeAttr(f)}" value="${escapeAttr(cur)}">`;
-        return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}${requiredMark}</div><div>${input}</div></div>`;
+          ? `<textarea data-field="${escapeAttr(f)}" rows="${Math.min(8, Math.max(2, cur.split('\n').length))}"${ro}>${escapeHtml(cur)}</textarea>`
+          : `<input type="text" data-field="${escapeAttr(f)}" value="${escapeAttr(cur)}"${ro}>`;
+        return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}${requiredMark}${proposeMark}</div><div>${input}</div></div>`;
       }).join("")}
     </div>`;
   }).join("");
   document.getElementById("modal-edit").style.display = "flex";
 }
 
-function submitEditVariable() {
+async function submitEditVariable() {
   const v = findVarByUid(editingUid);
   if (!v) return;
   const body = document.getElementById("modal-edit-body");
@@ -6295,24 +6613,46 @@ function submitEditVariable() {
   const newValues = {};
   inputs.forEach(el => newValues[el.dataset.field] = el.value);
 
-  // Read Instrument checkboxes
-  const checkedAtoms = [];
-  body.querySelectorAll("input[data-inst]:checked").forEach(cb => checkedAtoms.push(cb.dataset.inst));
-  if (checkedAtoms.length === 0) { showModalError("edit", "Pick at least one questionnaire"); return; }
-  newValues[state.instrumentField] = checkedAtoms.join(" + ");
+  // Read Instrument checkboxes (only present when the instrument field is editable).
+  const instInputs = body.querySelectorAll("input[data-inst]");
+  if (instInputs.length > 0) {
+    const checkedAtoms = [];
+    body.querySelectorAll("input[data-inst]:checked").forEach(cb => checkedAtoms.push(cb.dataset.inst));
+    if (checkedAtoms.length === 0) { showModalError("edit", "Pick at least one questionnaire"); return; }
+    newValues[state.instrumentField] = checkedAtoms.join(" + ");
+  }
 
+  // Identifier is only validated/edited when the role can edit it.
   const idField = state.identifierField;
-  const newId = newValues[idField];
-  if (!newId || !String(newId).trim()) { showModalError("edit", `${idField} cannot be empty`); return; }
-  const dup = state.codebook.find(x => x._uid !== v._uid && getId(x) === newId && !x._deleted && getId(v) !== newId);
-  if (dup) { showModalError("edit", `Another variable already has ${idField} = "${newId}"`); return; }
+  if ((accessOf(idField) === 'write' || accessOf(idField) === 'propose') && (idField in newValues)) {
+    const newId = newValues[idField];
+    if (!newId || !String(newId).trim()) { showModalError("edit", `${idField} cannot be empty`); return; }
+    const dup = state.codebook.find(x => x._uid !== v._uid && getId(x) === newId && !x._deleted && getId(v) !== newId);
+    if (dup) { showModalError("edit", `Another variable already has ${idField} = "${newId}"`); return; }
+  }
   const fieldChanges = {};
   state.allFields.forEach(f => {
+    const acc = accessOf(f);
+    if (acc !== 'write' && acc !== 'propose') return;   // only editable fields
+    if (!(f in newValues)) return;                       // input not in this form
     const oldVal = v[f] !== undefined && v[f] !== null ? v[f] : "";
     const newVal = newValues[f] !== undefined ? newValues[f] : "";
     if (String(oldVal) !== String(newVal)) fieldChanges[f] = { old: oldVal, new: newVal };
   });
   if (Object.keys(fieldChanges).length === 0) { showModalError("edit", "No changes detected"); return; }
+  // Concurrency guard: warn if this row changed since it was loaded. Admin/editor
+  // can read the table directly; ontology_engineer can't (RLS) so the check is
+  // skipped for them via try/catch.
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client;
+    if (c && v.id && v.updated_at) {
+      const { data, error } = await c.from('variables').select('updated_at').eq('id', v.id).single();
+      if (!error && data && data.updated_at && data.updated_at !== v.updated_at) {
+        const ok = confirm('Heads up: someone else changed this variable since you opened it. Saving now will overwrite their change.\n\nOK = overwrite anyway   ·   Cancel = stop (reload to see their version).');
+        if (!ok) return;
+      }
+    }
+  } catch (e) { /* no direct read access (e.g. ontology_engineer): skip */ }
   state.pendingChanges = [{ globalIndex: state.codebook.indexOf(v), variable_name: getId(v), fieldChanges }];
   state.selectedFields = Object.keys(fieldChanges);
   closeModal("edit");
@@ -7165,6 +7505,14 @@ function resetAll() {
       </div>
     </div>
     <div id="fm-error" class="msg msg-error" style="display:none; margin: 0 16px;"></div>
+    <div style="margin: 8px 16px; padding: 8px 10px; background: var(--surface-2); border-radius: 6px; display:flex; align-items:center; gap:8px; font-size:0.82rem;">
+      <span>Per-field access for role:</span>
+      <select id="fm-access-role" onchange="fmChangeAccessRole(this.value)" style="padding:4px 6px; border:1px solid var(--border); border-radius:4px;">
+        <option value="editor">Editor</option>
+        <option value="ontology_engineer">Ontology Engineer</option>
+      </select>
+      <span style="color: var(--text-faint);">none = hidden · read = view only · propose = edit needs approval · write = edit directly</span>
+    </div>
     <div class="modal-body" id="fm-list" style="overflow-y:auto; flex:1;"></div>
     <div class="modal-footer" style="justify-content:space-between;">
       <span id="fm-status" style="font-size:0.8rem; color: var(--text-muted);"></span>
