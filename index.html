@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.14.1
+      Codebook Editor — Cloud edition · v6.14.2
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.14.1 cloud</span>
+      <span class="version">v6.14.2 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4923,6 +4923,17 @@ function applyCloudCodebook(rows, opts) {
   if (typeof updateAutoSaveIndicator === 'function') updateAutoSaveIndicator();
 }
 
+// Sort rows by the restored display_order. Rows without it (e.g. the researcher
+// view / OE RPC until they expose the column, or brand-new rows) sort to the end,
+// keeping the server's stable order among themselves.
+function sortByDisplayOrder(rows) {
+  return rows.slice().sort((a, b) => {
+    const ao = (a && a.display_order != null) ? a.display_order : Infinity;
+    const bo = (b && b.display_order != null) ? b.display_order : Infinity;
+    return ao - bo;
+  });
+}
+
 // Fetch all variables from Supabase. Choice of table depends on role.
 async function loadCodebookFromCloud() {
   if (!window.cloudAuth || !window.cloudAuth.client) {
@@ -4936,7 +4947,7 @@ async function loadCodebookFromCloud() {
   if (role === 'ontology_engineer') {
     const { data, error } = await client.rpc('get_variables_for_role');
     if (error) throw error;
-    return normalizeCloudRows(Array.isArray(data) ? data : (data || []));
+    return sortByDisplayOrder(normalizeCloudRows(Array.isArray(data) ? data : (data || [])));
   }
 
   let tableOrView;
@@ -4963,7 +4974,7 @@ async function loadCodebookFromCloud() {
   const { data, error, count } = await query;
 
   if (error) throw error;
-  return normalizeCloudRows(data || []);
+  return sortByDisplayOrder(normalizeCloudRows(data || []));
 }
 
 // Show / hide loading overlay
