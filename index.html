@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.4
+      Codebook Editor — Cloud edition · v6.15.5
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.4 cloud</span>
+      <span class="version">v6.15.5 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4899,10 +4899,20 @@ function applyCloudCodebook(rows, opts) {
   }
   state.identifierField = identifierField;
 
-  // Collect all field names in first-seen order
+  // Collect all field names in first-seen order, EXCLUDING internal/system
+  // columns that should never appear as editable/visible fields in any panel
+  // (id is the internal UUID key; the rest are bookkeeping). Per-role visibility
+  // of the REAL fields is handled separately by the access system.
+  const HIDDEN_DISPLAY_FIELDS = new Set([
+    'id', 'display_order', 'custom_fields',
+    'created_at', 'updated_at', 'created_by', 'updated_by',
+    'is_deleted', 'deleted_at', 'deleted_by'
+  ]);
   const fieldList = [];
   const seen = new Set();
   rows.forEach(r => Object.keys(r).forEach(k => {
+    if (k.startsWith('_')) return;            // UI-only keys (_uid, _customKeys, …)
+    if (HIDDEN_DISPLAY_FIELDS.has(k)) return; // internal/system columns
     if (!seen.has(k)) { seen.add(k); fieldList.push(k); }
   }));
   state.allFields = fieldList;
@@ -6893,7 +6903,7 @@ function submitAddVariable() {
     return;
   }
   newVar[state.instrumentField] = checkedAtoms.join(" + ");
-  if (state.allFields.includes("id") && (!newVar.id || !String(newVar.id).trim())) newVar.id = generateUuid();
+  if (!newVar.id || !String(newVar.id).trim()) newVar.id = generateUuid();
   newVar._uid = newVar.id || ("tmp_" + Math.random().toString(36).slice(2, 11));
   newVar._added = true;
 
