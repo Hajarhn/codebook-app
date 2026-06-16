@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.2
+      Codebook Editor — Cloud edition · v6.15.3
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.2 cloud</span>
+      <span class="version">v6.15.3 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4162,8 +4162,16 @@ function renderPendingChanges() {
         + '<button class="btn-mini btn-reject" onclick="rejectPendingBatch(' + idsJson + ')">✕ Reject all</button>'
         + '</div>';
     } else if (pendingItems.length === 1 && isAdmin) {
-      // Single pending field: per-row buttons suffice; no batch row needed
-      actions = '';
+      // Single pending field: also offer clear card-level buttons (the tiny
+      // per-field ✓/✕ are easy to miss). For a deleted variable, approving the
+      // edit makes no sense, so offer Reject only.
+      const only = pendingItems[0];
+      actions = '<div class="pc-actions">'
+        + (v.is_deleted
+            ? '<span class="pc-meta" style="margin-right:8px;">Variable was deleted — approving isn\'t possible.</span>'
+            : '<button class="btn-mini btn-approve" onclick="approvePending(\'' + only.id + '\')">✓ Approve</button>')
+        + '<button class="btn-mini btn-reject" onclick="rejectPending(\'' + only.id + '\')">✕ Reject</button>'
+        + '</div>';
     } else if (pendingItems.length > 0) {
       // Editor view of own pending items: just show the status badge
       actions = '<div class="pc-actions"><span class="pc-status status-pending">pending review</span></div>';
@@ -4635,15 +4643,13 @@ function renderFieldManager() {
         + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
         + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
-        + (fld.isCustom
-            ? '<span class="fm-fname" title="Per-role access is not available for custom fields">(n/a)</span>'
-            : (function(){ var a = fmAccessOf(fld); return ''
-              + '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Access for the selected role" style="min-width:92px;">'
+        + (function(){ var a = fmAccessOf(fld); return ''
+              + '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Access for the selected role (works for custom fields too)" style="min-width:92px;">'
               +   '<option value="none"' + (a === 'none' ? ' selected' : '') + '>none</option>'
               +   '<option value="read"' + (a === 'read' ? ' selected' : '') + '>read</option>'
               +   '<option value="propose"' + (a === 'propose' ? ' selected' : '') + '>propose</option>'
               +   '<option value="write"' + (a === 'write' ? ' selected' : '') + '>write</option>'
-              + '</select>'; })())
+              + '</select>'; })()
         + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
         + '</div>';
     });
