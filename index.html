@@ -1243,7 +1243,7 @@
 <style id="cloud-v670-styles">
   /* v6.7: Field manager */
   .tab-dropdown { position:relative; display:inline-block; }
-  .admin-menu { position:absolute; top:100%; left:0; margin-top:4px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:60; display:none; }
+  .admin-menu { position:fixed; margin-top:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:1000; display:none; }
   .admin-menu.open { display:block; }
   .admin-menu button { display:block; width:100%; text-align:left; background:none; border:none; padding:8px 12px; border-radius:6px; font-size:0.9rem; cursor:pointer; color:var(--text); }
   .admin-menu button:hover { background:var(--surface-2); }
@@ -1311,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.17.0
+      Codebook Editor — Cloud edition · v6.17.1
     </div>
   </div>
 </div>
@@ -1603,7 +1603,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.17.0 cloud</span>
+      <span class="version">v6.17.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1868,14 +1868,6 @@
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
-    <div class="admin-only" id="field-mgmt-section" style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
-      <h3 style="margin: 0 0 0.3rem; font-size: 1rem;">Field management</h3>
-      <p style="margin: 0 0 0.7rem; color: var(--text-muted); font-size: 0.85rem;">Reorder fields, organize them into groups, and rename them. Changes are saved to the cloud and apply for everyone.</p>
-      <button class="btn-primary" onclick="openFieldManager()">⚙️ Manage fields</button>
-    </div>
-
-    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
-
     <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Identifier field</h2>
     <div class="info-box" style="margin-top: 0;">
       The unique name field for each variable. Used for required-field validation in Add/Edit and to confirm Delete. Auto-detected — change it if the wrong field was picked.
@@ -1915,13 +1907,14 @@
 
     <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
 
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Risks &amp; tips</h2>
+    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Notes &amp; tips</h2>
     <ul style="font-size: 12px; color: var(--text-muted); padding-left: 20px; line-height: 1.7;">
-      <li>All edits are <strong>in-memory</strong> until saved. With auto-save (Chrome/Edge), they go to disk automatically.</li>
-      <li>No undo. Keep numbered backups of important versions.</li>
-      <li>Browser cache may serve stale tool versions — hard-refresh if version doesn't match.</li>
-      <li>One person at a time. Multiple simultaneous edits will overwrite each other on save.</li>
-      <li>For team collaboration with access control, use a private GitHub repository.</li>
+      <li>Edits save to the <strong>cloud database</strong> automatically — there is no local file to keep.</li>
+      <li>Deleted variables go to <strong>Trash</strong> (Admin menu) and can be restored; other changes are kept in the <strong>Log</strong> (audit trail).</li>
+      <li>Multiple people can work at the same time. If two edit the <em>same</em> variable, the second save is warned before it overwrites the first.</li>
+      <li>Roles control who can do what: <strong>admin</strong> (full), <strong>editor</strong> (edit), <strong>ontology_engineer</strong> (granted fields), <strong>researcher</strong> (read + suggest changes).</li>
+      <li>Use <strong>Export Excel</strong> or <strong>Save JSON</strong> for a point-in-time backup before big changes.</li>
+      <li>Browser cache may serve a stale version — hard-refresh if the version number doesn't match.</li>
     </ul>
   </div>
 
@@ -5687,7 +5680,17 @@ async function reorderMove(uid, dir) {
   if (typeof refreshAllPanels === 'function') refreshAllPanels();
 }
 
-function toggleAdminMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('admin-menu'); if(m) m.classList.toggle('open'); }
+function toggleAdminMenu(e){
+  if(e) e.stopPropagation();
+  var m=document.getElementById('admin-menu');
+  var b=document.getElementById('admin-tab-btn');
+  if(!m||!b) return;
+  if(m.classList.contains('open')){ m.classList.remove('open'); return; }
+  var r=b.getBoundingClientRect();
+  m.style.left=Math.round(r.left)+'px';
+  m.style.top=Math.round(r.bottom+4)+'px';
+  m.classList.add('open');
+}
 function closeAdminMenu(){ var m=document.getElementById('admin-menu'); if(m) m.classList.remove('open'); }
 document.addEventListener('click', function(e){ var dd=document.getElementById('admin-dropdown'); if(dd && !dd.contains(e.target)) closeAdminMenu(); });
 
@@ -6676,24 +6679,44 @@ function updateIdentifierStatus() {
   if (!f || !state.codebook) return;
   const total = state.codebook.length;
   let filled = 0;
-  const unique = new Set();
-  let dups = 0;
+  const seen = new Map();
+  const missing = [];
   state.codebook.forEach(r => {
     const v = r[f];
     if (v !== undefined && v !== null && String(v).trim() !== "") {
       filled++;
       const sv = String(v);
-      if (unique.has(sv)) dups++; else unique.add(sv);
+      seen.set(sv, (seen.get(sv) || 0) + 1);
+    } else {
+      missing.push(r);
     }
   });
+  const dupValues = [...seen.entries()].filter(e => e[1] > 1);
+  const dups = dupValues.reduce((a, e) => a + (e[1] - 1), 0);
   const status = document.getElementById("identifier-status");
   if (!status) return;
+  function recLabel(r) {
+    const parts = [r.Instrument, r.variable_label_en || r.variable_label_nl || r.variable_name_FAIR || r.variable_name_FAIR_merged];
+    const s = parts.filter(x => x && String(x).trim()).join(" — ");
+    return s || "(unlabeled record)";
+  }
   const issues = [];
   if (filled < total) issues.push(`<span style="color: var(--warn);">⚠ ${total - filled} record${total - filled === 1 ? "" : "s"} missing this field</span>`);
   if (dups > 0) issues.push(`<span style="color: var(--warn);">⚠ ${dups} duplicate value${dups === 1 ? "" : "s"}</span>`);
-  status.innerHTML = issues.length === 0
+  let html = issues.length === 0
     ? `<span style="color: var(--success);">✓ Filled in all ${total} records, all unique</span>`
     : issues.join(" · ");
+  if (missing.length) {
+    html += `<details style="margin-top:6px;"><summary style="cursor:pointer; color:var(--accent);">Which record${missing.length === 1 ? "" : "s"}?</summary><ul style="margin:6px 0 0 18px; font-size:0.8rem; color:var(--text-muted);">`
+      + missing.map(r => `<li>${escapeHtml(recLabel(r))}</li>`).join("")
+      + `</ul></details>`;
+  }
+  if (dupValues.length) {
+    html += `<details style="margin-top:6px;"><summary style="cursor:pointer; color:var(--accent);">Which values are duplicated?</summary><ul style="margin:6px 0 0 18px; font-size:0.8rem; color:var(--text-muted);">`
+      + dupValues.map(e => `<li>${escapeHtml(e[0])} <span style="color:var(--text-faint);">(×${e[1]})</span></li>`).join("")
+      + `</ul></details>`;
+  }
+  status.innerHTML = html;
 }
 
 document.getElementById("identifier-select").addEventListener("change", function() {
