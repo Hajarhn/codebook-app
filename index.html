@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.0
+      Codebook Editor — Cloud edition · v6.15.1
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.0 cloud</span>
+      <span class="version">v6.15.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4467,7 +4467,7 @@ async function loadHistory() {
     const varIds = [...new Set((data || []).map(d => d.variable_id).filter(Boolean))];
     let varMap = {};
     if (varIds.length > 0) {
-      const { data: vars } = await client.from('variables').select('id, variable_name_CBS, "Instrument"').in('id', varIds);
+      const { data: vars } = await client.from('variables').select('id, variable_name_cbs, "Instrument"').in('id', varIds);
       (vars || []).forEach(v => { varMap[v.id] = v; });
     }
     HISTORY_STATE.items = data || [];
@@ -4505,7 +4505,7 @@ function renderHistory() {
     const who = userMap[it.performed_by] || 'unknown';
     const time = dt ? dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
     const v = varMap[it.variable_id];
-    const vname = v ? (v.variable_name_CBS || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
+    const vname = v ? (v.variable_name_cbs || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
     const vinst = v && v.Instrument ? ' · ' + histEscape(v.Instrument) : '';
 
     let detail = '';
@@ -5574,7 +5574,7 @@ function renderReorderList() {
     .sort((a, b) => ((a.display_order ?? Infinity) - (b.display_order ?? Infinity)));
   if (!list.length) { host.innerHTML = '<div class="empty-state"><p>This instrument has no variables to reorder.</p></div>'; return; }
   host.innerHTML = list.map((v, i) => {
-    const label = v.variable_label_en || v.variable_name_cbs || v.variable_label_nl || v.id;
+    const label = v.variable_name_CBS || v.variable_label_EN || v.variable_label_NL || v.id;
     const up = i === 0 ? 'disabled' : '';
     const down = i === list.length - 1 ? 'disabled' : '';
     return '<div style="display:flex; align-items:center; gap:10px; padding:7px 10px; border:1px solid var(--border); border-radius:7px; background:var(--surface);">'
@@ -6876,6 +6876,12 @@ function submitAddVariable() {
   if (!newId || !String(newId).trim()) { errEl.textContent = `${idField} is required`; errEl.style.display = "block"; return; }
   const dup = state.codebook.find(x => !x._deleted && getId(x) === newId);
   if (dup) { errEl.textContent = `A variable with ${idField} = "${newId}" already exists`; errEl.style.display = "block"; return; }
+  // variable_name_CBS is mandatory for every new variable.
+  if (!newVar['variable_name_CBS'] || !String(newVar['variable_name_CBS']).trim()) {
+    errEl.textContent = 'variable_name_cbs is required';
+    errEl.style.display = "block";
+    return;
+  }
   newVar[state.instrumentField] = checkedAtoms.join(" + ");
   if (state.allFields.includes("id") && (!newVar.id || !String(newVar.id).trim())) newVar.id = generateUuid();
   newVar._uid = newVar.id || ("tmp_" + Math.random().toString(36).slice(2, 11));
