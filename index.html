@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.3
+      Codebook Editor — Cloud edition · v6.15.4
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.3 cloud</span>
+      <span class="version">v6.15.4 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4515,7 +4515,7 @@ function renderHistory() {
       lastDay = day;
     }
     const who = userMap[it.performed_by] || 'unknown';
-    const time = dt ? dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
+    const time = dt ? dt.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
     const v = varMap[it.variable_id];
     const vname = v ? (v.variable_name_cbs || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
     const vinst = v && v.Instrument ? ' · ' + histEscape(v.Instrument) : '';
