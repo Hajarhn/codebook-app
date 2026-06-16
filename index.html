@@ -1311,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.17.1
+      Codebook Editor — Cloud edition · v6.17.2
     </div>
   </div>
 </div>
@@ -1603,7 +1603,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.17.1 cloud</span>
+      <span class="version">v6.17.2 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -6646,6 +6646,8 @@ function populateIdentifierPicker() {
     const aPerfect = (stats[a].filled === total && stats[a].unique === total) ? 0 : 1;
     const bPerfect = (stats[b].filled === total && stats[b].unique === total) ? 0 : 1;
     if (aPerfect !== bPerfect) return aPerfect - bPerfect;
+    // A good identifier is UNIQUE first, well-filled second.
+    if (stats[a].unique !== stats[b].unique) return stats[b].unique - stats[a].unique;
     if (stats[a].filled !== stats[b].filled) return stats[b].filled - stats[a].filled;
     return 0;
   });
@@ -6655,6 +6657,9 @@ function populateIdentifierPicker() {
     const currentIsPerfect = state.identifierField && stats[state.identifierField] && stats[state.identifierField].filled === total && stats[state.identifierField].unique === total;
     if (topIsPerfect && !currentIsPerfect) state.identifierField = top;
     if (!state.allFields.includes(state.identifierField)) state.identifierField = top;
+    // Auto-correct: if the current pick is clearly NOT a key (lots of duplicates) and a far more unique field exists, switch to it.
+    const cur = state.identifierField, cs = cur && stats[cur];
+    if (cs && cs.unique < total * 0.5 && stats[top].unique > cs.unique) state.identifierField = top;
   }
   select.innerHTML = sorted.map(f => {
     const s = stats[f];
@@ -6696,9 +6701,18 @@ function updateIdentifierStatus() {
   const status = document.getElementById("identifier-status");
   if (!status) return;
   function recLabel(r) {
-    const parts = [r.Instrument, r.variable_label_en || r.variable_label_nl || r.variable_name_FAIR || r.variable_name_FAIR_merged];
-    const s = parts.filter(x => x && String(x).trim()).join(" — ");
-    return s || "(unlabeled record)";
+    const pref = [r.Instrument, r.variable_label_en || r.variable_label_nl || r.variable_name_FAIR || r.variable_name_FAIR_merged];
+    let s = pref.filter(x => x && String(x).trim()).join(" — ");
+    if (!s) {
+      const parts = [];
+      for (const fld of state.allFields) {
+        const val = r[fld];
+        if (val && String(val).trim()) { parts.push(fld + ": " + String(val).trim()); if (parts.length >= 2) break; }
+      }
+      s = parts.join(" · ");
+    }
+    if (!s && r.id) s = "id " + String(r.id).slice(0, 8) + "…";
+    return s || "(completely empty record)";
   }
   const issues = [];
   if (filled < total) issues.push(`<span style="color: var(--warn);">⚠ ${total - filled} record${total - filled === 1 ? "" : "s"} missing this field</span>`);
@@ -6707,8 +6721,8 @@ function updateIdentifierStatus() {
     ? `<span style="color: var(--success);">✓ Filled in all ${total} records, all unique</span>`
     : issues.join(" · ");
   if (missing.length) {
-    html += `<details style="margin-top:6px;"><summary style="cursor:pointer; color:var(--accent);">Which record${missing.length === 1 ? "" : "s"}?</summary><ul style="margin:6px 0 0 18px; font-size:0.8rem; color:var(--text-muted);">`
-      + missing.map(r => `<li>${escapeHtml(recLabel(r))}</li>`).join("")
+    html += `<details style="margin-top:6px;"><summary style="cursor:pointer; color:var(--accent);">Which record${missing.length === 1 ? "" : "s"}? (click to open)</summary><ul style="margin:6px 0 0 18px; font-size:0.8rem;">`
+      + missing.map(r => `<li><a href="#" onclick="openEditDialog('${escapeAttr(r._uid)}'); return false;" style="color:var(--accent);">${escapeHtml(recLabel(r))}</a></li>`).join("")
       + `</ul></details>`;
   }
   if (dupValues.length) {
@@ -6867,7 +6881,7 @@ async function submitEditVariable() {
 
   // Identifier is only validated/edited when the role can edit it.
   const idField = state.identifierField;
-  if ((accessOf(idField) === 'write' || accessOf(idField) === 'propose') && (idField in newValues)) {
+  if (idField && idField !== state.instrumentField && (accessOf(idField) === 'write' || accessOf(idField) === 'propose') && (idField in newValues)) {
     const newId = newValues[idField];
     if (!newId || !String(newId).trim()) { showModalError("edit", `${idField} cannot be empty`); return; }
     const dup = state.codebook.find(x => x._uid !== v._uid && getId(x) === newId && !x._deleted && getId(v) !== newId);
