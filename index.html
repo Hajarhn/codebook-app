@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.3
+      Codebook Editor — Cloud edition · v6.16.1
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.3 cloud</span>
+      <span class="version">v6.16.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1662,6 +1662,7 @@
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 History</button>
     <button class="tab admin-only" data-tab="users" role="tab" onclick="switchTab('users')">👥 Users</button>
+    <button class="tab admin-only" data-tab="trash" role="tab" onclick="switchTab('trash')">🗑 Trash</button>
     <button class="tab" data-tab="settings" role="tab" onclick="switchTab('settings')">⚙️ Settings</button>
   </div>
 
@@ -1841,6 +1842,17 @@
       <span id="newuser-msg" style="font-size:12px; color:var(--text-muted); flex:1; min-width:200px;"></span>
     </div>
     <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-trash" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Trash</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Soft-deleted variables. Restore brings them back into the codebook.</p>
+      </div>
+      <button class="btn-mini" id="trash-refresh-btn" onclick="loadTrash()">↻ Refresh</button>
+    </div>
+    <div id="trash-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
@@ -3586,7 +3598,7 @@ async function loadFieldPermissions() {
   if (!window.cloudAuth || !window.cloudAuth.client) return;
   const { data, error } = await window.cloudAuth.client
     .from('field_metadata')
-    .select('field_name, permission_class, display_label, field_group, display_order');
+    .select('field_name, permission_class, display_label, field_group, display_order, fallback_field');
   if (error) { console.error('Could not load field_metadata:', error); return; }
   const map = {};
   const meta = {};
@@ -3596,12 +3608,30 @@ async function loadFieldPermissions() {
       display_label: r.display_label || r.field_name,
       field_group: r.field_group || 'other',
       display_order: r.display_order != null ? r.display_order : 999,
-      permission_class: r.permission_class
+      permission_class: r.permission_class,
+      fallback_field: r.fallback_field || ''
     };
   });
   window.cloudFieldPerms = map;
   window.cloudFieldMeta = meta;
   maybeApplyOrdering();
+}
+
+// Resolve a field's display value, applying the admin-configured fallback:
+// if the field is empty and has a fallback_field, show the fallback's value.
+// Returns { value, usedFallback, fallbackField }.
+function resolveFieldDisplay(v, f) {
+  let value = v ? v[f] : undefined;
+  const isEmpty = value === undefined || value === null || String(value).trim() === '';
+  const meta = window.cloudFieldMeta && window.cloudFieldMeta[f];
+  if (isEmpty && meta && meta.fallback_field && v) {
+    const fb = meta.fallback_field;
+    const fbVal = v[fb];
+    if (!(fbVal === undefined || fbVal === null || String(fbVal).trim() === '')) {
+      return { value: fbVal, usedFallback: true, fallbackField: fb };
+    }
+  }
+  return { value: value, usedFallback: false, fallbackField: '' };
 }
 
 // Sort state.allFields by display_order from field_metadata + custom defs.
@@ -4515,7 +4545,7 @@ function renderHistory() {
       lastDay = day;
     }
     const who = userMap[it.performed_by] || 'unknown';
-    const time = dt ? dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
+    const time = dt ? dt.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
     const v = varMap[it.variable_id];
     const vname = v ? (v.variable_name_cbs || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
     const vinst = v && v.Instrument ? ' · ' + histEscape(v.Instrument) : '';
@@ -4596,7 +4626,8 @@ async function openFieldManager() {
         orig_name: f,
         label: fieldDisplayLabel(f),
         isCustom: isCustom,
-        group: fieldGroupOf(f) || 'other'
+        group: fieldGroupOf(f) || 'other',
+        fallback: (window.cloudFieldMeta[f] && window.cloudFieldMeta[f].fallback_field) || ''
       };
     });
   // Bucket into groups, preserving first-seen order (which follows display_order).
@@ -4650,6 +4681,10 @@ function renderFieldManager() {
               +   '<option value="propose"' + (a === 'propose' ? ' selected' : '') + '>propose</option>'
               +   '<option value="write"' + (a === 'write' ? ' selected' : '') + '>write</option>'
               + '</select>'; })()
+        + '<select class="fm-group-sel" onchange="fmSetFallback(' + gi + ',' + fi + ',this.value)" title="If this field is empty, show this other field\'s value instead" style="min-width:120px;">'
+        +   '<option value="">(no fallback)</option>'
+        +   FM_STATE.groups.flatMap(g => g.fields).filter(o => o.field_name !== fld.field_name).map(o => '<option value="' + escapeAttr(o.field_name) + '"' + (fld.fallback === o.field_name ? ' selected' : '') + '>↳ ' + escapeHtml(o.field_name) + '</option>').join('')
+        + '</select>'
         + '<span class="fm-fname" title="DB field: ' + escapeAttr(fld.field_name) + '">' + escapeHtml(fld.isCustom ? '(custom)' : fld.field_name) + '</span>'
         + '</div>';
     });
@@ -4733,6 +4768,10 @@ function fmSetAccess(gi, fi, val) {
   FM_STATE.access[role][oeDbName(fld.field_name)] = val;
   FM_STATE.dirty = true;
 }
+function fmSetFallback(gi, fi, val) {
+  FM_STATE.groups[gi].fields[fi].fallback = val || '';
+  FM_STATE.dirty = true;
+}
 function fmChangeAccessRole(role) {
   FM_STATE.accessRole = role;
   renderFieldManager();
@@ -4802,7 +4841,7 @@ async function saveFieldManager() {
         if (cf) { cf.display_order = newOrder; cf.field_group = fld.group; cf.display_label = fld.label; }
       } else {
         const { data: upRows, error } = await client.from('field_metadata')
-          .update({ display_label: fld.label, field_group: fld.group, display_order: newOrder })
+          .update({ display_label: fld.label, field_group: fld.group, display_order: newOrder, fallback_field: fld.fallback || null })
           .eq('field_name', fld.field_name)
           .select('field_name');
         if (error) throw error;
@@ -4813,6 +4852,7 @@ async function saveFieldManager() {
           window.cloudFieldMeta[fld.field_name].display_label = fld.label;
           window.cloudFieldMeta[fld.field_name].field_group = fld.group;
           window.cloudFieldMeta[fld.field_name].display_order = newOrder;
+          window.cloudFieldMeta[fld.field_name].fallback_field = fld.fallback || '';
         }
       }
     }
@@ -4899,10 +4939,20 @@ function applyCloudCodebook(rows, opts) {
   }
   state.identifierField = identifierField;
 
-  // Collect all field names in first-seen order
+  // Collect all field names in first-seen order, EXCLUDING internal/system
+  // columns that should never appear as editable/visible fields in any panel
+  // (id is the internal UUID key; the rest are bookkeeping). Per-role visibility
+  // of the REAL fields is handled separately by the access system.
+  const HIDDEN_DISPLAY_FIELDS = new Set([
+    'id', 'display_order', 'custom_fields',
+    'created_at', 'updated_at', 'created_by', 'updated_by',
+    'is_deleted', 'deleted_at', 'deleted_by'
+  ]);
   const fieldList = [];
   const seen = new Set();
   rows.forEach(r => Object.keys(r).forEach(k => {
+    if (k.startsWith('_')) return;            // UI-only keys (_uid, _customKeys, …)
+    if (HIDDEN_DISPLAY_FIELDS.has(k)) return; // internal/system columns
     if (!seen.has(k)) { seen.add(k); fieldList.push(k); }
   }));
   state.allFields = fieldList;
@@ -5635,6 +5685,57 @@ function switchTab(name) {
   else if (name === "activity") refreshActivityTab();
   else if (name === "settings") refreshSettingsTab();
   else if (name === "users") loadUsers();
+  else if (name === "trash") loadTrash();
+}
+
+// ============ TRASH TAB (admin) ============
+async function loadTrash() {
+  const host = document.getElementById('trash-list');
+  if (!host) return;
+  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') {
+    host.innerHTML = '<div class="empty-state"><p>Admins only.</p></div>';
+    return;
+  }
+  host.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  const { data, error } = await window.cloudAuth.client
+    .from('variables')
+    .select('id, variable_name_cbs, "Instrument", deleted_at')
+    .eq('is_deleted', true)
+    .order('deleted_at', { ascending: false });
+  if (error) {
+    host.innerHTML = '<div class="empty-state"><p>Could not load trash: ' + escapeHtml(error.message) + '</p></div>';
+    return;
+  }
+  if (!data || !data.length) {
+    host.innerHTML = '<div class="empty-state"><div style="font-size:28px;opacity:.5;">🗑</div><p>Trash is empty.</p></div>';
+    return;
+  }
+  const rows = data.map(v => {
+    const name = v.variable_name_cbs || (v.id ? v.id.slice(0, 8) + '…' : '?');
+    const inst = v.Instrument ? ' · ' + escapeHtml(v.Instrument) : '';
+    const when = v.deleted_at ? new Date(v.deleted_at).toLocaleString() : '';
+    return '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; border-bottom:1px solid var(--border);">'
+      + '<div><strong style="font-size:13px;">' + escapeHtml(name) + '</strong>'
+      +   '<span style="color:var(--text-muted); font-size:12px;">' + inst + (when ? ' · deleted ' + escapeHtml(when) : '') + '</span></div>'
+      + '<button class="btn-mini" onclick="restoreDeleted(\'' + v.id + '\', this)">♻️ Restore</button>'
+      + '</div>';
+  }).join('');
+  host.innerHTML = '<div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow-sm);">' + rows + '</div>';
+}
+async function restoreDeleted(id, el) {
+  if (el) el.disabled = true;
+  try {
+    const { error } = await window.cloudAuth.client.rpc('admin_update_variable', {
+      p_variable_id: id, p_updates: { is_deleted: false }
+    });
+    if (error) { cloudShowToast('error', 'Could not restore: ' + error.message); if (el) el.disabled = false; return; }
+    cloudShowToast('success', 'Variable restored');
+    loadTrash();
+    if (typeof bootstrapCloudCodebook === 'function') bootstrapCloudCodebook();
+  } catch (e) {
+    cloudShowToast('error', 'Could not restore: ' + (e.message || e));
+    if (el) el.disabled = false;
+  }
 }
 
 // ============ VARIABLES TAB ============
@@ -6642,11 +6743,13 @@ function openViewDialog(uid) {
     return `<div class="field-group">
       <div class="field-group-title">${groupLabels[gKey]}</div>
       ${fields.map(f => {
-        const val = v[f];
+        const r = resolveFieldDisplay(v, f);
+        const val = r.value;
         const isEmpty = val === undefined || val === null || val === "";
         const display = isEmpty ? "(empty)" : String(val);
+        const fbTag = r.usedFallback ? ` <span style="color:var(--accent); font-size:10px;">(from ${escapeHtml(r.fallbackField)})</span>` : '';
         return `<div class="field-readonly">
-          <div class="field-readonly-name">${escapeHtml(f)}</div>
+          <div class="field-readonly-name">${escapeHtml(f)}${fbTag}</div>
           <div class="field-readonly-value ${isEmpty ? 'empty' : ''}">${escapeHtml(display)}</div>
         </div>`;
       }).join("")}
@@ -6893,7 +6996,7 @@ function submitAddVariable() {
     return;
   }
   newVar[state.instrumentField] = checkedAtoms.join(" + ");
-  if (state.allFields.includes("id") && (!newVar.id || !String(newVar.id).trim())) newVar.id = generateUuid();
+  if (!newVar.id || !String(newVar.id).trim()) newVar.id = generateUuid();
   newVar._uid = newVar.id || ("tmp_" + Math.random().toString(36).slice(2, 11));
   newVar._added = true;
 
