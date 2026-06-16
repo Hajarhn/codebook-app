@@ -1306,7 +1306,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.15.1
+      Codebook Editor — Cloud edition · v6.15.2
     </div>
   </div>
 </div>
@@ -1598,7 +1598,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.15.1 cloud</span>
+      <span class="version">v6.15.2 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -4321,14 +4321,16 @@ async function approvePending(id, silent) {
     }).eq('id', id);
     if (stErr) throw stErr;
 
-    // Audit
-    await client.from('audit_log').insert({
-      variable_id: item.variable_id,
-      action: 'approve_change',
-      field_name: item.field_name || null,
-      new_value: item.new_value || null,
-      performed_by: userId
-    });
+    // Audit (non-fatal: never let a logging hiccup block the approval)
+    try {
+      await client.from('audit_log').insert({
+        variable_id: item.variable_id,
+        action: 'approve_change',
+        field_name: item.field_name || null,
+        new_value: item.new_value || null,
+        performed_by: userId
+      });
+    } catch (auditErr) { console.warn('Audit log skipped:', auditErr); }
 
     // Reflect the change in the local codebook so the Variables tab updates
     // without requiring a manual refresh.
@@ -4376,11 +4378,13 @@ async function rejectPending(id, silent, presetNote) {
     if (error) throw error;
 
     const item = PENDING_STATE.items.find(x => x.id === id);
-    await client.from('audit_log').insert({
-      variable_id: item ? item.variable_id : null,
-      action: 'reject_change',
-      performed_by: userId
-    });
+    try {
+      await client.from('audit_log').insert({
+        variable_id: item ? item.variable_id : null,
+        action: 'reject_change',
+        performed_by: userId
+      });
+    } catch (auditErr) { console.warn('Audit log skipped:', auditErr); }
 
     if (!silent) {
       cloudShowToast('success', 'Change rejected');
