@@ -1242,15 +1242,20 @@
 </style>
 <style id="cloud-v670-styles">
   /* v6.7: Field manager */
+  .tab-dropdown { position:relative; display:inline-block; }
+  .admin-menu { position:absolute; top:100%; left:0; margin-top:4px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:60; display:none; }
+  .admin-menu.open { display:block; }
+  .admin-menu button { display:block; width:100%; text-align:left; background:none; border:none; padding:8px 12px; border-radius:6px; font-size:0.9rem; cursor:pointer; color:var(--text); }
+  .admin-menu button:hover { background:var(--surface-2); }
   .fm-row { display:flex; align-items:center; gap:0.5rem; padding:0.45rem 0.3rem; border-bottom:1px solid var(--border); }
   .fm-row:hover { background: var(--surface-2); }
   .fm-arrows { display:flex; flex-direction:column; gap:1px; }
   .fm-arrows button { padding:0 5px; font-size:0.7rem; line-height:1.1; cursor:pointer; border:1px solid var(--border); background:var(--surface); border-radius:3px; }
   .fm-arrows button:disabled { opacity:0.3; cursor:default; }
-  .fm-label-in { flex:1; min-width:80px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.85rem; }
+  .fm-label-in { flex:1; min-width:150px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.85rem; }
   .fm-group-in { width:130px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:0.82rem; }
   .fm-star { color:#E8A33D; font-size:0.8rem; width:14px; }
-  .fm-fname { font-family:monospace; font-size:0.72rem; color:var(--text-faint); width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fm-fname { font-family:monospace; font-size:0.72rem; color:var(--text-faint); width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .fm-group-header { font-weight:600; font-size:0.78rem; color:var(--text-muted); padding:0.6rem 0.3rem 0.25rem; text-transform:uppercase; letter-spacing:0.03em; }
 </style>
 <style id="cloud-v681-styles">
@@ -1306,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.16.1
+      Codebook Editor — Cloud edition · v6.17.0
     </div>
   </div>
 </div>
@@ -1598,7 +1603,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.16.1 cloud</span>
+      <span class="version">v6.17.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1658,12 +1663,19 @@
     <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')">📋 Variables <span class="count" id="tab-count-vars">0</span></button>
     <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')">🔍 Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
-    <button class="tab" data-tab="activity" role="tab" onclick="switchTab('activity')">📜 Activity <span class="count" id="tab-count-activity">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
-    <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 History</button>
-    <button class="tab admin-only" data-tab="users" role="tab" onclick="switchTab('users')">👥 Users</button>
-    <button class="tab admin-only" data-tab="trash" role="tab" onclick="switchTab('trash')">🗑 Trash</button>
-    <button class="tab" data-tab="settings" role="tab" onclick="switchTab('settings')">⚙️ Settings</button>
+    <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 Log</button>
+    <div class="tab-dropdown admin-only" id="admin-dropdown">
+      <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)">🛠 Admin ▾</button>
+      <div class="admin-menu" id="admin-menu">
+        <button type="button" onclick="switchTab('users'); closeAdminMenu();">👥 Users</button>
+        <button type="button" onclick="switchTab('trash'); closeAdminMenu();">🗑 Trash</button>
+        <button type="button" onclick="openFieldManager(); closeAdminMenu();">🧩 Manage fields</button>
+        <button type="button" onclick="switchTab('settings'); closeAdminMenu();">⚙️ Settings</button>
+      </div>
+    </div>
+    <!-- Activity (session changes) stays reachable via the "Unsaved changes" badge; tab-count-activity kept hidden so the counter still updates -->
+    <span id="tab-count-activity" style="display:none;">0</span>
   </div>
 
   <!-- ============ VARIABLES TAB ============ -->
@@ -5675,9 +5687,15 @@ async function reorderMove(uid, dir) {
   if (typeof refreshAllPanels === 'function') refreshAllPanels();
 }
 
+function toggleAdminMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('admin-menu'); if(m) m.classList.toggle('open'); }
+function closeAdminMenu(){ var m=document.getElementById('admin-menu'); if(m) m.classList.remove('open'); }
+document.addEventListener('click', function(e){ var dd=document.getElementById('admin-dropdown'); if(dd && !dd.contains(e.target)) closeAdminMenu(); });
+
 function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  var _adminBtn = document.getElementById("admin-tab-btn");
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   if (name === "variables") refreshVariablesTab();
   else if (name === "bulk") refreshBulkTab();
@@ -7705,7 +7723,7 @@ function resetAll() {
 
 <!-- v6.7: Field Manager modal -->
 <div class="modal-overlay" id="modal-field-manager" style="display: none;">
-  <div class="modal" style="max-width: 640px; max-height: 85vh; display:flex; flex-direction:column;">
+  <div class="modal" style="max-width: 920px; width: 92vw; max-height: 85vh; display:flex; flex-direction:column; resize: both; overflow: auto;">
     <div class="modal-header">
       <div>
         <div class="modal-title">Manage fields</div>
