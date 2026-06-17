@@ -1311,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.17.2
+      Codebook Editor — Cloud edition · v6.17.3
     </div>
   </div>
 </div>
@@ -1603,7 +1603,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.17.2 cloud</span>
+      <span class="version">v6.17.3 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2417,6 +2417,8 @@
     window.cloudAuth.user = null;
     window.cloudAuth.profile = null;
     window.cloudAuth.role = null;
+    window._fieldMetaReady = false;
+    window._customFieldsReady = false;
 
     // Clear input fields
     el('cloud-login-password').value = '';
@@ -2482,10 +2484,10 @@
         cloudCurrentUserId = null;
         onSignedOut();
       } else if (event === 'PASSWORD_RECOVERY') {
-        // User clicked a reset link. For now we just inform them.
-        // Full password update flow comes later.
-        showMessage('cloud-login-message', 'info',
-          'You can update your password through Supabase for now. Password change UI is coming in a future update.');
+        // User clicked a reset link → recovery session is active. Show the
+        // set-new-password overlay (it sits above everything via z-index).
+        var ro = document.getElementById('cloud-recovery-overlay');
+        if (ro) ro.style.display = 'flex';
       }
     });
   }
@@ -3514,6 +3516,7 @@ async function loadCustomFieldDefs() {
     .order('display_order', { ascending: true });
   if (error) { console.error('custom_field_defs load failed', error); return; }
   window.cloudCustomFields = data || [];
+  window._customFieldsReady = true;
   // Make sure these field names are registered in state.allFields so they show
   // up as columns / chips even when a variable has no value yet.
   if (Array.isArray(state.allFields)) {
@@ -3619,6 +3622,7 @@ async function loadFieldPermissions() {
   });
   window.cloudFieldPerms = map;
   window.cloudFieldMeta = meta;
+  window._fieldMetaReady = true;
   maybeApplyOrdering();
 }
 
@@ -3641,8 +3645,12 @@ function resolveFieldDisplay(v, f) {
 
 // Sort state.allFields by display_order from field_metadata + custom defs.
 function maybeApplyOrdering() {
-  // Re-apply ordering + refresh once codebook is present AND metadata is loaded.
+  // Re-apply ordering + refresh once codebook is present AND BOTH metadata
+  // sources (field_metadata + custom_field_defs) have finished loading.
+  // Waiting for both fixes the post-login bug where ordering applied before
+  // custom-field definitions were available.
   if (!Array.isArray(state.allFields) || state.allFields.length === 0) return;
+  if (!window._fieldMetaReady || !window._customFieldsReady) return;
   if (!window.cloudFieldMeta || Object.keys(window.cloudFieldMeta).length === 0) return;
   applyFieldOrdering();
   if (state.codebook && typeof refreshAllPanels === 'function') {
@@ -6923,21 +6931,30 @@ function showModalError(which, msg) {
 
 // ============ DELETE MODAL ============
 let deletingUid = null;
+let deleteConfirmValue = "";
 function openDeleteDialog(uid) {
   const v = findVarByUid(uid); if (!v) return;
   deletingUid = uid;
-  document.getElementById("delete-var-name").textContent = getId(v) || "(unnamed)";
+  // Always confirm against a UNIQUE value: the identifier field if it has a value,
+  // otherwise the database id (always unique) so deletion is never ambiguous.
+  let confirmField = state.identifierField;
+  let confirmValue = getId(v);
+  if (!confirmValue || String(confirmValue).trim() === "") {
+    confirmField = "id";
+    confirmValue = v.id || "";
+  }
+  deleteConfirmValue = String(confirmValue);
+  document.getElementById("delete-var-name").textContent = getId(v) || (v.id ? "id " + String(v.id).slice(0, 8) + "…" : "(unnamed)");
   document.getElementById("delete-var-label").textContent = truncate(v.variable_label_EN || v.variable_label || "(no label)", 100);
-  document.getElementById("delete-var-confirm-field").textContent = state.identifierField;
+  document.getElementById("delete-var-confirm-field").textContent = confirmField;
   document.getElementById("delete-confirm-input").value = "";
-  document.getElementById("delete-confirm-input").placeholder = getId(v) || "";
+  document.getElementById("delete-confirm-input").placeholder = deleteConfirmValue;
   document.getElementById("delete-confirm-btn").disabled = true;
   document.getElementById("modal-delete").style.display = "flex";
   setTimeout(() => document.getElementById("delete-confirm-input").focus(), 50);
 }
 document.getElementById("delete-confirm-input").addEventListener("input", function() {
-  const v = findVarByUid(deletingUid);
-  document.getElementById("delete-confirm-btn").disabled = !v || this.value !== getId(v);
+  document.getElementById("delete-confirm-btn").disabled = (deleteConfirmValue === "") || (this.value !== deleteConfirmValue);
 });
 
 function submitDeleteVariable() {
@@ -7787,5 +7804,33 @@ function resetAll() {
   </div>
 </div>
 
+<div id="cloud-recovery-overlay" style="display:none; position:fixed; inset:0; z-index:10000; background:var(--bg,#f4f5f7); align-items:center; justify-content:center;">
+  <div style="background:var(--surface,#fff); border:1px solid var(--border,#ddd); border-radius:12px; padding:28px; max-width:380px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+    <h2 style="margin:0 0 6px; font-size:1.15rem;">Set a new password</h2>
+    <p style="margin:0 0 16px; color:var(--text-muted,#666); font-size:0.85rem;">Enter a new password for your account.</p>
+    <input id="recovery-pw1" type="password" placeholder="New password" style="width:100%; padding:9px 11px; margin-bottom:10px; border:1px solid var(--border,#ccc); border-radius:7px; box-sizing:border-box;">
+    <input id="recovery-pw2" type="password" placeholder="Confirm new password" style="width:100%; padding:9px 11px; margin-bottom:10px; border:1px solid var(--border,#ccc); border-radius:7px; box-sizing:border-box;">
+    <div id="recovery-message" style="font-size:0.82rem; margin-bottom:10px; min-height:1em;"></div>
+    <button onclick="submitNewPassword()" style="width:100%; padding:10px; background:var(--accent,#0f766e); color:#fff; border:none; border-radius:7px; font-weight:600; cursor:pointer;">Update password</button>
+  </div>
+</div>
+<script>
+async function submitNewPassword() {
+  var pw1 = document.getElementById('recovery-pw1').value;
+  var pw2 = document.getElementById('recovery-pw2').value;
+  var msg = document.getElementById('recovery-message');
+  if (!pw1 || pw1.length < 8) { msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = 'Password must be at least 8 characters.'; return; }
+  if (pw1 !== pw2) { msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = 'Passwords do not match.'; return; }
+  msg.style.color = 'var(--text-muted,#666)'; msg.textContent = 'Updating…';
+  try {
+    var res = await window.cloudAuth.client.auth.updateUser({ password: pw1 });
+    if (res && res.error) { msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = res.error.message || 'Could not update password.'; return; }
+    msg.style.color = 'var(--success,#15803d)'; msg.textContent = 'Password updated. Loading…';
+    setTimeout(function(){ location.reload(); }, 1200);
+  } catch (e) {
+    msg.style.color = 'var(--danger,#b91c1c)'; msg.textContent = 'Unexpected error. Please try again.';
+  }
+}
+</script>
 </body>
 </html>
