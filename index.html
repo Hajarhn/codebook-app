@@ -1311,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.17.3
+      Codebook Editor — Cloud edition · v6.18.0
     </div>
   </div>
 </div>
@@ -1603,7 +1603,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.17.3 cloud</span>
+      <span class="version">v6.18.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1657,6 +1657,9 @@
     <button class="btn-secondary btn-mini" onclick="openAddInstrumentDialog()">+ New instrument</button>
     <button class="btn-secondary btn-mini admin-only" onclick="openReorderModal()" title="Change the order of variables in the selected instrument">↕ Reorder</button>
   </div>
+
+  <!-- Per-instrument info: intro/description + admin status controls -->
+  <div id="instrument-info-bar" style="display:none;"></div>
 
   <!-- Tabs -->
   <div class="tabs" role="tablist" id="tabs-bar">
@@ -5321,7 +5324,7 @@ function populateInstruments() {
     });
     state.pendingInstruments.forEach(name => { if (!(name in atomicCounts)) atomicCounts[name] = 0; });
   }
-  const atomicNames = Object.keys(atomicCounts).sort();
+  const atomicNames = Object.keys(atomicCounts).filter(n => instVisible(n)).sort();
   const select = document.getElementById("instrument-select");
   const prev = state.selectedInstrument;
 
@@ -5421,11 +5424,112 @@ function detectFamilies(atomicNames) {
   return { orphans, groups };
 }
 
+// ====== v6.18: instrument metadata (description + display status) ======
+// Stored in the `instruments` table: { name, description, status }.
+// status: 'published' (everyone) | 'hidden' (admin-only) | 'pending_review' (admin-only).
+window.cloudInstrumentMeta = {};  // name -> { description, status }
+async function loadInstrumentMeta() {
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client;
+    if (!c) return;
+    const { data, error } = await c.from('instruments').select('name, description, status');
+    if (error) { console.warn('instrument meta load:', error.message); return; }
+    const m = {};
+    (data || []).forEach(r => { m[r.name] = { description: r.description || '', status: r.status || 'published' }; });
+    window.cloudInstrumentMeta = m;
+  } catch (e) { console.warn('instrument meta load failed', e); }
+}
+function instMeta(name) {
+  return (window.cloudInstrumentMeta && window.cloudInstrumentMeta[name]) || { description: '', status: 'published' };
+}
+function isAdminRole() { return !!(window.cloudAuth && window.cloudAuth.role === 'admin'); }
+function instVisible(name) {
+  // Admins see every instrument; other roles only see published ones.
+  if (isAdminRole()) return true;
+  return instMeta(name).status === 'published';
+}
+window.addEventListener('cloud-authenticated', async () => { await loadInstrumentMeta(); });
+
+async function saveInstrumentMeta(name, patch) {
+  const c = window.cloudAuth && window.cloudAuth.client;
+  if (!c) return false;
+  const cur = instMeta(name);
+  const row = {
+    name: name,
+    description: patch.description != null ? patch.description : cur.description,
+    status: patch.status != null ? patch.status : cur.status
+  };
+  const { error } = await c.from('instruments').upsert(row, { onConflict: 'name' });
+  if (error) { alert('Could not save: ' + error.message); return false; }
+  window.cloudInstrumentMeta[name] = { description: row.description, status: row.status };
+  return true;
+}
+
+function renderInstrumentInfoBar() {
+  const bar = document.getElementById('instrument-info-bar');
+  if (!bar) return;
+  const name = state.selectedInstrument;
+  if (!name) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  const meta = instMeta(name);
+  const admin = isAdminRole();
+  const desc = (meta.description || '').trim();
+
+  // Status badge (admin only)
+  let badge = '';
+  if (admin && meta.status === 'hidden') badge = '<span style="margin-left:8px; font-size:0.72rem; background:#fde2e2; color:#b91c1c; padding:2px 8px; border-radius:10px;">🚫 hidden</span>';
+  else if (admin && meta.status === 'pending_review') badge = '<span style="margin-left:8px; font-size:0.72rem; background:#fff0d6; color:#9a6700; padding:2px 8px; border-radius:10px;">🟠 new — needs review</span>';
+
+  // Admin controls
+  let controls = '';
+  if (admin) {
+    const toggle = meta.status === 'published'
+      ? `<button class="btn-mini" onclick="setInstrumentStatus('hidden')" title="Hide this instrument from researchers and the viewer">🚫 Hide</button>`
+      : `<button class="btn-mini" onclick="setInstrumentStatus('published')" title="Make this instrument visible to everyone">✅ Publish</button>`;
+    controls = `<div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+      <button class="btn-mini" onclick="openInstrumentDescEditor()">✏️ ${desc ? 'Edit' : 'Add'} description</button>
+      ${toggle}
+    </div>`;
+  }
+
+  const descHtml = desc
+    ? `<div style="white-space:pre-wrap; font-size:0.86rem; color:var(--text-muted); line-height:1.5;">${escapeHtml(desc)}</div>`
+    : (admin ? `<div style="font-size:0.82rem; color:var(--text-faint); font-style:italic;">No description yet.</div>` : '');
+
+  if (!desc && !admin) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  bar.style.display = 'block';
+  bar.style.cssText = 'display:block; margin-bottom:14px; padding:12px 14px; background:var(--surface-2,#f3f4f6); border:1px solid var(--border,#e3e5e8); border-radius:8px;';
+  bar.innerHTML = `<div style="display:flex; align-items:center;"><strong style="font-size:0.9rem;">${escapeHtml(name)}</strong>${badge}</div>${descHtml}${controls}`;
+}
+
+function openInstrumentDescEditor() {
+  const name = state.selectedInstrument; if (!name) return;
+  document.getElementById('inst-desc-name').textContent = name;
+  document.getElementById('inst-desc-text').value = instMeta(name).description || '';
+  document.getElementById('modal-inst-desc').style.display = 'flex';
+  setTimeout(() => document.getElementById('inst-desc-text').focus(), 50);
+}
+async function saveInstrumentDesc() {
+  const name = state.selectedInstrument; if (!name) return;
+  const text = document.getElementById('inst-desc-text').value;
+  const ok = await saveInstrumentMeta(name, { description: text });
+  if (ok) { closeModal('inst-desc'); renderInstrumentInfoBar(); }
+}
+async function setInstrumentStatus(status) {
+  const name = state.selectedInstrument; if (!name) return;
+  const ok = await saveInstrumentMeta(name, { status: status });
+  if (ok) { renderInstrumentInfoBar(); populateInstruments(); }
+}
+
 function buildInstrumentOption(name, counts, prev) {
   const opt = document.createElement("option");
   opt.value = name;
   const c = counts[name];
   opt.textContent = c === 0 ? `${name}  (empty — new)` : `${name}  (${c} variable${c === 1 ? "" : "s"})`;
+  if (isAdminRole()) {
+    const st = instMeta(name).status;
+    if (st === 'hidden') opt.textContent += '  🚫';
+    else if (st === 'pending_review') opt.textContent += '  🟠';
+  }
   if (name === prev) opt.selected = true;
   return opt;
 }
@@ -5503,6 +5607,7 @@ document.getElementById("instrument-select").addEventListener("change", function
   state.selectedInstrument = this.value;
   state.selectedFields = [];
   state.fieldConfigs = {};
+  renderInstrumentInfoBar();
   refreshAllPanels();
 });
 
@@ -5770,6 +5875,7 @@ async function restoreDeleted(id, el) {
 // ============ VARIABLES TAB ============
 let _browseSearchListener = false;
 function refreshVariablesTab() {
+  renderInstrumentInfoBar();
   if (!state.selectedInstrument) {
     document.getElementById("browse-list").innerHTML = `<div class="empty-state"><div style="font-size: 28px; margin-bottom: 8px; opacity: 0.5;">📋</div><p>Select an instrument above to browse variables.</p></div>`;
     document.getElementById("tab-count-vars").textContent = "0";
@@ -7832,5 +7938,16 @@ async function submitNewPassword() {
   }
 }
 </script>
+<div class="modal-overlay" id="modal-inst-desc" style="display:none;">
+  <div class="modal" style="max-width:560px;">
+    <h2 style="margin:0 0 4px;">Instrument description</h2>
+    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Intro / notes shown above the variables of <strong id="inst-desc-name"></strong>. Optional.</p>
+    <textarea id="inst-desc-text" rows="6" style="width:100%; box-sizing:border-box; padding:9px 11px; border:1px solid var(--border,#ccc); border-radius:7px; font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+    <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-secondary" onclick="closeModal('inst-desc')">Cancel</button>
+      <button class="btn-primary" onclick="saveInstrumentDesc()">Save</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
