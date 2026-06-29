@@ -1311,7 +1311,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.18.0
+      Codebook Editor — Cloud edition · v6.18.1
     </div>
   </div>
 </div>
@@ -1383,6 +1383,8 @@
         <option value="">— Select an instrument —</option>
       </select>
     </div>
+
+    <div id="rv-instrument-desc" style="display:none; margin-bottom:14px; padding:12px 14px; background:var(--rv-surface-2,#f3f4f6); border:1px solid var(--rv-border,#e3e5e8); border-radius:8px; white-space:pre-wrap; font-size:13px; line-height:1.55; color:var(--rv-text-muted,#444);"></div>
 
     <div class="rv-pagination" id="rv-pagination-top">
       <label class="rv-page-size-picker">
@@ -1603,7 +1605,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.18.0 cloud</span>
+      <span class="version">v6.18.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2954,6 +2956,15 @@ function rvPopulateInstruments() {
 }
 
 // ---------- Filter rows for current selection + copyright ----------
+function rvRenderDesc(instrument) {
+  const el = document.getElementById('rv-instrument-desc');
+  if (!el) return;
+  const meta = instrument && window.cloudInstrumentMeta && window.cloudInstrumentMeta[instrument];
+  const desc = meta && (meta.description || '').trim();
+  if (desc) { el.textContent = desc; el.style.display = 'block'; }
+  else { el.textContent = ''; el.style.display = 'none'; }
+}
+
 function rvApplyFilter() {
   const instrument = RV_STATE.filter;
   const restricted = RV_STATE.restrictedAtoms;
@@ -2963,14 +2974,22 @@ function rvApplyFilter() {
   // user to pick one) instead of dumping every variable.
   let matched;
   if (!instrument) {
+    rvRenderDesc('');
     RV_STATE.filteredRows = [];
     RV_STATE.page = 1;
     rvRenderTable();
     return;
   } else {
+    rvRenderDesc(instrument);
     matched = RV_STATE.allRows.filter(row => {
       const parts = rvSplitInstrument(row.Instrument);
       return parts.includes(instrument);
+    });
+    // Honor the admin-defined order (display_order); rows without it sort last.
+    matched = matched.slice().sort((a, b) => {
+      const ao = a.display_order == null ? 1e9 : Number(a.display_order);
+      const bo = b.display_order == null ? 1e9 : Number(b.display_order);
+      return ao - bo;
     });
   }
 
