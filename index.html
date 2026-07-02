@@ -1314,7 +1314,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.19.1
+      Codebook Editor — Cloud edition · v6.20.0
     </div>
   </div>
 </div>
@@ -1608,7 +1608,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.19.1 cloud</span>
+      <span class="version">v6.20.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -5519,24 +5519,20 @@ function handleImportFile(ev) {
   reader.readAsArrayBuffer(file);
 }
 
-function parseImportWorkbook(arrayBuffer) {
-  const wb = XLSX.read(arrayBuffer, { type: 'array' });
-  let aoa = null, headerIdx = -1, colIndex = null;
-  // Find the sheet + header row that contains variable_name_CBS
-  for (const sn of wb.SheetNames) {
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', blankrows: true });
-    for (let i = 0; i < Math.min(rows.length, 15); i++) {
-      const norm = rows[i].map(_impNorm);
-      if (norm.includes('variablenamecbs')) {
-        aoa = rows; headerIdx = i;
-        colIndex = {};
-        norm.forEach((h, ci) => { if (IMP_COLMAP[h] && colIndex[IMP_COLMAP[h]] == null) colIndex[IMP_COLMAP[h]] = ci; });
-        break;
-      }
+// Parse a single sheet (array-of-arrays) into one instrument, or return null
+// if the sheet has no variable_name_CBS header / no usable variable rows.
+function parseImportSheet(aoa, ctx) {
+  let headerIdx = -1, colIndex = null;
+  for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+    const norm = (aoa[i] || []).map(_impNorm);
+    if (norm.includes('variablenamecbs')) {
+      headerIdx = i;
+      colIndex = {};
+      norm.forEach((h, ci) => { if (IMP_COLMAP[h] && colIndex[IMP_COLMAP[h]] == null) colIndex[IMP_COLMAP[h]] = ci; });
+      break;
     }
-    if (aoa) break;
   }
-  if (!aoa) throw new Error('No sheet with a "variable_name_CBS" column was found.');
+  if (headerIdx === -1) return null;
 
   const get = (row, key) => { const ci = colIndex[key]; return ci == null ? '' : String(row[ci] == null ? '' : row[ci]).trim(); };
 
@@ -5563,37 +5559,48 @@ function parseImportWorkbook(arrayBuffer) {
     if (!cbs) continue; // skip rows without an identifier
     varRows.push(row);
   }
-  if (varRows.length === 0) throw new Error('No variable rows (with variable_name_CBS) were found.');
+  if (varRows.length === 0) return null;
 
   // Instrument name = first non-empty Instrument value
   let instrument = '';
   for (const row of varRows) { const v = get(row, 'Instrument'); if (v) { instrument = v; break; } }
-  if (!instrument) throw new Error('No Instrument name found in the file.');
+  if (!instrument) return null;
 
-  // Build __varname -> CBS map for formula rewriting
+  // Build "Variable name" -> CBS map and a set of CBS names in this sheet,
+  // both used for CALCULATION-formula reference rewriting.
   const nameMap = {};
-  varRows.forEach(row => { const vn = get(row, '__varname'), cbs = get(row, 'variable_name_CBS'); if (vn) nameMap[vn] = cbs; });
+  const cbsSet = new Set();
+  varRows.forEach(row => {
+    const vn = get(row, '__varname'), cbs = get(row, 'variable_name_CBS');
+    if (vn) nameMap[vn] = cbs;
+    if (cbs) cbsSet.add(cbs);
+  });
 
   const warnings = [];
   const seen = new Set();
-  const existingCbs = new Set((state.codebook || []).map(v => (v.variable_name_CBS || '').trim()).filter(Boolean));
-  const existingInstruments = new Set();
-  (state.codebook || []).forEach(v => { if (v.Instrument) String(v.Instrument).split(' + ').forEach(a => existingInstruments.add(a.trim())); });
-  if (existingInstruments.has(instrument)) warnings.push('Instrument "' + instrument + '" already exists in the codebook — new variables will be added to it.');
+  if (ctx.existingInstruments.has(instrument)) warnings.push('Instrument "' + instrument + '" already exists in the codebook — new variables will be added to it.');
 
   const rows = varRows.map(row => {
     const cbs = get(row, 'variable_name_CBS');
-    if (seen.has(cbs)) warnings.push('Duplicate variable_name_CBS in file: "' + cbs + '"');
-    seen.add(cbs);
-    if (existingCbs.has(cbs)) warnings.push('variable_name_CBS "' + cbs + '" already exists in the codebook — importing will create a second one.');
+    if (seen.has(cbs) || ctx.globalSeen.has(cbs)) warnings.push('Duplicate variable_name_CBS: "' + cbs + '"');
+    seen.add(cbs); ctx.globalSeen.add(cbs);
+    if (ctx.existingCbs.has(cbs)) warnings.push('variable_name_CBS "' + cbs + '" already exists in the codebook — importing will create a second one.');
 
+    // "gevraagde aanpassing" — only CALCULATION rows carry a {…} formula.
+    // For each {ref}: if ref matches a "Variable name" -> use its CBS.
+    // Else if ref is already a variable_name_CBS in this sheet -> keep it, but warn.
+    // Else -> leave unchanged and warn (unknown reference).
     const note = get(row, '__note');
     let calculation = '';
     if (note.indexOf('{') !== -1) {
       calculation = note.replace(/\{([^}]+)\}/g, function(_, ref) {
         const r = ref.trim();
         if (nameMap[r]) return '{' + nameMap[r] + '}';
-        warnings.push('Formula for "' + cbs + '" refers to "' + r + '" which is not in this file — left unchanged.');
+        if (cbsSet.has(r)) {
+          warnings.push('Formula for "' + cbs + '": "' + r + '" matched variable_name_CBS directly (no matching Variable name) — used as-is.');
+          return '{' + r + '}';
+        }
+        warnings.push('Formula for "' + cbs + '" refers to "' + r + '" which is not in this sheet — left unchanged.');
         return '{' + r + '}';
       });
     }
@@ -5610,71 +5617,119 @@ function parseImportWorkbook(arrayBuffer) {
     };
   });
 
-  importParsed = { instrument, description, rows, warnings };
+  return { instrument, description, rows, warnings };
+}
+
+function parseImportWorkbook(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+
+  // Shared context across sheets (existing codebook + global de-dup)
+  const existingCbs = new Set((state.codebook || []).map(v => (v.variable_name_CBS || '').trim()).filter(Boolean));
+  const existingInstruments = new Set();
+  (state.codebook || []).forEach(v => { if (v.Instrument) String(v.Instrument).split(' + ').forEach(a => existingInstruments.add(a.trim())); });
+  const ctx = { existingCbs, existingInstruments, globalSeen: new Set() };
+
+  // Each sheet with a variable_name_CBS header = one instrument.
+  const instruments = [];
+  const skipped = [];
+  for (const sn of wb.SheetNames) {
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', blankrows: true });
+    const parsed = parseImportSheet(aoa, ctx);
+    if (parsed) instruments.push(parsed);
+    else skipped.push(sn);
+  }
+  if (instruments.length === 0) throw new Error('No sheet with a "variable_name_CBS" column and variable rows was found.');
+
+  // Warn if the same instrument name appears in more than one sheet.
+  const counts = {};
+  instruments.forEach(p => { counts[p.instrument] = (counts[p.instrument] || 0) + 1; });
+  instruments.forEach(p => { if (counts[p.instrument] > 1) p.warnings.push('Instrument name "' + p.instrument + '" appears in more than one sheet — variables will be merged into one instrument.'); });
+
+  importParsed = { instruments, skipped };
 }
 
 function renderImportPreview() {
   const p = importParsed, el = document.getElementById('import-preview');
-  if (!p) { el.innerHTML = ''; return; }
-  const warnHtml = p.warnings.length
-    ? '<div style="margin:8px 0; padding:8px 10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; font-size:0.8rem; color:#9a3412;">⚠ ' + p.warnings.length + ' warning(s):<ul style="margin:4px 0 0 16px;">' + p.warnings.map(w => '<li>' + escapeHtml(w) + '</li>').join('') + '</ul></div>'
-    : '<div style="margin:8px 0; font-size:0.8rem; color:var(--success,#15803d);">✓ No warnings.</div>';
-  const rowsHtml = p.rows.map(r => `<tr>
-      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.variable_name_CBS)}</td>
-      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml((r.variable_label_EN || r.variable_label_NL || '').slice(0, 60))}</td>
-      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.field_type || '')}</td>
-      <td style="padding:3px 6px; border-bottom:1px solid var(--border); font-family:monospace; font-size:0.72rem;">${escapeHtml(r.calculation || '')}</td>
-    </tr>`).join('');
-  el.innerHTML = `
-    <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(p.instrument)} &nbsp;·&nbsp; <strong>${p.rows.length}</strong> variable(s)</div>
-    ${p.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>Description:</strong> ${escapeHtml(p.description.slice(0, 200))}${p.description.length > 200 ? '…' : ''}</div>` : ''}
-    ${warnHtml}
-    <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
-      <thead><tr>
-        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">variable_name_CBS</th>
-        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Label</th>
-        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Type</th>
-        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Calculation</th>
-      </tr></thead>
-      <tbody>${rowsHtml}</tbody>
-    </table>`;
-  document.getElementById('import-confirm-btn').disabled = p.rows.length === 0;
+  if (!p || !p.instruments || !p.instruments.length) { el.innerHTML = ''; return; }
+  const totalRows = p.instruments.reduce((n, ins) => n + ins.rows.length, 0);
+  const totalWarn = p.instruments.reduce((n, ins) => n + ins.warnings.length, 0);
+
+  const summary = `<div style="font-size:0.9rem; margin-bottom:8px;">`
+    + `<strong>${p.instruments.length}</strong> instrument(s) &nbsp;·&nbsp; <strong>${totalRows}</strong> variable(s)`
+    + (totalWarn ? ` &nbsp;·&nbsp; <span style="color:#9a3412;">${totalWarn} warning(s)</span>` : '')
+    + (p.skipped && p.skipped.length ? ` &nbsp;·&nbsp; <span style="color:var(--text-faint);">skipped sheet(s): ${p.skipped.map(escapeHtml).join(', ')}</span>` : '')
+    + `</div>`;
+
+  const blocks = p.instruments.map(ins => {
+    const warnHtml = ins.warnings.length
+      ? '<div style="margin:6px 0; padding:8px 10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; font-size:0.8rem; color:#9a3412;">⚠ ' + ins.warnings.length + ' warning(s):<ul style="margin:4px 0 0 16px;">' + ins.warnings.map(w => '<li>' + escapeHtml(w) + '</li>').join('') + '</ul></div>'
+      : '<div style="margin:6px 0; font-size:0.8rem; color:var(--success,#15803d);">✓ No warnings.</div>';
+    const rowsHtml = ins.rows.map(r => `<tr>
+        <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.variable_name_CBS)}</td>
+        <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml((r.variable_label_EN || r.variable_label_NL || '').slice(0, 60))}</td>
+        <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.field_type || '')}</td>
+        <td style="padding:3px 6px; border-bottom:1px solid var(--border); font-family:monospace; font-size:0.72rem;">${escapeHtml(r.calculation || '')}</td>
+      </tr>`).join('');
+    return `<div style="margin-bottom:16px; padding-top:8px; border-top:1px solid var(--border);">
+      <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(ins.instrument)} &nbsp;·&nbsp; <strong>${ins.rows.length}</strong> variable(s)</div>
+      ${ins.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>Description:</strong> ${escapeHtml(ins.description.slice(0, 200))}${ins.description.length > 200 ? '…' : ''}</div>` : ''}
+      ${warnHtml}
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+        <thead><tr>
+          <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">variable_name_CBS</th>
+          <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Label</th>
+          <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Type</th>
+          <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Calculation</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = summary + blocks;
+  document.getElementById('import-confirm-btn').disabled = totalRows === 0;
 }
 
 async function confirmImport() {
   const p = importParsed;
-  if (!p || !p.rows.length) return;
+  if (!p || !p.instruments || !p.instruments.length) return;
   const c = window.cloudAuth && window.cloudAuth.client;
   const uid = window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id;
   if (!c || !uid) { alert('Not signed in.'); return; }
   const btn = document.getElementById('import-confirm-btn');
   btn.disabled = true; btn.textContent = 'Importing…';
   try {
-    const payloads = p.rows.map(r => {
-      const cf = {};
-      if (r.field_type) cf.field_type = r.field_type;
-      if (r.source_other) cf.source_other = r.source_other;
-      if (r.calculation) cf.calculation = r.calculation;
-      const row = {
-        "Theme": r.Theme || null,
-        "Subdomain": r.Subdomain || null,
-        "Instrument": p.instrument,
-        "variable_name_cbs": r.variable_name_CBS,
-        "variable_label_nl": r.variable_label_NL || null,
-        "variable_label_en": r.variable_label_EN || null,
-        "value_labels_nl": r.value_labels_NL || null,
-        "value_labels_en": r.value_labels_EN || null,
-        "created_by": uid, "updated_by": uid
-      };
-      if (Object.keys(cf).length) row.custom_fields = cf;
-      return row;
-    });
-    const { error } = await c.from('variables').insert(payloads);
-    if (error) throw error;
-    // Instrument meta: description + pending_review (via SECURITY DEFINER RPC)
-    const { error: mErr } = await c.rpc('import_instrument_meta', { p_name: p.instrument, p_description: p.description || null });
-    if (mErr) console.warn('instrument meta rpc:', mErr.message);
-    cloudShowToast('success', 'Imported ' + p.rows.length + ' variables into "' + p.instrument + '" (pending review)');
+    let totalVars = 0;
+    for (const ins of p.instruments) {
+      const payloads = ins.rows.map(r => {
+        // Always an object (never undefined/null) so a batch insert can't
+        // set custom_fields = null on rows that happen to lack extras and
+        // violate the NOT NULL constraint.
+        const cf = {};
+        if (r.field_type) cf.field_type = r.field_type;
+        if (r.source_other) cf.source_other = r.source_other;
+        if (r.calculation) cf.calculation = r.calculation;
+        return {
+          "Theme": r.Theme || null,
+          "Subdomain": r.Subdomain || null,
+          "Instrument": ins.instrument,
+          "variable_name_cbs": r.variable_name_CBS,
+          "variable_label_nl": r.variable_label_NL || null,
+          "variable_label_en": r.variable_label_EN || null,
+          "value_labels_nl": r.value_labels_NL || null,
+          "value_labels_en": r.value_labels_EN || null,
+          "custom_fields": cf,
+          "created_by": uid, "updated_by": uid
+        };
+      });
+      const { error } = await c.from('variables').insert(payloads);
+      if (error) throw new Error('"' + ins.instrument + '": ' + (error.message || error));
+      // Instrument meta: description + pending_review (via SECURITY DEFINER RPC)
+      const { error: mErr } = await c.rpc('import_instrument_meta', { p_name: ins.instrument, p_description: ins.description || null });
+      if (mErr) console.warn('instrument meta rpc (' + ins.instrument + '):', mErr.message);
+      totalVars += ins.rows.length;
+    }
+    cloudShowToast('success', 'Imported ' + totalVars + ' variable(s) across ' + p.instruments.length + ' instrument(s) (pending review)');
     closeImportDialog();
     if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
   } catch (err) {
@@ -8199,7 +8254,7 @@ async function submitNewPassword() {
 <div class="modal-overlay" id="modal-import" style="display:none;">
   <div class="modal" style="max-width:820px; width:94vw; max-height:88vh; display:flex; flex-direction:column;">
     <h2 style="margin:0 0 4px;">Import instrument from Excel</h2>
-    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Upload an .xlsx file. One instrument per file. New variables are added; the instrument is created as <strong>pending review</strong>.</p>
+    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Upload an .xlsx file. Each sheet with a <code>variable_name_CBS</code> column becomes one instrument. New variables are added; each instrument is created as <strong>pending review</strong>.</p>
     <input type="file" id="import-file" accept=".xlsx,.xls" onchange="handleImportFile(event)" style="margin-bottom:12px;">
     <div id="import-preview" style="overflow:auto; flex:1; min-height:80px;"></div>
     <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
