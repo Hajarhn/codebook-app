@@ -1244,6 +1244,8 @@
 <style id="cloud-v670-styles">
   /* v6.7: Field manager */
   .tab-dropdown { position:relative; display:inline-block; }
+  .fx-btn { display:inline-flex; align-items:center; margin-left:6px; padding:0 5px; font-size:0.7rem; font-style:italic; font-weight:700; color:var(--accent,#0f766e); background:var(--accent-bg,#e4f1ef); border:1px solid var(--accent,#0f766e); border-radius:4px; cursor:pointer; line-height:1.5; }
+  .fx-btn:hover { background:var(--accent,#0f766e); color:#fff; }
   .admin-menu { position:fixed; margin-top:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:1000; display:none; }
   .admin-menu.open { display:block; }
   .admin-menu button { display:block; width:100%; text-align:left; background:none; border:none; padding:8px 12px; border-radius:6px; font-size:0.9rem; cursor:pointer; color:var(--text); }
@@ -1312,7 +1314,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.19.0
+      Codebook Editor — Cloud edition · v6.19.1
     </div>
   </div>
 </div>
@@ -1606,7 +1608,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.19.0 cloud</span>
+      <span class="version">v6.19.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -3052,10 +3054,11 @@ function rvRenderTable() {
       }
       const cells = RV_COLUMNS.map(col => {
         const val = r[col.key];
+        const extra = (col.key === 'variable_name_CBS') ? rvFxBadge(r) : '';
         if (val === null || val === undefined || val === '') {
-          return `<td class="${col.cls} rv-cell-empty">—</td>`;
+          return `<td class="${col.cls} rv-cell-empty">${extra || '—'}</td>`;
         }
-        return `<td class="${col.cls}">${rvEscape(val)}</td>`;
+        return `<td class="${col.cls}">${rvEscape(val)}${extra}</td>`;
       }).join('');
       const actions = `<button class="rv-btn-mini" onclick="rvOpenSuggest('${rvEscape(r.id)}')">✎ Suggest</button>`;
       return `<tr>
@@ -5682,6 +5685,18 @@ async function confirmImport() {
 }
 // ====== END v6.19 import ======
 
+// ====== v6.19: calculation (ƒx) marker ======
+function getCalc(v) { return (v && v.custom_fields && v.custom_fields.calculation) ? String(v.custom_fields.calculation) : ''; }
+function showCalcPopup(title, formula) {
+  document.getElementById('calc-title').textContent = title || 'Calculation';
+  document.getElementById('calc-body').textContent = formula || '';
+  document.getElementById('modal-calc').style.display = 'flex';
+}
+function showCalcForUid(uid) { const v = findVarByUid(uid); if (v) showCalcPopup(getId(v), getCalc(v)); }
+function fxBadge(v) { return getCalc(v) ? ` <button class="fx-btn" title="Show calculation" onclick="showCalcForUid('${escapeAttr(v._uid)}')">ƒx</button>` : ''; }
+function rvShowCalc(id) { const v = RV_STATE.allRows.find(r => r.id === id); if (v) showCalcPopup(v.variable_name_CBS, getCalc(v)); }
+function rvFxBadge(r) { return getCalc(r) ? ` <button class="fx-btn" title="Show calculation" onclick="rvShowCalc('${rvEscape(r.id)}')">ƒx</button>` : ''; }
+
 async function saveInstrumentMeta(name, patch) {
   const c = window.cloudAuth && window.cloudAuth.client;
   if (!c) return false;
@@ -6148,7 +6163,7 @@ function refreshVariablesTab() {
         + (canDelete ? `<button class="btn-mini" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>` : '');
     return `<div class="browse-row ${isDeleted ? 'deleted' : ''}">
       <span class="row-idx">${i + 1}</span>
-      <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}</span>
+      <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}${fxBadge(v)}</span>
       <span class="row-label">${escapeHtml(truncate(label, 110))}</span>
       <span class="row-actions">${actions}</span>
     </div>`;
@@ -8190,6 +8205,15 @@ async function submitNewPassword() {
     <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn-secondary" onclick="closeImportDialog()">Cancel</button>
       <button class="btn-primary" id="import-confirm-btn" onclick="confirmImport()" disabled>Import</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-calc" style="display:none;">
+  <div class="modal" style="max-width:520px;">
+    <h2 style="margin:0 0 8px;"><span style="font-style:italic; color:var(--accent);">ƒx</span> <span id="calc-title" style="font-weight:600;"></span></h2>
+    <div id="calc-body" style="white-space:pre-wrap; font-family:monospace; font-size:0.85rem; background:var(--surface-2,#f3f4f6); padding:12px; border-radius:8px; line-height:1.55;"></div>
+    <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+      <button class="btn-primary" onclick="closeModal('calc')">Close</button>
     </div>
   </div>
 </div>
