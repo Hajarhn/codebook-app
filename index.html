@@ -251,6 +251,7 @@
 
 <!-- ====== CLOUD ADDITION: Supabase JS SDK ====== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- ====== CLOUD ADDITION: Auth overlay styling ====== -->
 <style id="cloud-auth-styles">
@@ -1311,7 +1312,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.18.1
+      Codebook Editor — Cloud edition · v6.19.0
     </div>
   </div>
 </div>
@@ -1605,7 +1606,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.18.1 cloud</span>
+      <span class="version">v6.19.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1657,6 +1658,7 @@
     <label for="instrument-select">Instrument:</label>
     <select id="instrument-select"></select>
     <button class="btn-secondary btn-mini" onclick="openAddInstrumentDialog()">+ New instrument</button>
+    <button class="btn-secondary btn-mini oe-hide" onclick="openImportDialog()" title="Import a new instrument from an Excel file">📥 Import Excel</button>
     <button class="btn-secondary btn-mini admin-only" onclick="openReorderModal()" title="Change the order of variables in the selected instrument">↕ Reorder</button>
   </div>
 
@@ -5451,23 +5453,234 @@ async function loadInstrumentMeta() {
   try {
     const c = window.cloudAuth && window.cloudAuth.client;
     if (!c) return;
-    const { data, error } = await c.from('instruments').select('name, description, status');
+    const { data, error } = await c.from('instruments').select('name, description, status, created_by');
     if (error) { console.warn('instrument meta load:', error.message); return; }
     const m = {};
-    (data || []).forEach(r => { m[r.name] = { description: r.description || '', status: r.status || 'published' }; });
+    (data || []).forEach(r => { m[r.name] = { description: r.description || '', status: r.status || 'published', created_by: r.created_by || null }; });
     window.cloudInstrumentMeta = m;
   } catch (e) { console.warn('instrument meta load failed', e); }
 }
 function instMeta(name) {
-  return (window.cloudInstrumentMeta && window.cloudInstrumentMeta[name]) || { description: '', status: 'published' };
+  return (window.cloudInstrumentMeta && window.cloudInstrumentMeta[name]) || { description: '', status: 'published', created_by: null };
 }
 function isAdminRole() { return !!(window.cloudAuth && window.cloudAuth.role === 'admin'); }
 function instVisible(name) {
-  // Admins see every instrument; other roles only see published ones.
+  // Admins see every instrument; others see published ones, plus their OWN
+  // pending_review instruments (so the person who imported it can still see it).
   if (isAdminRole()) return true;
-  return instMeta(name).status === 'published';
+  const meta = instMeta(name);
+  if (meta.status === 'published') return true;
+  const myUid = window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id;
+  if (meta.status === 'pending_review' && myUid && meta.created_by === myUid) return true;
+  return false;
 }
 window.addEventListener('cloud-authenticated', async () => { await loadInstrumentMeta(); });
+
+// ====== v6.19: Import instrument from Excel ======
+let importParsed = null;
+function _impNorm(s) { return String(s == null ? '' : s).toLowerCase().replace(/[\s_\-]/g, '').trim(); }
+const IMP_COLMAP = {
+  'theme': 'Theme', 'subdomain': 'Subdomain', 'instrument': 'Instrument',
+  'variablename': '__varname',
+  'variablenamecbs': 'variable_name_CBS',
+  'variablelabelnl': 'variable_label_NL',
+  'variablelabelengels': 'variable_label_EN', 'variablelabelen': 'variable_label_EN', 'variablelabelenglish': 'variable_label_EN',
+  'valuelabelnl': 'value_labels_NL',
+  'valuelabelengels': 'value_labels_EN', 'valuelabelen': 'value_labels_EN', 'valuelabelenglish': 'value_labels_EN',
+  'fieldtypeother': '__fieldtype', 'fieldtype': '__fieldtype',
+  'sourceotherstudies': '__source', 'sourceother': '__source',
+  'gevraagdeaanpassing': '__note'
+};
+
+function openImportDialog() {
+  importParsed = null;
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-preview').innerHTML = '<div style="color:var(--text-faint); font-size:0.85rem;">Choose an .xlsx file to see a preview before importing.</div>';
+  document.getElementById('import-confirm-btn').disabled = true;
+  document.getElementById('modal-import').style.display = 'flex';
+}
+function closeImportDialog() { document.getElementById('modal-import').style.display = 'none'; importParsed = null; }
+
+function handleImportFile(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try { parseImportWorkbook(e.target.result); renderImportPreview(); }
+    catch (err) {
+      console.error(err);
+      document.getElementById('import-preview').innerHTML = '<div style="color:var(--danger,#b91c1c);">Could not read file: ' + escapeHtml(err.message || String(err)) + '</div>';
+      document.getElementById('import-confirm-btn').disabled = true;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function parseImportWorkbook(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+  let aoa = null, headerIdx = -1, colIndex = null;
+  // Find the sheet + header row that contains variable_name_CBS
+  for (const sn of wb.SheetNames) {
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', blankrows: true });
+    for (let i = 0; i < Math.min(rows.length, 15); i++) {
+      const norm = rows[i].map(_impNorm);
+      if (norm.includes('variablenamecbs')) {
+        aoa = rows; headerIdx = i;
+        colIndex = {};
+        norm.forEach((h, ci) => { if (IMP_COLMAP[h] && colIndex[IMP_COLMAP[h]] == null) colIndex[IMP_COLMAP[h]] = ci; });
+        break;
+      }
+    }
+    if (aoa) break;
+  }
+  if (!aoa) throw new Error('No sheet with a "variable_name_CBS" column was found.');
+
+  const get = (row, key) => { const ci = colIndex[key]; return ci == null ? '' : String(row[ci] == null ? '' : row[ci]).trim(); };
+
+  // Read data rows until two fully-empty rows in a row
+  const dataRows = [];
+  let emptyStreak = 0;
+  for (let i = headerIdx + 1; i < aoa.length; i++) {
+    const row = aoa[i];
+    const isEmpty = !row || row.every(c => String(c == null ? '' : c).trim() === '');
+    if (isEmpty) { emptyStreak++; if (emptyStreak >= 2) break; continue; }
+    emptyStreak = 0;
+    dataRows.push(row);
+  }
+
+  // Split into intro (description) rows vs variable rows
+  let description = '';
+  const varRows = [];
+  for (const row of dataRows) {
+    const cbs = get(row, 'variable_name_CBS');
+    const varname = get(row, '__varname');
+    const inst = get(row, 'Instrument');
+    const labelNl = get(row, 'variable_label_NL');
+    if (!cbs && !varname && !inst && labelNl) { if (!description) description = labelNl; continue; }
+    if (!cbs) continue; // skip rows without an identifier
+    varRows.push(row);
+  }
+  if (varRows.length === 0) throw new Error('No variable rows (with variable_name_CBS) were found.');
+
+  // Instrument name = first non-empty Instrument value
+  let instrument = '';
+  for (const row of varRows) { const v = get(row, 'Instrument'); if (v) { instrument = v; break; } }
+  if (!instrument) throw new Error('No Instrument name found in the file.');
+
+  // Build __varname -> CBS map for formula rewriting
+  const nameMap = {};
+  varRows.forEach(row => { const vn = get(row, '__varname'), cbs = get(row, 'variable_name_CBS'); if (vn) nameMap[vn] = cbs; });
+
+  const warnings = [];
+  const seen = new Set();
+  const existingCbs = new Set((state.codebook || []).map(v => (v.variable_name_CBS || '').trim()).filter(Boolean));
+  const existingInstruments = new Set();
+  (state.codebook || []).forEach(v => { if (v.Instrument) String(v.Instrument).split(' + ').forEach(a => existingInstruments.add(a.trim())); });
+  if (existingInstruments.has(instrument)) warnings.push('Instrument "' + instrument + '" already exists in the codebook — new variables will be added to it.');
+
+  const rows = varRows.map(row => {
+    const cbs = get(row, 'variable_name_CBS');
+    if (seen.has(cbs)) warnings.push('Duplicate variable_name_CBS in file: "' + cbs + '"');
+    seen.add(cbs);
+    if (existingCbs.has(cbs)) warnings.push('variable_name_CBS "' + cbs + '" already exists in the codebook — importing will create a second one.');
+
+    const note = get(row, '__note');
+    let calculation = '';
+    if (note.indexOf('{') !== -1) {
+      calculation = note.replace(/\{([^}]+)\}/g, function(_, ref) {
+        const r = ref.trim();
+        if (nameMap[r]) return '{' + nameMap[r] + '}';
+        warnings.push('Formula for "' + cbs + '" refers to "' + r + '" which is not in this file — left unchanged.');
+        return '{' + r + '}';
+      });
+    }
+    return {
+      Theme: get(row, 'Theme'), Subdomain: get(row, 'Subdomain'),
+      variable_name_CBS: cbs,
+      variable_label_NL: get(row, 'variable_label_NL'),
+      variable_label_EN: get(row, 'variable_label_EN'),
+      value_labels_NL: get(row, 'value_labels_NL'),
+      value_labels_EN: get(row, 'value_labels_EN'),
+      field_type: get(row, '__fieldtype'),
+      source_other: get(row, '__source'),
+      calculation: calculation
+    };
+  });
+
+  importParsed = { instrument, description, rows, warnings };
+}
+
+function renderImportPreview() {
+  const p = importParsed, el = document.getElementById('import-preview');
+  if (!p) { el.innerHTML = ''; return; }
+  const warnHtml = p.warnings.length
+    ? '<div style="margin:8px 0; padding:8px 10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; font-size:0.8rem; color:#9a3412;">⚠ ' + p.warnings.length + ' warning(s):<ul style="margin:4px 0 0 16px;">' + p.warnings.map(w => '<li>' + escapeHtml(w) + '</li>').join('') + '</ul></div>'
+    : '<div style="margin:8px 0; font-size:0.8rem; color:var(--success,#15803d);">✓ No warnings.</div>';
+  const rowsHtml = p.rows.map(r => `<tr>
+      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.variable_name_CBS)}</td>
+      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml((r.variable_label_EN || r.variable_label_NL || '').slice(0, 60))}</td>
+      <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.field_type || '')}</td>
+      <td style="padding:3px 6px; border-bottom:1px solid var(--border); font-family:monospace; font-size:0.72rem;">${escapeHtml(r.calculation || '')}</td>
+    </tr>`).join('');
+  el.innerHTML = `
+    <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(p.instrument)} &nbsp;·&nbsp; <strong>${p.rows.length}</strong> variable(s)</div>
+    ${p.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>Description:</strong> ${escapeHtml(p.description.slice(0, 200))}${p.description.length > 200 ? '…' : ''}</div>` : ''}
+    ${warnHtml}
+    <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+      <thead><tr>
+        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">variable_name_CBS</th>
+        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Label</th>
+        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Type</th>
+        <th style="text-align:left; padding:3px 6px; border-bottom:2px solid var(--border);">Calculation</th>
+      </tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  document.getElementById('import-confirm-btn').disabled = p.rows.length === 0;
+}
+
+async function confirmImport() {
+  const p = importParsed;
+  if (!p || !p.rows.length) return;
+  const c = window.cloudAuth && window.cloudAuth.client;
+  const uid = window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id;
+  if (!c || !uid) { alert('Not signed in.'); return; }
+  const btn = document.getElementById('import-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Importing…';
+  try {
+    const payloads = p.rows.map(r => {
+      const cf = {};
+      if (r.field_type) cf.field_type = r.field_type;
+      if (r.source_other) cf.source_other = r.source_other;
+      if (r.calculation) cf.calculation = r.calculation;
+      const row = {
+        "Theme": r.Theme || null,
+        "Subdomain": r.Subdomain || null,
+        "Instrument": p.instrument,
+        "variable_name_cbs": r.variable_name_CBS,
+        "variable_label_nl": r.variable_label_NL || null,
+        "variable_label_en": r.variable_label_EN || null,
+        "value_labels_nl": r.value_labels_NL || null,
+        "value_labels_en": r.value_labels_EN || null,
+        "created_by": uid, "updated_by": uid
+      };
+      if (Object.keys(cf).length) row.custom_fields = cf;
+      return row;
+    });
+    const { error } = await c.from('variables').insert(payloads);
+    if (error) throw error;
+    // Instrument meta: description + pending_review (via SECURITY DEFINER RPC)
+    const { error: mErr } = await c.rpc('import_instrument_meta', { p_name: p.instrument, p_description: p.description || null });
+    if (mErr) console.warn('instrument meta rpc:', mErr.message);
+    cloudShowToast('success', 'Imported ' + p.rows.length + ' variables into "' + p.instrument + '" (pending review)');
+    closeImportDialog();
+    if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
+  } catch (err) {
+    console.error('Import failed:', err);
+    alert('Import failed: ' + (err.message || err));
+    btn.disabled = false; btn.textContent = 'Import';
+  }
+}
+// ====== END v6.19 import ======
 
 async function saveInstrumentMeta(name, patch) {
   const c = window.cloudAuth && window.cloudAuth.client;
@@ -7965,6 +8178,18 @@ async function submitNewPassword() {
     <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn-secondary" onclick="closeModal('inst-desc')">Cancel</button>
       <button class="btn-primary" onclick="saveInstrumentDesc()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-import" style="display:none;">
+  <div class="modal" style="max-width:820px; width:94vw; max-height:88vh; display:flex; flex-direction:column;">
+    <h2 style="margin:0 0 4px;">Import instrument from Excel</h2>
+    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Upload an .xlsx file. One instrument per file. New variables are added; the instrument is created as <strong>pending review</strong>.</p>
+    <input type="file" id="import-file" accept=".xlsx,.xls" onchange="handleImportFile(event)" style="margin-bottom:12px;">
+    <div id="import-preview" style="overflow:auto; flex:1; min-height:80px;"></div>
+    <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-secondary" onclick="closeImportDialog()">Cancel</button>
+      <button class="btn-primary" id="import-confirm-btn" onclick="confirmImport()" disabled>Import</button>
     </div>
   </div>
 </div>
