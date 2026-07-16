@@ -435,6 +435,67 @@
   #cloud-user-banner .role-badge.role-editor { background: #f59e0b; }
   #cloud-user-banner .role-badge.role-researcher { background: #10b981; }
   #cloud-user-banner .role-badge.role-ontology_engineer { background: #9333ea; }
+
+  /* ===== v6.28 UI polish ===== */
+  /* 1) Banner merged into the topbar (JS moves #cloud-user-banner into .topbar-inner) */
+  .topbar-inner #cloud-user-banner { background: transparent; padding: 0; margin-left: auto; gap: 8px; }
+  .topbar-inner #cloud-user-banner .user-info { font-size: 0.75rem; color: #6b7280; }
+  .topbar-inner #cloud-user-banner .user-info strong { font-weight: 600; color: #374151; }
+  .topbar-inner #cloud-user-banner button {
+    color: #374151; background: #fff; border: 1px solid #d1d5db;
+    padding: 0.28rem 0.7rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer;
+  }
+  .topbar-inner #cloud-user-banner button:hover { background: #f3f4f6; border-color: #9ca3af; }
+  .topbar-inner #rv-preview-btn { color: var(--accent-text, #4338ca); border-color: var(--border-accent, #c7d2fe); background: var(--accent-bg, #eef2ff); }
+  .topbar-inner #rv-preview-btn:hover { background: #e0e7ff; }
+  .topbar-inner { flex-wrap: wrap; row-gap: 6px; }
+
+  /* 2) Row actions: icon buttons revealed on hover/focus (always visible on touch) */
+  .browse-row .row-actions { opacity: 0; transition: opacity 0.12s ease; }
+  .browse-row:hover .row-actions,
+  .browse-row:focus-within .row-actions { opacity: 1; }
+  @media (hover: none), (max-width: 700px) {
+    .browse-row .row-actions { opacity: 1; }
+  }
+  .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: none; background: transparent; border-radius: 6px; cursor: pointer; color: var(--text-muted, #6b7280); padding: 0; }
+  .icon-btn:hover { background: var(--accent-bg, #eef2ff); color: var(--accent-text, #4338ca); }
+  .icon-btn.danger:hover { background: #fde8e8; color: #b91c1c; }
+  .icon-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .row-nolabel { color: var(--text-faint, #b6bac2); font-style: italic; }
+
+  /* 3) Tabs: line icons + colored counters */
+  .tab svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; margin-right: 5px; }
+  #tab-count-pending { background: #fff0d6 !important; color: #9a6700 !important; }
+
+  /* 4) Status pill next to the instrument select */
+  #inst-status-pill { display: none; font-size: 0.7rem; padding: 2px 9px; border-radius: 10px; white-space: nowrap; }
+  #inst-status-pill.st-hidden { display: inline-block; background: #fde2e2; color: #b91c1c; }
+  #inst-status-pill.st-pending { display: inline-block; background: #fff0d6; color: #9a6700; }
+
+  /* 6) Consistent focus rings */
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+    outline: 2px solid rgba(79, 70, 229, 0.45); outline-offset: 1px;
+  }
+
+  /* ===== v6.31: admin menu sections + dashboard ===== */
+  .admin-menu-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint, #b6bac2); padding: 7px 12px 3px; }
+  .admin-menu-label:not(:first-child) { border-top: 1px solid var(--border, #e3e5e8); margin-top: 4px; }
+  .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .dash-card { border: 1px solid var(--border, #e3e5e8); border-radius: 10px; padding: 12px 14px; background: var(--surface, #fff); }
+  .dash-card .dc-num { font-size: 22px; font-weight: 600; line-height: 1.2; }
+  .dash-card .dc-label { font-size: 11.5px; color: var(--text-muted, #6b7280); margin-top: 2px; }
+  .dash-card .dc-sub { font-size: 11px; color: var(--text-faint, #b6bac2); margin-top: 4px; }
+  .dash-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .dash-table th { text-align: left; padding: 7px 10px; font-weight: 500; color: var(--text-muted, #6b7280); border-bottom: 2px solid var(--border, #e3e5e8); font-size: 11.5px; }
+  .dash-table td { padding: 7px 10px; border-bottom: 1px solid var(--border, #e3e5e8); vertical-align: middle; }
+  .dash-table .di-name { font-weight: 500; cursor: pointer; color: var(--accent-text, #4338ca); }
+  .dash-table .di-name:hover { text-decoration: underline; }
+  .dash-pill { display: inline-block; font-size: 10.5px; padding: 2px 9px; border-radius: 10px; white-space: nowrap; }
+  .dash-pill.published { background: #dcfce7; color: #166534; }
+  .dash-pill.hidden { background: #fde2e2; color: #b91c1c; }
+  .dash-pill.pending_review { background: #fff0d6; color: #9a6700; }
+  .dash-bar { display: inline-block; width: 60px; height: 6px; border-radius: 3px; background: #eef0f2; vertical-align: middle; margin-right: 6px; overflow: hidden; }
+  .dash-bar > span { display: block; height: 100%; background: #6366f1; border-radius: 3px; }
   #cloud-user-banner button {
     background: transparent;
     color: #f5f5f4;
@@ -495,6 +556,7 @@
      after login. Use that to gate UI. */
   body:not(.role-admin) .admin-only { display: none !important; }
   body:not(.role-admin):not(.role-editor) .editor-and-up-only { display: none !important; }
+  body:not(.role-admin):not(.role-editor):not(.role-ontology_engineer) .staff-only { display: none !important; }
   body.role-ontology_engineer .oe-hide { display: none !important; }
 
   /* Cloud error banner (when DB load fails) */
@@ -539,6 +601,12 @@
   /* v5.3: Suggest button only visible to researcher */
   .researcher-only { display: none !important; }
   body.role-researcher .researcher-only { display: inline-flex !important; }
+
+  /* v6.20: admin "Preview as researcher" toggle */
+  #rv-preview-btn { display: none; margin-right: 8px; }
+  body.role-admin #rv-preview-btn { display: inline-flex; }
+  body.rv-preview-mode #rv-preview-btn { display: none; }
+  body.rv-preview-mode #rv-exit-preview-btn { display: inline-flex !important; }
 
   /* v5.3: Researcher-friendly View dialog button */
   #cloud-suggest-edit-btn {
@@ -848,6 +916,49 @@
   #rv-app .rv-col-value-nl,
   #rv-app .rv-col-value-en,
   #rv-app .rv-col-fair       { min-width: 200px; max-width: 280px; white-space: pre-wrap; }
+  #rv-app .rv-col-sources    { min-width: 120px; max-width: 180px; }
+
+  /* ===== Master–detail layout (v6.20) ===== */
+  #rv-app .rv-md { display:grid; grid-template-columns: 300px 1fr; border:1px solid var(--rv-border,#e3e5e8); border-radius:10px; overflow:hidden; background:#fff; }
+  #rv-app .rv-md-list { border-right:1px solid var(--rv-border,#e3e5e8); display:flex; flex-direction:column; min-height:440px; max-height:640px; }
+  #rv-app .rv-md-search { padding:10px; border-bottom:1px solid var(--rv-border,#e3e5e8); }
+  #rv-app .rv-md-search input { width:100%; box-sizing:border-box; padding:7px 10px; font-size:13px; border:1px solid var(--rv-border,#e3e5e8); border-radius:6px; outline:none; }
+  #rv-app .rv-md-search input:focus { border-color:#818cf8; }
+  #rv-app .rv-md-list-scroll { overflow-y:auto; flex:1; }
+  #rv-app .rv-md-item { padding:9px 12px 9px 13px; border-left:3px solid transparent; border-bottom:1px solid #eef0f2; cursor:pointer; display:flex; gap:10px; align-items:baseline; }
+  #rv-app .rv-md-item:hover { background:#f7f8fa; }
+  #rv-app .rv-md-item-sel { background:#eef2ff; border-left-color:#4f46e5; }
+  #rv-app .rv-md-item-num { font-size:11px; color:#9ca3af; min-width:22px; text-align:right; font-variant-numeric:tabular-nums; flex-shrink:0; }
+  #rv-app .rv-md-item-sel .rv-md-item-num { color:#6366f1; }
+  #rv-app .rv-md-item-body { flex:1; min-width:0; }
+  #rv-app .rv-md-item-name { display:block; font-family:ui-monospace,Menlo,monospace; font-size:13px; color:#111827; }
+  #rv-app .rv-md-item-sel .rv-md-item-name { color:#3730a3; }
+  #rv-app .rv-md-item-label { font-size:12px; color:#6b7280; margin-top:2px; line-height:1.4; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  #rv-app .rv-md-detail { padding:16px 20px; }
+  #rv-app .rv-md-detail-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:10px; flex-wrap:wrap; }
+  #rv-app .rv-md-detail-name { font-family:ui-monospace,Menlo,monospace; font-size:16px; font-weight:600; color:#111827; }
+  #rv-app .rv-md-section { margin-bottom:16px; }
+  #rv-app .rv-md-section-title { font-size:11px; letter-spacing:0.04em; color:#9ca3af; margin-bottom:6px; text-transform:uppercase; }
+  #rv-app .rv-md-table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
+  #rv-app .rv-md-key { color:#6b7280; padding:4px 12px 4px 0; width:40%; vertical-align:top; }
+  #rv-app .rv-md-val { color:#111827; padding:4px 0; word-break:break-word; line-height:1.5; white-space:pre-wrap; }
+  #rv-app .rv-md-val.rv-cell-empty { color:#c0c4cc; }
+  #rv-app .rv-md-empty { padding:48px 20px; text-align:center; color:#9ca3af; font-size:13px; grid-column:1/-1; }
+  /* calculation / derived-variable display */
+  #rv-app .rv-fx-mark { display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:11px; color:#0f766e; background:#d1fae5; border:1px solid #99f6e4; border-radius:5px; padding:0 5px; vertical-align:middle; }
+  #rv-app .rv-calc-tag { display:inline-block; font-size:11px; color:#0f766e; background:#d1fae5; border:1px solid #99f6e4; border-radius:10px; padding:2px 10px; margin-bottom:8px; }
+  #rv-app .rv-calc-code { font-family:ui-monospace,Menlo,monospace; font-size:12.5px; line-height:1.55; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; white-space:pre-wrap; word-break:break-word; color:#1f2937; margin:0 0 8px; }
+  #rv-app .rv-calc-ref { font-family:ui-monospace,Menlo,monospace; color:#4338ca; background:#eef2ff; border-radius:4px; padding:0 4px; cursor:pointer; }
+  #rv-app .rv-calc-ref:hover { background:#e0e7ff; }
+  #rv-app .rv-calc-deps { font-size:12px; color:#6b7280; }
+  #rv-app .rv-calc-deps .rv-calc-ref { margin-right:4px; }
+  #rv-app .rv-md-detail-inner { max-width:640px; }
+  #rv-app .rv-md-section-title { border-bottom:0.5px solid var(--rv-border,#e3e5e8); padding-bottom:5px; }
+  #rv-app .rv-vl-wrap { display:flex; flex-direction:column; gap:4px; }
+  #rv-app .rv-vl { display:flex; gap:8px; align-items:baseline; }
+  #rv-app .rv-vl-code { font-family:ui-monospace,Menlo,monospace; font-size:11px; background:#f1f5f9; border:0.5px solid #e2e8f0; border-radius:5px; padding:1px 7px; min-width:20px; text-align:center; color:#334155; flex-shrink:0; }
+  #rv-app .rv-vl-label { font-size:13px; line-height:1.45; }
+  #rv-app .rv-fair-chip { display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:4px 10px; color:#1f2937; }
   #rv-app .rv-cell-empty     { color: var(--rv-text-faint); }
 
   /* Empty state */
@@ -1246,9 +1357,11 @@
   .tab-dropdown { position:relative; display:inline-block; }
   .fx-btn { display:inline-flex; align-items:center; margin-left:6px; padding:0 5px; font-size:0.7rem; font-style:italic; font-weight:700; color:var(--accent,#0f766e); background:var(--accent-bg,#e4f1ef); border:1px solid var(--accent,#0f766e); border-radius:4px; cursor:pointer; line-height:1.5; }
   .fx-btn:hover { background:var(--accent,#0f766e); color:#fff; }
-  .admin-menu { position:fixed; margin-top:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:1000; display:none; }
+  .admin-menu { position:fixed; margin-top:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,0.14); padding:4px; min-width:185px; z-index:1000; display:none; max-height:calc(100vh - 140px); overflow-y:auto; }
   .admin-menu.open { display:block; }
-  .admin-menu button { display:block; width:100%; text-align:left; background:none; border:none; padding:8px 12px; border-radius:6px; font-size:0.9rem; cursor:pointer; color:var(--text); }
+  .admin-menu button { display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none; border:none; padding:8px 12px; border-radius:6px; font-size:0.9rem; cursor:pointer; color:var(--text); }
+  .admin-menu button svg { width:15px; height:15px; stroke:currentColor; stroke-width:1.7; fill:none; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; color:var(--text-muted); }
+  .admin-menu button:hover svg { color:var(--accent-text, #4338ca); }
   .admin-menu button:hover { background:var(--surface-2); }
   .fm-row { display:flex; align-items:center; gap:0.5rem; padding:0.45rem 0.3rem; border-bottom:1px solid var(--border); }
   .fm-row:hover { background: var(--surface-2); }
@@ -1274,6 +1387,7 @@
     <span>Logged in as <strong id="cloud-banner-email">…</strong></span>
     <span id="cloud-banner-role" class="role-badge role-researcher">researcher</span>
   </div>
+  <button id="rv-preview-btn" onclick="rvPreviewEnter()" title="See exactly what researchers see, without logging out">👁 Preview as researcher</button>
   <button id="cloud-logout-btn">Log out</button>
 </div>
 
@@ -1314,7 +1428,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.20.0
+      Codebook Editor — Cloud edition · v6.32.0
     </div>
   </div>
 </div>
@@ -1349,9 +1463,10 @@
           <div class="rv-brand-title">Codebook</div>
           <div class="rv-brand-sub">PCNN variable dictionary</div>
         </div>
-        <span class="rv-version-pill">v5.8 · cloud viewer</span>
+        <span class="rv-version-pill">v6.31 · cloud viewer</span>
       </div>
       <div class="rv-topbar-actions">
+        <button class="rv-btn" id="rv-exit-preview-btn" onclick="rvPreviewExit()" style="display:none">← Exit preview</button>
         <button class="rv-btn" id="rv-download-excel-btn">📊 Download Excel</button>
         <div class="rv-menu-wrap">
           <button class="rv-btn" id="rv-about-btn">ℹ️ About ▾</button>
@@ -1377,7 +1492,6 @@
         <span class="rv-label">Instruments:</span>
         <strong id="rv-info-instruments">—</strong>
       </div>
-      <div class="rv-infobar-note">Only 9 curated fields are shown to researchers.</div>
     </div>
 
     <div class="rv-filter-row">
@@ -1387,9 +1501,9 @@
       </select>
     </div>
 
-    <div id="rv-instrument-desc" style="display:none; margin-bottom:14px; padding:12px 14px; background:var(--rv-surface-2,#f3f4f6); border:1px solid var(--rv-border,#e3e5e8); border-radius:8px; white-space:pre-wrap; font-size:13px; line-height:1.55; color:var(--rv-text-muted,#444);"></div>
+    <div id="rv-instrument-desc" style="display:none; margin-bottom:14px; padding:12px 14px 12px 13px; background:#eef2ff; border:1px solid #e0e7ff; border-left:3px solid #4f46e5; border-radius:8px;"></div>
 
-    <div class="rv-pagination" id="rv-pagination-top">
+    <div class="rv-pagination" id="rv-pagination-top" style="display:none">
       <label class="rv-page-size-picker">
         <span>Per page:</span>
         <select id="rv-page-size">
@@ -1404,32 +1518,11 @@
       <button class="rv-btn-mini" id="rv-next-btn">Next →</button>
     </div>
 
-    <div class="rv-table-wrap">
-      <div class="rv-table-scroll">
-        <table class="rv-table">
-          <thead>
-            <tr>
-              <th class="rv-col-idx">#</th>
-              <th class="rv-col-theme">Theme</th>
-              <th class="rv-col-subdomain">Subdomain</th>
-              <th class="rv-col-instrument">Instrument</th>
-              <th class="rv-col-varname">Variable name</th>
-              <th class="rv-col-label-nl">Variable label (NL)</th>
-              <th class="rv-col-label-en">Variable label (EN)</th>
-              <th class="rv-col-value-nl">Value label (NL)</th>
-              <th class="rv-col-value-en">Value label (EN)</th>
-              <th class="rv-col-fair">FAIR coding</th>
-              <th class="rv-col-actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="rv-tbody">
-            <tr><td colspan="11" class="rv-empty">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div id="rv-md" class="rv-md">
+      <div class="rv-md-empty">Loading…</div>
     </div>
 
-    <div class="rv-pagination" id="rv-pagination-bottom">
+    <div class="rv-pagination" id="rv-pagination-bottom" style="display:none">
       <label class="rv-page-size-picker">
         <span>Per page:</span>
         <select id="rv-page-size-bottom">
@@ -1586,7 +1679,7 @@
         </div>
 
         <div class="rv-info-box">
-          Columns: Theme, Subdomain, Instrument, Variable name, Variable label (NL/EN), Value label (NL/EN), and FAIR coding. 🔒 Copyrighted instruments are replaced with a placeholder row.
+          Columns: Theme, Subdomain, Instrument, Variable name, Variable label (NL/EN), Value label (NL/EN), Source(s), and FAIR coding. 🔒 Copyrighted instruments are replaced with a placeholder row.
         </div>
 
         <div id="rv-excel-error" style="display: none; margin-top: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 6px; background: #fef2f2; color: #991b1b; font-size: 12px;"></div>
@@ -1608,7 +1701,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.20.0 cloud</span>
+      <span class="version">v6.32.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1659,6 +1752,7 @@
   <div class="instrument-bar">
     <label for="instrument-select">Instrument:</label>
     <select id="instrument-select"></select>
+    <span id="inst-status-pill"></span>
     <button class="btn-secondary btn-mini" onclick="openAddInstrumentDialog()">+ New instrument</button>
     <button class="btn-secondary btn-mini oe-hide" onclick="openImportDialog()" title="Import a new instrument from an Excel file">📥 Import Excel</button>
     <button class="btn-secondary btn-mini admin-only" onclick="openReorderModal()" title="Change the order of variables in the selected instrument">↕ Reorder</button>
@@ -1669,18 +1763,23 @@
 
   <!-- Tabs -->
   <div class="tabs" role="tablist" id="tabs-bar">
-    <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')">📋 Variables <span class="count" id="tab-count-vars">0</span></button>
-    <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')">📝 Bulk edit</button>
-    <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')">🔍 Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
-    <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')">🔔 Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
-    <button class="tab admin-only" data-tab="history" role="tab" onclick="switchTab('history')">📋 Log</button>
+    <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>Variables <span class="count" id="tab-count-vars">0</span></button>
+    <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Bulk edit</button>
+    <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
+    <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
+    <button class="tab staff-only" data-tab="dashboard" role="tab" onclick="switchTab('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
     <div class="tab-dropdown admin-only" id="admin-dropdown">
-      <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)">🛠 Admin ▾</button>
+      <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Admin ▾</button>
       <div class="admin-menu" id="admin-menu">
-        <button type="button" onclick="switchTab('users'); closeAdminMenu();">👥 Users</button>
-        <button type="button" onclick="switchTab('trash'); closeAdminMenu();">🗑 Trash</button>
-        <button type="button" onclick="openFieldManager(); closeAdminMenu();">🧩 Manage fields</button>
-        <button type="button" onclick="switchTab('settings'); closeAdminMenu();">⚙️ Settings</button>
+        <div class="admin-menu-label">Overview</div>
+        <button type="button" onclick="switchTab('history'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
+        <div class="admin-menu-label">Content</div>
+        <button type="button" onclick="switchTab('trash'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Trash</button>
+        <div class="admin-menu-label">Configuration</div>
+        <button type="button" onclick="openFieldManager(); closeAdminMenu();"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="12" height="4" rx="1"/></svg>Manage fields</button>
+        <button type="button" onclick="switchTab('settings'); closeAdminMenu();"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Settings</button>
+        <div class="admin-menu-label">People</div>
+        <button type="button" onclick="switchTab('users'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</button>
       </div>
     </div>
     <!-- Activity (session changes) stays reachable via the "Unsaved changes" badge; tab-count-activity kept hidden so the counter still updates -->
@@ -1691,7 +1790,7 @@
   <div class="tab-panel active" id="panel-variables" role="tabpanel">
     <div class="panel-toolbar">
       <input type="text" id="browse-search" placeholder="Search by name or label...">
-      <button class="btn-secondary btn-mini editor-and-up-only" onclick="openAddVariableDialog()">+ Add variable</button>
+      <button class="btn-primary btn-mini editor-and-up-only" onclick="openAddVariableDialog()">+ Add variable</button>
       <button class="btn-secondary btn-mini admin-only" onclick="openAddFieldDialog()">+ Add field</button>
       <button class="btn-secondary btn-mini admin-only" onclick="openRemoveFieldDialog()">− Remove field</button>
     </div>
@@ -1865,6 +1964,18 @@
     <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
   </div>
 
+  <div class="tab-panel staff-only" id="panel-dashboard" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Dashboard</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Codebook health at a glance — instrument status, completeness, and quick actions.</p>
+      </div>
+      <button class="btn-mini" onclick="renderDashboard()">↻ Refresh</button>
+    </div>
+    <div id="dash-cards" class="dash-cards"></div>
+    <div id="dash-instruments"></div>
+  </div>
+
   <div class="tab-panel admin-only" id="panel-trash" role="tabpanel">
     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
       <div>
@@ -1877,54 +1988,40 @@
   </div>
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
+    <div style="margin-bottom: 1.25rem;">
+      <h2 style="margin: 0; font-size: 1.1rem;">Settings</h2>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Codebook configuration. Field visibility and ordering live under Admin → Manage fields; instrument publish/hide lives on each instrument and in the Dashboard.</p>
+    </div>
+
+    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Export &amp; copyright</h2>
+    <div class="info-box" style="margin-top: 0;">
+      Instruments whose variables have <code>copyright_status</code> = <code>"restricted"</code> (or empty) are replaced by a placeholder row in copyright-respecting Excel exports and in the researcher viewer; <code>"public"</code> and <code>"licensed"</code> are shown in full. This is a convention, not a security boundary.
+    </div>
+    <label>Contact email shown on restricted instruments</label>
+    <input type="text" id="settings-contact-email" placeholder="contact@example.org" style="max-width: 460px;">
+    <div class="hint">Shown on 🔒 placeholder rows and used as the default in the Excel export dialog. Stored for this session.</div>
+
+    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
+
     <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Identifier field</h2>
     <div class="info-box" style="margin-top: 0;">
-      The unique name field for each variable. Used for required-field validation in Add/Edit and to confirm Delete. Auto-detected — change it if the wrong field was picked.
+      The unique name field for each variable — used for required-field validation in Add/Edit and to confirm deletions. Auto-detected; change it only if the wrong field was picked.
     </div>
     <select id="identifier-select" style="max-width: 460px;"></select>
     <div id="identifier-status" class="hint" style="margin-top: 6px;"></div>
 
     <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
 
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Copyright protection</h2>
-    <div class="info-box" style="margin-top: 0;">
-      Many validated questionnaires are copyrighted (e.g. EQ-5D-5L, PROMIS-29). To track this in the codebook, add a <code>copyright_status</code> field to each variable. Recognized values:
-      <ul style="margin: 6px 0 0 18px;">
-        <li><code>"public"</code> — freely shareable</li>
-        <li><code>"restricted"</code> — copyrighted; not shown in restricted Excel exports</li>
-        <li><code>"licensed"</code> — copyrighted but licensed for your use; treated as public</li>
-        <li>(empty / anything else) — treated as restricted by default</li>
-      </ul>
-      <div style="margin-top: 8px;">When "Respect copyright" is enabled during Excel export, restricted instruments are replaced with a single placeholder row showing the contact email below. <strong>This is a convention, not a security boundary</strong> — anyone with the source JSON sees everything.</div>
-    </div>
-    <label>Default contact email for restricted instruments</label>
-    <input type="text" id="settings-contact-email" placeholder="contact@example.org" style="max-width: 460px;">
-    <div class="hint">Used as default in the Excel export dialog. Stored only in this session.</div>
-
-    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
-
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Auto-tracking</h2>
-    <div class="info-box" style="margin-top: 0;">
-      Every change you Apply automatically updates:
-      <ul style="margin: 6px 0 0 18px;">
-        <li><code>checked_by</code> — your name appended (semicolon-separated if there were prior entries)</li>
-        <li><code>check_date</code> — set to today's date (older dates kept after a "→")</li>
-        <li><code>change_log</code> — append-only history: <code>YYYY-MM-DD | name | field: "old" → "new"</code></li>
-      </ul>
-      <div style="margin-top: 8px;">The <code>change_log</code> field is created automatically the first time a variable is edited.</div>
-    </div>
-
-    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
-
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Notes &amp; tips</h2>
-    <ul style="font-size: 12px; color: var(--text-muted); padding-left: 20px; line-height: 1.7;">
-      <li>Edits save to the <strong>cloud database</strong> automatically — there is no local file to keep.</li>
-      <li>Deleted variables go to <strong>Trash</strong> (Admin menu) and can be restored; other changes are kept in the <strong>Log</strong> (audit trail).</li>
-      <li>Multiple people can work at the same time. If two edit the <em>same</em> variable, the second save is warned before it overwrites the first.</li>
-      <li>Roles control who can do what: <strong>admin</strong> (full), <strong>editor</strong> (edit), <strong>ontology_engineer</strong> (granted fields), <strong>researcher</strong> (read + suggest changes).</li>
-      <li>Use <strong>Export Excel</strong> or <strong>Save JSON</strong> for a point-in-time backup before big changes.</li>
-      <li>Browser cache may serve a stale version — hard-refresh if the version number doesn't match.</li>
-    </ul>
+    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Roles</h2>
+    <table class="dash-table" style="max-width: 640px;">
+      <tbody>
+        <tr><td style="width: 170px;"><strong>admin</strong></td><td>Everything: edit, publish/hide, delete, users, field access, settings.</td></tr>
+        <tr><td><strong>editor</strong></td><td>Edit variables, add/edit instrument descriptions, review pending suggestions. Sees unpublished instruments.</td></tr>
+        <tr><td><strong>ontology_engineer</strong></td><td>Edits only the fields granted under Admin → Manage fields (e.g. FAIR coding). Sees unpublished instruments.</td></tr>
+        <tr><td><strong>researcher</strong></td><td>Read-only viewer of published instruments; can suggest changes.</td></tr>
+      </tbody>
+    </table>
+    <div class="hint" style="margin-top: 8px;">Deleted variables go to Admin → Trash (restorable). All changes are recorded in Admin → Log. Use Export Excel / Save JSON for a point-in-time backup before big changes.</div>
   </div>
 
 </div> <!-- /workspace -->
@@ -2577,7 +2674,7 @@ const CLOUD_DB_MANAGED_FIELDS = new Set(['created_at', 'updated_at']);
 
 // The complete set of REAL columns in the variables table. Anything not in
 // this set is a UI-only field and must never be written.
-const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_EN', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'Source_portal', 'Source_biobank', 'Source_platform_trials', 'Source_expertise_clinics', 'source_merged', 'start_date', 'stop_date', 'condition', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_EN', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
 
 // Same whitelist but expressed in actual DB column names (reverse-mapped),
 // so membership tests after cloudDenormalizeRow's case conversion succeed.
@@ -2601,7 +2698,7 @@ function cloudDenormalizeRow(row) {
         out[targetKey] = (val === true || val === 'true');
         continue;
       }
-      if (val === '') val = null;
+      if (val === '') val = (targetKey === 'sources') ? '' : null;
       out[targetKey] = val;
       continue;
     }
@@ -2788,7 +2885,7 @@ const RV_COLUMNS = [
   { key: 'variable_label_EN',        cls: 'rv-col-label-en',  label: 'Variable label (EN)' },
   { key: 'value_labels_NL',          cls: 'rv-col-value-nl',  label: 'Value label (NL)' },
   { key: 'value_labels_EN',          cls: 'rv-col-value-en',  label: 'Value label (EN)' },
-  { key: 'value_label_FAIR_merged',  cls: 'rv-col-fair',      label: 'FAIR coding' }
+  { key: 'variable_name_FAIR_merged', cls: 'rv-col-fair',      label: 'Standardized name (FAIR coding)' }
 ];
 
 // ---------- Helpers ----------
@@ -2965,8 +3062,13 @@ function rvRenderDesc(instrument) {
   if (!el) return;
   const meta = instrument && window.cloudInstrumentMeta && window.cloudInstrumentMeta[instrument];
   const desc = meta && (meta.description || '').trim();
-  if (desc) { el.textContent = desc; el.style.display = 'block'; }
-  else { el.textContent = ''; el.style.display = 'none'; }
+  if (desc) {
+    el.innerHTML = '<div style="display:flex; gap:10px; align-items:flex-start;">'
+      + '<span style="font-size:15px; line-height:1.4;">📋</span>'
+      + '<div><div style="font-size:11px; font-weight:600; color:#4338ca; letter-spacing:0.03em; margin-bottom:3px;">INSTRUCTION</div>'
+      + '<div style="white-space:pre-wrap; font-size:13px; line-height:1.55; color:#3730a3;">' + rvEscape(desc) + '</div></div></div>';
+    el.style.display = 'block';
+  } else { el.innerHTML = ''; el.style.display = 'none'; }
 }
 
 function rvApplyFilter() {
@@ -3024,79 +3126,199 @@ function rvApplyFilter() {
 }
 
 // ---------- Render the table ----------
-function rvRenderTable() {
-  const tbody = document.getElementById('rv-tbody');
-  const total = RV_STATE.filteredRows.length;
-  const pageSize = RV_STATE.pageSize;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  if (RV_STATE.page > totalPages) RV_STATE.page = totalPages;
+// ---------- Master–detail helpers ----------
+function rvColMeta(key) { return RV_COLUMNS.find(c => c.key === key) || { key, label: key }; }
+function rvColLabel(key) { return rvColMeta(key).label; }
+function rvColVal(r, key) {
+  const c = rvColMeta(key);
+  const v = c.fmt ? c.fmt(r[key], r) : r[key];
+  return (v === null || v === undefined) ? '' : String(v);
+}
+function rvRowId(r, i) { return r._placeholder ? ('ph_' + i) : r.id; }
 
-  const start = (RV_STATE.page - 1) * pageSize;
-  const end = Math.min(start + pageSize, total);
-  const rows = RV_STATE.filteredRows.slice(start, end);
+function rvBuildListItems() {
+  const rows = RV_STATE.filteredRows;
+  const q = (RV_STATE.listSearch || '').toLowerCase();
+  const html = rows.map((r, i) => {
+    const rid = rvRowId(r, i);
+    const sel = (RV_STATE.selectedId === rid) ? ' rv-md-item-sel' : '';
+    if (r._placeholder) {
+      return `<div class="rv-md-item rv-md-item-locked${sel}" onclick="rvSelectRow('${rvEscape(rid)}')">
+        <span class="rv-md-item-num">${i + 1}</span>
+        <div class="rv-md-item-body">
+          <span class="rv-md-item-name">🔒 ${rvEscape(r.Instrument)}</span>
+          <span class="rv-md-item-label">Copyrighted — contact for items</span>
+        </div></div>`;
+    }
+    const name = r.variable_name_CBS || '';
+    const label = r.variable_label_NL || r.variable_label_EN || '';
+    if (q && !(name.toLowerCase().includes(q) || label.toLowerCase().includes(q))) return '';
+    // Calculated variables: don't show a raw formula (or "(no label)") as the
+    // list subtitle — a quiet "Derived variable" reads better.
+    const isCalc = !!getCalc(r);
+    const labelHtml = (isCalc && (!label || label.indexOf('{') !== -1))
+      ? '<span class="rv-cell-empty" style="font-style:italic;">Derived variable</span>'
+      : (label ? rvEscape(label) : '<span class="rv-cell-empty">(no label)</span>');
+    return `<div class="rv-md-item${sel}" onclick="rvSelectRow('${rvEscape(rid)}')">
+      <span class="rv-md-item-num">${i + 1}</span>
+      <div class="rv-md-item-body">
+        <span class="rv-md-item-name">${rvEscape(name)}${rvFxBadge(r)}</span>
+        <span class="rv-md-item-label">${labelHtml}</span>
+      </div></div>`;
+  }).join('');
+  return html || '<div class="rv-md-empty">No matches.</div>';
+}
 
-  if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="rv-empty">No variables to show. Select an instrument above.</td></tr>`;
-  } else {
-    tbody.innerHTML = rows.map((r, i) => {
-      const absIdx = start + i + 1;
-      if (r._placeholder) {
-        return `<tr class="rv-restricted-row">
-          <td class="rv-col-idx">${absIdx}</td>
-          <td colspan="10">
-            <div class="rv-restricted-content">
-              <span class="rv-restricted-icon">🔒</span>
-              <span class="rv-restricted-name">${rvEscape(r.Instrument)}</span>
-              <span class="rv-restricted-msg">This questionnaire is copyrighted. Contact for the full item list.</span>
-            </div>
-          </td>
-        </tr>`;
-      }
-      const cells = RV_COLUMNS.map(col => {
-        const val = r[col.key];
-        const extra = (col.key === 'variable_name_CBS') ? rvFxBadge(r) : '';
-        if (val === null || val === undefined || val === '') {
-          return `<td class="${col.cls} rv-cell-empty">${extra || '—'}</td>`;
-        }
-        return `<td class="${col.cls}">${rvEscape(val)}${extra}</td>`;
-      }).join('');
-      const actions = `<button class="rv-btn-mini" onclick="rvOpenSuggest('${rvEscape(r.id)}')">✎ Suggest</button>`;
-      return `<tr>
-        <td class="rv-col-idx">${absIdx}</td>
-        ${cells}
-        <td class="rv-col-actions">${actions}</td>
-      </tr>`;
-    }).join('');
+function rvParseValues(raw) {
+  const s = String(raw == null ? '' : raw).trim();
+  if (!s) return null;
+  const re = /\[([^\]]*)\]\s*([^\[]*)/g; const out = []; let m;
+  while ((m = re.exec(s))) { const code = m[1].trim(); const label = (m[2] || '').trim(); if (code !== '') out.push({ code: code, label: label }); }
+  return out.length ? out : null;
+}
+function rvValueCell(raw) {
+  const parsed = rvParseValues(raw);
+  const labeled = parsed ? parsed.filter(o => o.label !== '') : null;
+  if (!labeled || labeled.length === 0) {
+    const isEmpty = (raw === undefined || raw === null || raw === '');
+    return `<td class="rv-md-val ${isEmpty ? 'rv-cell-empty' : ''}">${isEmpty ? '—' : rvEscape(String(raw))}</td>`;
   }
+  const rows = labeled.map(o => `<div class="rv-vl"><span class="rv-vl-code">${rvEscape(o.code)}</span><span class="rv-vl-label">${rvEscape(o.label)}</span></div>`).join('');
+  return `<td class="rv-md-val"><div class="rv-vl-wrap">${rows}</div></td>`;
+}
+function rvFairCell(raw) {
+  const isEmpty = (raw === undefined || raw === null || raw === '');
+  if (isEmpty) return `<td class="rv-md-val rv-cell-empty">—</td>`;
+  return `<td class="rv-md-val"><span class="rv-fair-chip">${rvEscape(String(raw))}</span></td>`;
+}
+function rvRenderDetail(r) {
+  if (!r) return '<div class="rv-md-empty">Select a variable from the list.</div>';
+  if (r._placeholder) {
+    return `<div class="rv-md-detail"><div class="rv-restricted-content" style="flex-direction:column; gap:8px; text-align:center; padding:24px;">
+      <span class="rv-restricted-icon" style="font-size:22px;">🔒</span>
+      <span class="rv-restricted-name">${rvEscape(r.Instrument)}</span>
+      <span class="rv-restricted-msg">This questionnaire is copyrighted. Contact for the full item list.</span>
+    </div></div>`;
+  }
+  const groups = [
+    ['Classification', ['Theme', 'Subdomain']],
+    ['Labels', ['variable_label_NL', 'variable_label_EN']],
+    ['Values', ['value_labels_NL', 'value_labels_EN', 'variable_name_FAIR_merged']]
+  ];
+  const sections = groups.map(([title, keys]) => {
+    const present = keys.filter(k => RV_COLUMNS.some(c => c.key === k));
+    // Hide a group entirely when ALL of its fields are empty (e.g. a derived
+    // variable with no labels/values). Within a partly-filled group, empty
+    // fields still show as "—".
+    const groupHasValue = present.some(k => {
+      if (k === 'variable_name_FAIR_merged') {
+        const merged = (r.variable_name_FAIR_merged == null ? '' : String(r.variable_name_FAIR_merged)).trim();
+        return !!(merged || (r.variable_name_FAIR != null && String(r.variable_name_FAIR).trim() !== ''));
+      }
+      const v = r[k];
+      return !(v === undefined || v === null || String(v).trim() === '');
+    });
+    if (!groupHasValue) return '';
+    const rowsHtml = present.map(k => {
+      let valCell;
+      if (k === 'value_labels_NL' || k === 'value_labels_EN') valCell = rvValueCell(r[k]);
+      else if (k === 'variable_name_FAIR_merged') {
+        // Same rule as the standalone viewer: prefer the merged value, else the
+        // raw variable_name_FAIR, so this never shows blank when a code exists.
+        const merged = (r.variable_name_FAIR_merged == null ? '' : String(r.variable_name_FAIR_merged)).trim();
+        const fair = merged || (r.variable_name_FAIR == null ? '' : String(r.variable_name_FAIR));
+        valCell = rvFairCell(fair);
+      }
+      else { const val = rvColVal(r, k); valCell = `<td class="rv-md-val ${val ? '' : 'rv-cell-empty'}">${val ? rvEscape(val) : '—'}</td>`; }
+      return `<tr><td class="rv-md-key">${rvEscape(rvColLabel(k))}</td>${valCell}</tr>`;
+    }).join('');
+    return `<div class="rv-md-section"><div class="rv-md-section-title">${title}</div><table class="rv-md-table">${rowsHtml}</table></div>`;
+  }).join('');
+  return `<div class="rv-md-detail"><div class="rv-md-detail-inner">
+    <div class="rv-md-detail-head">
+      <span class="rv-md-detail-name">${rvEscape(r.variable_name_CBS || '')}${rvFxBadge(r)}</span>
+      <button class="rv-btn-mini" onclick="rvOpenSuggest('${rvEscape(r.id)}')">✎ Suggest a change</button>
+    </div>
+    ${rvCalcSection(r)}
+    ${sections}
+  </div></div>`;
+}
 
-  // Pagination info
-  const info = total === 0
-    ? 'No results'
-    : `Showing <strong>${start + 1}–${end}</strong> of <strong>${total}</strong>`;
-  document.getElementById('rv-pagination-info').innerHTML = info;
-  document.getElementById('rv-pagination-info-bottom').innerHTML = info;
+function rvSelectedRow() {
+  const rows = RV_STATE.filteredRows;
+  for (let i = 0; i < rows.length; i++) if (rvRowId(rows[i], i) === RV_STATE.selectedId) return rows[i];
+  return null;
+}
+function rvRenderListPane() {
+  const scroll = document.querySelector('#rv-md .rv-md-list-scroll');
+  if (scroll) scroll.innerHTML = rvBuildListItems();
+}
+function rvRenderDetailPane() {
+  const wrap = document.querySelector('#rv-md .rv-md-detail-wrap');
+  if (wrap) wrap.innerHTML = rvRenderDetail(rvSelectedRow());
+}
+function rvSelectRow(rid) {
+  RV_STATE.selectedId = rid;
+  rvRenderListPane();     // refresh highlight
+  rvRenderDetailPane();   // swap detail
+}
 
-  ['rv-prev-btn', 'rv-prev-btn-bottom'].forEach(id => {
-    document.getElementById(id).disabled = RV_STATE.page <= 1;
-  });
-  ['rv-next-btn', 'rv-next-btn-bottom'].forEach(id => {
-    document.getElementById(id).disabled = RV_STATE.page >= totalPages;
-  });
-
-  // Infobar — show total UNIQUE variables and instrument count
+// ---------- Render the master–detail view ----------
+function rvRenderTable() {
+  // Infobar — total UNIQUE variables and instrument count
   document.getElementById('rv-info-total').textContent = RV_STATE.allRows.length;
   const instrumentSet = new Set();
   RV_STATE.allRows.forEach(r => rvSplitInstrument(r.Instrument).forEach(a => instrumentSet.add(a)));
   document.getElementById('rv-info-instruments').textContent = instrumentSet.size;
+
+  const md = document.getElementById('rv-md');
+  if (!md) return;
+  const rows = RV_STATE.filteredRows;
+  if (rows.length === 0) {
+    md.innerHTML = '<div class="rv-md-empty">No variables to show. Select an instrument above.</div>';
+    return;
+  }
+  // Ensure a valid selection (default to first row).
+  const ids = new Set(rows.map((r, i) => rvRowId(r, i)));
+  if (!RV_STATE.selectedId || !ids.has(RV_STATE.selectedId)) {
+    RV_STATE.selectedId = rvRowId(rows[0], 0);
+  }
+  md.innerHTML = `
+    <div class="rv-md-list">
+      <div class="rv-md-search"><input type="text" id="rv-md-search-in" placeholder="Search variables…" value="${rvEscape(RV_STATE.listSearch || '')}"></div>
+      <div class="rv-md-list-scroll">${rvBuildListItems()}</div>
+    </div>
+    <div class="rv-md-detail-wrap">${rvRenderDetail(rvSelectedRow())}</div>`;
+  const si = document.getElementById('rv-md-search-in');
+  if (si) si.addEventListener('input', function() { RV_STATE.listSearch = this.value; rvRenderListPane(); });
 }
 
 // ---------- Suggest a change ----------
+(function _rvReparentSuggest() {
+  function move() {
+    const m = document.getElementById('cloud-suggest-modal');
+    if (m && m.parentElement !== document.body) document.body.appendChild(m);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', move); else move();
+  // v6.28: merge the user banner into the topbar (single compact header) — but
+  // NOT for researchers: the editor topbar is hidden for them, and the banner
+  // is their only Log out. Decide after auth, when the role is known.
+  window.addEventListener('cloud-authenticated', (e) => {
+    const role = e.detail && e.detail.profile && e.detail.profile.role;
+    const banner = document.getElementById('cloud-user-banner');
+    const inner = document.querySelector('.topbar-inner');
+    if (role !== 'researcher' && banner && inner && banner.parentElement !== inner) inner.appendChild(banner);
+  });
+})();
 function rvOpenSuggest(variableId) {
   const v = RV_STATE.allRows.find(r => r.id === variableId);
   if (!v) {
     alert('Variable not found.');
     return;
   }
+  // The submit handler resolves the variable via _cloudSuggestUid — set it so a
+  // researcher's suggestion submits correctly (rv passes r.id, not _uid).
+  _cloudSuggestUid = v._uid;
   document.getElementById('cloud-suggest-modal').classList.add('visible');
 
   const name = v.variable_name_CBS || v.id || '—';
@@ -3436,6 +3658,8 @@ function rvWireUp() {
   if (filter) {
     filter.addEventListener('change', (e) => {
       RV_STATE.filter = e.target.value;
+      RV_STATE.selectedId = null;   // default to first variable of the new instrument
+      RV_STATE.listSearch = '';
       rvApplyFilter();
     });
   }
@@ -3531,6 +3755,28 @@ window.applyCloudCodebook = function(rows, opts) {
 };
 
 // ====== END v5.6 viewer pane ======
+
+// ====== v6.20: Admin "Preview as researcher" ======
+// Lets an admin see the researcher viewer inline, without logging out. The
+// underlying role stays 'admin' (so permissions are unaffected) — only the
+// body class is toggled so the existing CSS shows #rv-app and hides the editor.
+let _rvPreviewWired = false;
+function rvPreviewEnter() {
+  if (!_rvPreviewWired) { try { rvWireUp(); } catch (e) { console.warn('rvWireUp', e); } _rvPreviewWired = true; }
+  RV_STATE.allRows = (state.codebook || []).filter(r => !r._deleted);
+  RV_STATE.restrictedAtoms = rvComputeRestrictedAtoms();
+  RV_STATE.filter = '';
+  RV_STATE.selectedId = null;
+  RV_STATE.listSearch = '';
+  rvPopulateInstruments();
+  rvApplyFilter();
+  document.body.classList.add('role-researcher', 'rv-preview-mode');
+  window.scrollTo(0, 0);
+}
+function rvPreviewExit() {
+  document.body.classList.remove('role-researcher', 'rv-preview-mode');
+  window.scrollTo(0, 0);
+}
 
 // ====== v6.5: Custom fields (JSONB) support ======
 window.cloudCustomFields = [];  // array of {field_name, display_order}
@@ -5467,12 +5713,20 @@ function instMeta(name) {
   return (window.cloudInstrumentMeta && window.cloudInstrumentMeta[name]) || { description: '', status: 'published', created_by: null };
 }
 function isAdminRole() { return !!(window.cloudAuth && window.cloudAuth.role === 'admin'); }
+function canSeeUnpublished() {
+  // Admin, editor, and ontology_engineer all work on unpublished instruments
+  // (reviewing, mapping, filling in codings). Researchers do not.
+  const role = window.cloudAuth && window.cloudAuth.role;
+  return isAdminRole() || role === 'editor' || role === 'ontology_engineer';
+}
 function instVisible(name) {
-  // Admins see every instrument; others see published ones, plus their OWN
-  // pending_review instruments (so the person who imported it can still see it).
-  if (isAdminRole()) return true;
+  // Admin / editor / ontology_engineer see every instrument regardless of
+  // status — an instrument is often unpublished precisely because it still
+  // needs values/codings, which is what these roles are here to add.
+  if (canSeeUnpublished()) return true;
   const meta = instMeta(name);
   if (meta.status === 'published') return true;
+  // Researchers (and any other role): published only, plus their own pending.
   const myUid = window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id;
   if (meta.status === 'pending_review' && myUid && meta.created_by === myUid) return true;
   return false;
@@ -5547,19 +5801,39 @@ function parseImportSheet(aoa, ctx) {
     dataRows.push(row);
   }
 
-  // Split into intro (description) rows vs variable rows
-  let description = '';
+  // Split into intro rows (instruction / description) vs variable rows
+  let description = '', instruction = '';
   const varRows = [];
   for (const row of dataRows) {
     const cbs = get(row, 'variable_name_CBS');
     const varname = get(row, '__varname');
     const inst = get(row, 'Instrument');
     const labelNl = get(row, 'variable_label_NL');
+    const labelEn = get(row, 'variable_label_EN');
+    // Instruction header row: the word INSTRUCTION appears in the identifier
+    // (either the "Variable name" column or variable_name_CBS). The instruction
+    // text itself is in the label column(s); fall back to the identifier cell
+    // with the marker words ("INSTRUCTION", "text field") stripped out.
+    if (_impNorm(varname).indexOf('instruction') !== -1 || _impNorm(cbs).indexOf('instruction') !== -1) {
+      const txt = labelNl || labelEn ||
+        (varname || cbs)
+          .replace(/text\s*field/ig, '')
+          .replace(/instruction/ig, '')
+          .replace(/^[\s:.\-–—]+/, '').trim();
+      if (txt && !instruction) instruction = txt;
+      continue;
+    }
+    // Plain description row: no identifier at all, just a label.
     if (!cbs && !varname && !inst && labelNl) { if (!description) description = labelNl; continue; }
     if (!cbs) continue; // skip rows without an identifier
     varRows.push(row);
   }
   if (varRows.length === 0) return null;
+
+  // Instrument header text: an instruction takes priority; if a plain
+  // description row also exists, keep both.
+  let headerText = instruction;
+  if (description) headerText = headerText ? (headerText + '\n\n' + description) : description;
 
   // Instrument name = first non-empty Instrument value
   let instrument = '';
@@ -5590,10 +5864,8 @@ function parseImportSheet(aoa, ctx) {
     // For each {ref}: if ref matches a "Variable name" -> use its CBS.
     // Else if ref is already a variable_name_CBS in this sheet -> keep it, but warn.
     // Else -> leave unchanged and warn (unknown reference).
-    const note = get(row, '__note');
-    let calculation = '';
-    if (note.indexOf('{') !== -1) {
-      calculation = note.replace(/\{([^}]+)\}/g, function(_, ref) {
+    const rewriteFormula = function(text) {
+      return String(text).replace(/\{([^}]+)\}/g, function(_, ref) {
         const r = ref.trim();
         if (nameMap[r]) return '{' + nameMap[r] + '}';
         if (cbsSet.has(r)) {
@@ -5603,11 +5875,25 @@ function parseImportSheet(aoa, ctx) {
         warnings.push('Formula for "' + cbs + '" refers to "' + r + '" which is not in this sheet — left unchanged.');
         return '{' + r + '}';
       });
+    };
+    const note = get(row, '__note');
+    const labelNlRaw = get(row, 'variable_label_NL');
+    const ftype = get(row, '__fieldtype');
+    let calculation = '';
+    let labelNlOut = labelNlRaw;
+    if (note.indexOf('{') !== -1) {
+      calculation = rewriteFormula(note);
+    } else if (labelNlRaw && (/\{[^}]+\}/.test(labelNlRaw) || /calculation/i.test(ftype))) {
+      // The "label" is really a formula/condition (has {ref} tokens, or the
+      // field type says CALCULATION). Move it into the calculation field so it
+      // renders in the Calculation section instead of as a variable label.
+      calculation = rewriteFormula(labelNlRaw);
+      labelNlOut = '';
     }
     return {
       Theme: get(row, 'Theme'), Subdomain: get(row, 'Subdomain'),
       variable_name_CBS: cbs,
-      variable_label_NL: get(row, 'variable_label_NL'),
+      variable_label_NL: labelNlOut,
       variable_label_EN: get(row, 'variable_label_EN'),
       value_labels_NL: get(row, 'value_labels_NL'),
       value_labels_EN: get(row, 'value_labels_EN'),
@@ -5617,7 +5903,7 @@ function parseImportSheet(aoa, ctx) {
     };
   });
 
-  return { instrument, description, rows, warnings };
+  return { instrument, description: headerText, isInstruction: !!instruction, rows, warnings };
 }
 
 function parseImportWorkbook(arrayBuffer) {
@@ -5672,7 +5958,7 @@ function renderImportPreview() {
       </tr>`).join('');
     return `<div style="margin-bottom:16px; padding-top:8px; border-top:1px solid var(--border);">
       <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(ins.instrument)} &nbsp;·&nbsp; <strong>${ins.rows.length}</strong> variable(s)</div>
-      ${ins.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>Description:</strong> ${escapeHtml(ins.description.slice(0, 200))}${ins.description.length > 200 ? '…' : ''}</div>` : ''}
+      ${ins.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>${ins.isInstruction ? '📋 Instruction' : 'Description'}:</strong> ${escapeHtml(ins.description.slice(0, 200))}${ins.description.length > 200 ? '…' : ''}</div>` : ''}
       ${warnHtml}
       <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
         <thead><tr>
@@ -5718,6 +6004,7 @@ async function confirmImport() {
           "variable_label_en": r.variable_label_EN || null,
           "value_labels_nl": r.value_labels_NL || null,
           "value_labels_en": r.value_labels_EN || null,
+          "sources": r.source_other ? "otherStudies" : "",
           "custom_fields": cf,
           "created_by": uid, "updated_by": uid
         };
@@ -5731,6 +6018,9 @@ async function confirmImport() {
     }
     cloudShowToast('success', 'Imported ' + totalVars + ' variable(s) across ' + p.instruments.length + ' instrument(s) (pending review)');
     closeImportDialog();
+    // Refresh instrument metadata (description/instruction + status) so the
+    // newly imported instrument renders correctly in the researcher viewer.
+    if (typeof loadInstrumentMeta === 'function') await loadInstrumentMeta();
     if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
   } catch (err) {
     console.error('Import failed:', err);
@@ -5750,7 +6040,45 @@ function showCalcPopup(title, formula) {
 function showCalcForUid(uid) { const v = findVarByUid(uid); if (v) showCalcPopup(getId(v), getCalc(v)); }
 function fxBadge(v) { return getCalc(v) ? ` <button class="fx-btn" title="Show calculation" onclick="showCalcForUid('${escapeAttr(v._uid)}')">ƒx</button>` : ''; }
 function rvShowCalc(id) { const v = RV_STATE.allRows.find(r => r.id === id); if (v) showCalcPopup(v.variable_name_CBS, getCalc(v)); }
-function rvFxBadge(r) { return getCalc(r) ? ` <button class="fx-btn" title="Show calculation" onclick="rvShowCalc('${rvEscape(r.id)}')">ƒx</button>` : ''; }
+// Researcher view: the calculation is shown inline in the detail panel, so the
+// list/header marker is just an indicator (the modal is hidden for researchers).
+function rvFxBadge(r) { return getCalc(r) ? ' <span class="rv-fx-mark" title="Derived / calculated variable">ƒx</span>' : ''; }
+function rvCalcRefs(formula) {
+  const set = new Set();
+  (String(formula).match(/\{([^}]+)\}/g) || []).forEach(t => set.add(t.replace(/[{}]/g, '').trim()));
+  return [...set].filter(Boolean);
+}
+function rvHighlightRefs(formula) {
+  return rvEscape(String(formula)).replace(/\{([^}]+)\}/g, function(_, ref) {
+    const r = ref.trim();
+    return `<span class="rv-calc-ref" onclick="rvSelectByName('${rvEscape(r)}')">${rvEscape(r)}</span>`;
+  });
+}
+function rvSelectByName(name) {
+  const rows = RV_STATE.filteredRows;
+  for (let i = 0; i < rows.length; i++) {
+    if (!rows[i]._placeholder && (rows[i].variable_name_CBS || '') === name) {
+      rvSelectRow(rvRowId(rows[i], i));
+      const item = document.querySelectorAll('#rv-md .rv-md-item')[i];
+      if (item && item.scrollIntoView) item.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+  }
+}
+function rvCalcSection(r) {
+  const calc = getCalc(r);
+  if (!calc) return '';
+  const deps = rvCalcRefs(calc);
+  const depsHtml = deps.length
+    ? `<div class="rv-calc-deps">Depends on: ${deps.map(d => `<span class="rv-calc-ref" onclick="rvSelectByName('${rvEscape(d)}')">${rvEscape(d)}</span>`).join('')}</div>`
+    : '';
+  return `<div class="rv-md-section">
+    <div class="rv-md-section-title">Calculation</div>
+    <div class="rv-calc-tag">ƒx Derived variable</div>
+    <pre class="rv-calc-code">${rvHighlightRefs(calc)}</pre>
+    ${depsHtml}
+  </div>`;
+}
 
 async function saveInstrumentMeta(name, patch) {
   const c = window.cloudAuth && window.cloudAuth.client;
@@ -5771,6 +6099,14 @@ function renderInstrumentInfoBar() {
   const bar = document.getElementById('instrument-info-bar');
   if (!bar) return;
   const name = state.selectedInstrument;
+  // v6.28: status pill next to the instrument dropdown (roles that see unpublished)
+  const pill = document.getElementById('inst-status-pill');
+  if (pill) {
+    const st = name && canSeeUnpublished() ? instMeta(name).status : '';
+    if (st === 'hidden') { pill.className = 'st-hidden'; pill.textContent = '🚫 hidden'; }
+    else if (st === 'pending_review') { pill.className = 'st-pending'; pill.textContent = '🟠 pending review'; }
+    else { pill.className = ''; pill.textContent = ''; }
+  }
   if (!name) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
   const meta = instMeta(name);
   const admin = isAdminRole();
@@ -5781,23 +6117,29 @@ function renderInstrumentInfoBar() {
   if (admin && meta.status === 'hidden') badge = '<span style="margin-left:8px; font-size:0.72rem; background:#fde2e2; color:#b91c1c; padding:2px 8px; border-radius:10px;">🚫 hidden</span>';
   else if (admin && meta.status === 'pending_review') badge = '<span style="margin-left:8px; font-size:0.72rem; background:#fff0d6; color:#9a6700; padding:2px 8px; border-radius:10px;">🟠 new — needs review</span>';
 
-  // Admin controls
+  // Controls: editors may edit the description/instruction; publish/hide/delete
+  // stay admin-only.
+  const canEditDesc = admin || (window.cloudAuth && window.cloudAuth.role === 'editor');
   let controls = '';
-  if (admin) {
-    const toggle = meta.status === 'published'
-      ? `<button class="btn-mini" onclick="setInstrumentStatus('hidden')" title="Hide this instrument from researchers and the viewer">🚫 Hide</button>`
-      : `<button class="btn-mini" onclick="setInstrumentStatus('published')" title="Make this instrument visible to everyone">✅ Publish</button>`;
-    controls = `<div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
-      <button class="btn-mini" onclick="openInstrumentDescEditor()">✏️ ${desc ? 'Edit' : 'Add'} description</button>
-      ${toggle}
-    </div>`;
+  if (admin || canEditDesc) {
+    const descBtn = canEditDesc
+      ? `<button class="btn-mini" onclick="openInstrumentDescEditor()">✏️ ${desc ? 'Edit' : 'Add'} description</button>`
+      : '';
+    let adminBtns = '';
+    if (admin) {
+      const toggle = meta.status === 'published'
+        ? `<button class="btn-mini" onclick="setInstrumentStatus('hidden')" title="Hide this instrument from researchers and the viewer">🚫 Hide</button>`
+        : `<button class="btn-mini" onclick="setInstrumentStatus('published')" title="Make this instrument visible to everyone">✅ Publish</button>`;
+      adminBtns = toggle + `<button class="btn-mini" onclick="deleteInstrument()" style="color:#b91c1c; border-color:#f3c1c1;" title="Delete this instrument and its variables">🗑 Delete</button>`;
+    }
+    controls = `<div style="margin-top:6px; display:flex; gap:8px; align-items:center;">${descBtn}${adminBtns}</div>`;
   }
 
   const descHtml = desc
     ? `<div style="white-space:pre-wrap; font-size:0.86rem; color:var(--text-muted); line-height:1.5;">${escapeHtml(desc)}</div>`
-    : (admin ? `<div style="font-size:0.82rem; color:var(--text-faint); font-style:italic;">No description yet.</div>` : '');
+    : (canEditDesc ? `<div style="font-size:0.82rem; color:var(--text-faint); font-style:italic;">No description yet.</div>` : '');
 
-  if (!desc && !admin) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  if (!desc && !canEditDesc) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
   bar.style.display = 'block';
   bar.style.cssText = 'display:block; margin-bottom:14px; padding:12px 14px; background:var(--surface-2,#f3f4f6); border:1px solid var(--border,#e3e5e8); border-radius:8px;';
   bar.innerHTML = `<div style="display:flex; align-items:center;"><strong style="font-size:0.9rem;">${escapeHtml(name)}</strong>${badge}</div>${descHtml}${controls}`;
@@ -5822,15 +6164,59 @@ async function setInstrumentStatus(status) {
   if (ok) { renderInstrumentInfoBar(); populateInstruments(); }
 }
 
+// v6.23: delete an instrument (its own variables + its meta row). Admin only,
+// with a type-the-name confirmation. Variables shared with other instruments
+// are kept. Uses soft-delete for variables (re-import is unaffected).
+async function deleteInstrument() {
+  const name = state.selectedInstrument;
+  if (!name) return;
+  if (typeof isAdminRole === 'function' && !isAdminRole()) { alert('Only admins can delete instruments.'); return; }
+  const c = window.cloudAuth && window.cloudAuth.client;
+  const uid = window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id;
+  if (!c || !uid) { alert('Not signed in.'); return; }
+
+  const atomsOf = v => String(v.Instrument || '').split(' + ').map(s => s.trim()).filter(Boolean);
+  const own = (state.codebook || []).filter(v => !v._deleted && v.id && atomsOf(v).length === 1 && atomsOf(v)[0] === name);
+  const shared = (state.codebook || []).filter(v => !v._deleted && atomsOf(v).length > 1 && atomsOf(v).includes(name));
+
+  let msg = 'This will delete instrument "' + name + '" and its ' + own.length + ' variable(s).';
+  if (shared.length) msg += '\n' + shared.length + ' variable(s) shared with other instruments will be KEPT.';
+  msg += '\n\nType the instrument name to confirm:';
+  const typed = prompt(msg);
+  if (typed == null) return;
+  if (typed.trim() !== name) { alert('Name did not match — cancelled.'); return; }
+
+  try {
+    for (const v of own) {
+      const { error } = await c.rpc('admin_update_variable', { p_variable_id: v.id, p_updates: { is_deleted: true } });
+      if (error) throw error;
+      try { await c.from('audit_log').insert({ variable_id: v.id, action: 'delete', performed_by: uid }); } catch (_) {}
+    }
+    const { error: mErr } = await c.from('instruments').delete().eq('name', name);
+    if (mErr) console.warn('instrument meta delete:', mErr.message);
+    if (window.cloudInstrumentMeta) delete window.cloudInstrumentMeta[name];
+
+    let done = 'Deleted "' + name + '" — ' + own.length + ' variable(s) removed.';
+    if (shared.length) done += ' ' + shared.length + ' shared variable(s) kept.';
+    cloudShowToast('success', done);
+    state.selectedInstrument = '';
+    if (typeof loadInstrumentMeta === 'function') await loadInstrumentMeta();
+    if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
+  } catch (err) {
+    console.error('Delete instrument failed:', err);
+    alert('Delete failed: ' + (err.message || err));
+  }
+}
+
 function buildInstrumentOption(name, counts, prev) {
   const opt = document.createElement("option");
   opt.value = name;
   const c = counts[name];
   opt.textContent = c === 0 ? `${name}  (empty — new)` : `${name}  (${c} variable${c === 1 ? "" : "s"})`;
-  if (isAdminRole()) {
+  if (canSeeUnpublished()) {
     const st = instMeta(name).status;
-    if (st === 'hidden') opt.textContent += '  🚫';
-    else if (st === 'pending_review') opt.textContent += '  🟠';
+    if (st === 'hidden') opt.textContent += '  🚫 hidden';
+    else if (st === 'pending_review') opt.textContent += '  🟠 pending review';
   }
   if (name === prev) opt.selected = true;
   return opt;
@@ -6108,12 +6494,21 @@ function toggleAdminMenu(e){
 }
 function closeAdminMenu(){ var m=document.getElementById('admin-menu'); if(m) m.classList.remove('open'); }
 document.addEventListener('click', function(e){ var dd=document.getElementById('admin-dropdown'); if(dd && !dd.contains(e.target)) closeAdminMenu(); });
+// The menu is position:fixed, so page scroll would detach it from its anchor
+// button — close it on any scroll instead (standard dropdown behavior).
+window.addEventListener('scroll', function(ev){
+  var m=document.getElementById('admin-menu');
+  if(!m || !m.classList.contains('open')) return;
+  // Ignore scrolls inside the menu's own scrollbar (it has max-height).
+  if (ev.target instanceof Node && m.contains(ev.target)) return;
+  closeAdminMenu();
+}, true);
 
 function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   var _adminBtn = document.getElementById("admin-tab-btn");
-  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings"].indexOf(name) !== -1);
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   if (name === "variables") refreshVariablesTab();
   else if (name === "bulk") refreshBulkTab();
@@ -6122,6 +6517,86 @@ function switchTab(name) {
   else if (name === "settings") refreshSettingsTab();
   else if (name === "users") loadUsers();
   else if (name === "trash") loadTrash();
+  else if (name === "dashboard") renderDashboard();
+}
+
+// ============ ADMIN DASHBOARD (v6.31) ============
+function _dashAtoms(v) { return String(v.Instrument || '').split(' + ').map(s => s.trim()).filter(Boolean); }
+function renderDashboard() {
+  const cardsEl = document.getElementById('dash-cards');
+  const instEl = document.getElementById('dash-instruments');
+  if (!cardsEl || !instEl) return;
+  const rows = (state.codebook || []).filter(v => !v._deleted);
+
+  // Per-instrument aggregation
+  const agg = {}; // name -> {count, labEn, fair}
+  rows.forEach(v => {
+    const hasEn = !!(v.variable_label_EN && String(v.variable_label_EN).trim());
+    const fairVal = (v.variable_name_FAIR_merged && String(v.variable_name_FAIR_merged).trim())
+                 || (v.variable_name_FAIR && String(v.variable_name_FAIR).trim()) || '';
+    _dashAtoms(v).forEach(a => {
+      if (!agg[a]) agg[a] = { count: 0, labEn: 0, fair: 0 };
+      agg[a].count++;
+      if (hasEn) agg[a].labEn++;
+      if (fairVal) agg[a].fair++;
+    });
+  });
+  const names = Object.keys(agg).sort((a, b) => a.localeCompare(b));
+
+  // Status breakdown
+  let pub = 0, hid = 0, pen = 0;
+  names.forEach(n => {
+    const st = instMeta(n).status;
+    if (st === 'hidden') hid++;
+    else if (st === 'pending_review') pen++;
+    else pub++;
+  });
+  const fxCount = rows.filter(v => !!getCalc(v)).length;
+  const pendingBadge = document.getElementById('tab-count-pending');
+  const pendingN = pendingBadge && pendingBadge.style.display !== 'none' ? (pendingBadge.textContent || '0') : '0';
+
+  function sum(list, f) { return list.reduce((t, n) => t + f(n), 0); }
+  function pct(part, total) { return total ? Math.round(100 * part / total) : 0; }
+  function bar(part, total) {
+    const p = pct(part, total);
+    return `<span class="dash-bar"><span style="width:${p}%"></span></span>${p}%`;
+  }
+
+  cardsEl.innerHTML = `
+    <div class="dash-card"><div class="dc-num">${rows.length}</div><div class="dc-label">Variables</div><div class="dc-sub">${fxCount} derived (ƒx)</div></div>
+    <div class="dash-card"><div class="dc-num">${names.length}</div><div class="dc-label">Instruments</div><div class="dc-sub">${pub} published · ${pen} pending · ${hid} hidden</div></div>
+    <div class="dash-card"><div class="dc-num">${pendingN}</div><div class="dc-label">Pending suggestions</div><div class="dc-sub">review in the Pending tab</div></div>
+    <div class="dash-card"><div class="dc-num">${pct(sum(names, n => agg[n].labEn), rows.length)}%</div><div class="dc-label">EN labels filled</div><div class="dc-sub">across all variables</div></div>
+    <div class="dash-card"><div class="dc-num">${pct(sum(names, n => agg[n].fair), rows.length)}%</div><div class="dc-label">FAIR coded</div><div class="dc-sub">across all variables</div></div>`;
+
+  instEl.innerHTML = `<table class="dash-table">
+    <thead><tr><th>Instrument</th><th>Status</th><th>Vars</th><th>EN labels</th><th>FAIR coded</th><th></th></tr></thead>
+    <tbody>${names.map(n => {
+      const a = agg[n];
+      const st = instMeta(n).status || 'published';
+      const action = !isAdminRole() ? ''
+        : (st === 'published'
+          ? `<button class="btn-mini" onclick="dashSetStatus('${escapeAttr(n)}','hidden')">Hide</button>`
+          : `<button class="btn-mini" onclick="dashSetStatus('${escapeAttr(n)}','published')">Publish</button>`);
+      return `<tr>
+        <td class="di-name" onclick="dashGo('${escapeAttr(n)}')" title="Open in Variables">${escapeHtml(n)}</td>
+        <td><span class="dash-pill ${st}">${st === 'pending_review' ? 'pending review' : st}</span></td>
+        <td>${a.count}</td>
+        <td>${bar(a.labEn, a.count)}</td>
+        <td>${bar(a.fair, a.count)}</td>
+        <td style="text-align:right;">${action}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+async function dashSetStatus(name, status) {
+  const ok = await saveInstrumentMeta(name, { status: status });
+  if (ok) { renderDashboard(); populateInstruments(); if (typeof renderInstrumentInfoBar === 'function') renderInstrumentInfoBar(); }
+}
+function dashGo(name) {
+  const sel = document.getElementById('instrument-select');
+  if (sel) { sel.value = name; sel.dispatchEvent(new Event('change')); }
+  switchTab('variables');
 }
 
 // ============ TRASH TAB (admin) ============
@@ -6211,15 +6686,22 @@ function refreshVariablesTab() {
     const role = window.cloudAuth && window.cloudAuth.role;
     const canEdit = role === 'admin' || role === 'editor' || role === 'ontology_engineer';
     const canDelete = role === 'admin' || role === 'editor';
+    const _icoEye = '<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const _icoPen = '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    const _icoTrash = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+    const _icoRestore = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>';
     const actions = isDeleted
-      ? `<button class="btn-mini" onclick="restoreVariable('${escapeAttr(v._uid)}')">Restore</button>`
-      : `<button class="btn-mini" onclick="openViewDialog('${escapeAttr(v._uid)}')">View</button>`
-        + (canEdit ? `<button class="btn-mini" onclick="openEditDialog('${escapeAttr(v._uid)}')">Edit</button>` : '')
-        + (canDelete ? `<button class="btn-mini" onclick="openDeleteDialog('${escapeAttr(v._uid)}')" style="color: var(--danger);">Delete</button>` : '');
+      ? `<button class="icon-btn" title="Restore" onclick="restoreVariable('${escapeAttr(v._uid)}')">${_icoRestore}</button>`
+      : `<button class="icon-btn" title="View" onclick="openViewDialog('${escapeAttr(v._uid)}')">${_icoEye}</button>`
+        + (canEdit ? `<button class="icon-btn" title="Edit" onclick="openEditDialog('${escapeAttr(v._uid)}')">${_icoPen}</button>` : '')
+        + (canDelete ? `<button class="icon-btn danger" title="Delete" onclick="openDeleteDialog('${escapeAttr(v._uid)}')">${_icoTrash}</button>` : '');
+    const labelHtml = (v.variable_label_EN || v.variable_label)
+      ? escapeHtml(truncate(label, 110))
+      : '<span class="row-nolabel">(no label)</span>';
     return `<div class="browse-row ${isDeleted ? 'deleted' : ''}">
       <span class="row-idx">${i + 1}</span>
       <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}${fxBadge(v)}</span>
-      <span class="row-label">${escapeHtml(truncate(label, 110))}</span>
+      <span class="row-label">${labelHtml}</span>
       <span class="row-actions">${actions}</span>
     </div>`;
   }).join("");
@@ -7171,7 +7653,7 @@ const COMPACT_VIEW_FIELDS = [
   "variable_label_NL",
   "value_labels_EN",
   "values",
-  "source_merged",
+  "sources",
 ];
 
 function openViewDialogCompact(uid) {
@@ -7188,7 +7670,7 @@ function openViewDialogCompact(uid) {
       ${fieldsToShow.map(f => {
         const val = v[f];
         const isEmpty = val === undefined || val === null || val === "";
-        const display = isEmpty ? "(empty)" : String(val);
+        const display = isEmpty ? "(empty)" : (f === "sources" ? splitSources(val).map(sourceLabel).join(", ") : String(val));
         const isMulti = !isEmpty && (display.includes("\n") || display.length > 80);
         return `<tr style="border-bottom: 1px solid var(--border);">
           <td style="padding: 8px 12px 8px 0; vertical-align: top; width: 200px; font-family: var(--mono); font-size: 11px; color: var(--text-muted); white-space: nowrap;">${escapeHtml(f)}</td>
@@ -7217,7 +7699,7 @@ function openViewDialog(uid) {
         const r = resolveFieldDisplay(v, f);
         const val = r.value;
         const isEmpty = val === undefined || val === null || val === "";
-        const display = isEmpty ? "(empty)" : String(val);
+        const display = isEmpty ? "(empty)" : (f === "sources" ? splitSources(val).map(sourceLabel).join(", ") : String(val));
         const fbTag = r.usedFallback ? ` <span style="color:var(--accent); font-size:10px;">(from ${escapeHtml(r.fallbackField)})</span>` : '';
         return `<div class="field-readonly">
           <div class="field-readonly-name">${escapeHtml(f)}${fbTag}</div>
@@ -7262,6 +7744,14 @@ function openEditDialog(uid) {
           }
           return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)} <span style="color: var(--accent); font-size: 10px;">(this row only)</span></div><div>${buildInstrumentCheckboxes(curAtoms, "data-inst")}</div></div>`;
         }
+        if (f === "sources") {
+          if (!editable) {
+            const shown = splitSources(v.sources).map(sourceLabel).join(", ");
+            return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div class="field-readonly-value">${escapeHtml(shown || "—")}</div></div>`;
+          }
+          const curSrc = new Set(splitSources(v.sources));
+          return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div>${buildSourceCheckboxes(curSrc, "data-src")}</div></div>`;
+        }
         const cur = v[f] !== undefined && v[f] !== null ? String(v[f]) : "";
         const isLong = cur.length > 80 || cur.includes("\n");
         const isRequired = f === state.identifierField;
@@ -7293,6 +7783,14 @@ async function submitEditVariable() {
     body.querySelectorAll("input[data-inst]:checked").forEach(cb => checkedAtoms.push(cb.dataset.inst));
     if (checkedAtoms.length === 0) { showModalError("edit", "Pick at least one questionnaire"); return; }
     newValues[state.instrumentField] = checkedAtoms.join(" + ");
+  }
+
+  // Read Sources checkboxes (multi-select consolidated column).
+  const srcInputs = body.querySelectorAll("input[data-src]");
+  if (srcInputs.length > 0) {
+    const checkedSrc = [];
+    body.querySelectorAll("input[data-src]:checked").forEach(cb => checkedSrc.push(cb.dataset.src));
+    newValues["sources"] = checkedSrc.join(" + ");
   }
 
   // Identifier is only validated/edited when the role can edit it.
@@ -7408,6 +7906,27 @@ function getAllAtomicInstruments() {
   });
   if (state.pendingInstruments) state.pendingInstruments.forEach(n => set.add(n));
   return [...set].sort();
+}
+
+// Canonical source options (single consolidated `sources` column).
+// token = value stored in DB; label = shown in the UI.
+const SOURCE_OPTIONS = [
+  { token: "biobank",           label: "Biobank" },
+  { token: "portal",            label: "Portal" },
+  { token: "platform_trials",   label: "Platform trials" },
+  { token: "expertise_clinics", label: "Expertise clinics" },
+  { token: "otherStudies",      label: "Other studies" },
+];
+function sourceLabel(tok) { const o = SOURCE_OPTIONS.find(s => s.token === tok); return o ? o.label : tok; }
+function splitSources(s) { return String(s == null ? "" : s).split(" + ").map(x => x.trim()).filter(Boolean); }
+function buildSourceCheckboxes(selectedSet, dataAttr) {
+  return `<div style="border: 1px solid var(--border-strong); border-radius: 6px; padding: 8px; background: var(--surface);">
+    ${SOURCE_OPTIONS.map(o => `<label style="display: flex; align-items: center; padding: 3px 0; font-weight: 400; color: var(--text); margin: 0; cursor: pointer;">
+      <input type="checkbox" ${dataAttr}="${escapeAttr(o.token)}" ${selectedSet.has(o.token) ? "checked" : ""}>
+      <span style="margin-left: 4px;">${escapeHtml(o.label)}</span>
+    </label>`).join("")}
+  </div>
+  <div class="hint" style="margin-top: 4px;">Tick every source this variable comes from. Stored as <code>A + B + C</code>.</div>`;
 }
 
 function buildInstrumentCheckboxes(selectedSet, dataAttr) {
