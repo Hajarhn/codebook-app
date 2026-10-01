@@ -1428,7 +1428,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.32.0
+      Codebook Editor — Cloud edition · v6.32.1
     </div>
   </div>
 </div>
@@ -1701,7 +1701,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.32.0 cloud</span>
+      <span class="version">v6.32.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -5735,7 +5735,7 @@ window.addEventListener('cloud-authenticated', async () => { await loadInstrumen
 
 // ====== v6.19: Import instrument from Excel ======
 let importParsed = null;
-function _impNorm(s) { return String(s == null ? '' : s).toLowerCase().replace(/[\s_\-]/g, '').trim(); }
+function _impNorm(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
 const IMP_COLMAP = {
   'theme': 'Theme', 'subdomain': 'Subdomain', 'instrument': 'Instrument',
   'variablename': '__varname',
@@ -5746,8 +5746,30 @@ const IMP_COLMAP = {
   'valuelabelengels': 'value_labels_EN', 'valuelabelen': 'value_labels_EN', 'valuelabelenglish': 'value_labels_EN',
   'fieldtypeother': '__fieldtype', 'fieldtype': '__fieldtype',
   'sourceotherstudies': '__source', 'sourceother': '__source',
-  'gevraagdeaanpassing': '__note'
+  'gevraagdeaanpassing': '__note',
+  // v6.32.1 aliases: plurals, Dutch spellings, bracketed language tags
+  'thema': 'Theme', 'subdomein': 'Subdomain', 'instrumentnaam': 'Instrument',
+  'variablelabelsnl': 'variable_label_NL', 'variablelabeldutch': 'variable_label_NL', 'variablelabelnederlands': 'variable_label_NL',
+  'variablelabelsen': 'variable_label_EN', 'variablelabelsengels': 'variable_label_EN',
+  'valuelabelsnl': 'value_labels_NL', 'valuelabeldutch': 'value_labels_NL', 'valuelabelnederlands': 'value_labels_NL',
+  'valuelabelsen': 'value_labels_EN', 'valuelabelsengels': 'value_labels_EN', 'valuelabelsenglish': 'value_labels_EN'
 };
+// Any other column whose header matches a codebook field (by field name or by
+// its display label) is imported too, instead of being silently dropped.
+const IMP_SKIP_FIELDS = new Set(['id','Instrument','variable_name_CBS','sources','source_merged','is_deleted',
+  'created_at','updated_at','created_by','updated_by','change_log','custom_fields','display_order']);
+function impFieldLookup() {
+  const m = {};
+  const add = (key, field) => { const k = _impNorm(key); if (k && !(k in m)) m[k] = field; };
+  const custom = (window.cloudCustomFields || []).map(d => d.field_name);
+  const fields = Array.from(CLOUD_DB_COLUMNS).concat(custom).filter(f => !IMP_SKIP_FIELDS.has(f));
+  fields.forEach(f => {
+    add(f, f);
+    if (typeof fieldDisplayLabel === 'function') { try { add(fieldDisplayLabel(f), f); } catch (_) {} }
+  });
+  (window.cloudCustomFields || []).forEach(d => { if (d.display_label) add(d.display_label, d.field_name); });
+  return m;
+}
 
 function openImportDialog() {
   importParsed = null;
@@ -5782,11 +5804,35 @@ function parseImportSheet(aoa, ctx) {
     if (norm.includes('variablenamecbs')) {
       headerIdx = i;
       colIndex = {};
-      norm.forEach((h, ci) => { if (IMP_COLMAP[h] && colIndex[IMP_COLMAP[h]] == null) colIndex[IMP_COLMAP[h]] = ci; });
       break;
     }
   }
   if (headerIdx === -1) return null;
+
+  // Resolve every column. A header may also sit in one of the 2 rows above the
+  // variable_name_CBS row (two-row / merged headers).
+  const lookup = impFieldLookup();
+  const extraCols = {};            // column index -> codebook field
+  const mapping = [], ignored = [];
+  const width = Math.max(...[0, 1, 2].map(o => (aoa[headerIdx - o] || []).length));
+  for (let ci = 0; ci < width; ci++) {
+    let raw = '', field = null, core = null;
+    for (let o = 0; o <= 2 && headerIdx - o >= 0; o++) {
+      const cell = String(((aoa[headerIdx - o] || [])[ci]) == null ? '' : (aoa[headerIdx - o] || [])[ci]).trim();
+      if (!cell) continue;
+      const h = _impNorm(cell);
+      if (IMP_COLMAP[h]) { core = IMP_COLMAP[h]; raw = cell; break; }
+      if (lookup[h]) { field = lookup[h]; raw = cell; break; }
+      if (!raw) raw = cell;
+    }
+    if (core) {
+      if (colIndex[core] == null) { colIndex[core] = ci; if (core.indexOf('__') !== 0) mapping.push(raw + ' → ' + core); }
+    } else if (field) {
+      if (!Object.values(extraCols).includes(field)) { extraCols[ci] = field; mapping.push(raw + ' → ' + field); }
+    } else if (raw) {
+      ignored.push(raw);
+    }
+  }
 
   const get = (row, key) => { const ci = colIndex[key]; return ci == null ? '' : String(row[ci] == null ? '' : row[ci]).trim(); };
 
@@ -5899,11 +5945,17 @@ function parseImportSheet(aoa, ctx) {
       value_labels_EN: get(row, 'value_labels_EN'),
       field_type: get(row, '__fieldtype'),
       source_other: get(row, '__source'),
-      calculation: calculation
+      calculation: calculation,
+      extra: Object.keys(extraCols).reduce((o, ci) => {
+        const v = String(row[ci] == null ? '' : row[ci]).trim();
+        if (v) o[extraCols[ci]] = v;
+        return o;
+      }, {})
     };
   });
 
-  return { instrument, description: headerText, isInstruction: !!instruction, rows, warnings };
+  if (ignored.length) warnings.push('Column(s) not recognised and NOT imported: ' + ignored.join(', ') + '. Rename the header to the field name (or add the field under Admin → Manage fields) and re-import.');
+  return { instrument, description: headerText, isInstruction: !!instruction, rows, warnings, mapping, ignored };
 }
 
 function parseImportWorkbook(arrayBuffer) {
@@ -5959,6 +6011,7 @@ function renderImportPreview() {
     return `<div style="margin-bottom:16px; padding-top:8px; border-top:1px solid var(--border);">
       <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(ins.instrument)} &nbsp;·&nbsp; <strong>${ins.rows.length}</strong> variable(s)</div>
       ${ins.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>${ins.isInstruction ? '📋 Instruction' : 'Description'}:</strong> ${escapeHtml(ins.description.slice(0, 200))}${ins.description.length > 200 ? '…' : ''}</div>` : ''}
+      ${(ins.mapping && ins.mapping.length) ? `<details style="margin:4px 0 6px; font-size:0.78rem; color:var(--text-muted);"><summary style="cursor:pointer;">✓ ${ins.mapping.length} column(s) recognised${ins.ignored && ins.ignored.length ? ` · <span style="color:#9a3412;">${ins.ignored.length} ignored</span>` : ''}</summary><div style="margin-top:4px; line-height:1.6;">${ins.mapping.map(escapeHtml).join('<br>')}</div></details>` : ''}
       ${warnHtml}
       <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
         <thead><tr>
@@ -5995,7 +6048,13 @@ async function confirmImport() {
         if (r.field_type) cf.field_type = r.field_type;
         if (r.source_other) cf.source_other = r.source_other;
         if (r.calculation) cf.calculation = r.calculation;
-        return {
+        const extraCols = {};
+        const customNames = new Set((window.cloudCustomFields || []).map(d => d.field_name));
+        Object.keys(r.extra || {}).forEach(f => {
+          if (customNames.has(f)) cf[f] = r.extra[f];
+          else if (CLOUD_DB_COLUMNS.has(f)) extraCols[CLOUD_FIELD_CASE_REVERSE[f] || f] = r.extra[f];
+        });
+        return Object.assign(extraCols, {
           "Theme": r.Theme || null,
           "Subdomain": r.Subdomain || null,
           "Instrument": ins.instrument,
@@ -6007,7 +6066,7 @@ async function confirmImport() {
           "sources": r.source_other ? "otherStudies" : "",
           "custom_fields": cf,
           "created_by": uid, "updated_by": uid
-        };
+        });
       });
       const { error } = await c.from('variables').insert(payloads);
       if (error) throw new Error('"' + ins.instrument + '": ' + (error.message || error));
