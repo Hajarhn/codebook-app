@@ -1428,7 +1428,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.32.1
+      Codebook Editor — Cloud edition · v6.37.0
     </div>
   </div>
 </div>
@@ -1701,7 +1701,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.32.1 cloud</span>
+      <span class="version">v6.37.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1774,6 +1774,7 @@
         <div class="admin-menu-label">Overview</div>
         <button type="button" onclick="switchTab('history'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
         <div class="admin-menu-label">Content</div>
+        <button type="button" onclick="switchTab('imports'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Imports</button>
         <button type="button" onclick="switchTab('trash'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Trash</button>
         <div class="admin-menu-label">Configuration</div>
         <button type="button" onclick="openFieldManager(); closeAdminMenu();"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="12" height="4" rx="1"/></svg>Manage fields</button>
@@ -1974,6 +1975,17 @@
     </div>
     <div id="dash-cards" class="dash-cards"></div>
     <div id="dash-instruments"></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-imports" role="tabpanel">
+    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Imports</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Every batch of variables added together (Excel or Castor XML). Undo puts a whole batch in the Trash — nothing is lost, and you can restore it here or in Trash.</p>
+      </div>
+      <button class="btn-mini" onclick="loadImports()">↻ Refresh</button>
+    </div>
+    <div id="imports-list"></div>
   </div>
 
   <div class="tab-panel admin-only" id="panel-trash" role="tabpanel">
@@ -2876,6 +2888,37 @@ const RV_STATE = {
   restrictedAtoms: new Set()  // populated from copyright_status
 };
 
+// v6.36: researcher field visibility (Admin -> Manage fields -> Researcher).
+// DB field names shown to researchers when the admin hasn't configured any.
+const RV_DEFAULT_FIELDS = ['Theme', 'Subdomain', 'variable_label_nl', 'variable_label_en',
+  'value_labels_nl', 'value_labels_en', 'variable_name_fair_merged', 'variable_name_fair'];
+window.researcherAccess = null;   // { dbField: 'read' | 'none' } or null (= defaults)
+async function loadResearcherAccess() {
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client; if (!c) return;
+    const { data, error } = await c.from('role_field_access').select('field_name, access').eq('role', 'researcher');
+    if (error) throw error;
+    const m = {}; (data || []).forEach(r => { m[r.field_name] = r.access; });
+    window.researcherAccess = Object.keys(m).length ? m : null;
+  } catch (e) { console.warn('researcher access load failed — using defaults', e); window.researcherAccess = null; }
+}
+function rvDbName(appField) { return (typeof oeDbName === 'function') ? oeDbName(appField) : appField; }
+function rvFieldVisible(appField) {
+  const db = rvDbName(appField);
+  const m = window.researcherAccess;
+  if (m && (db in m)) return m[db] === 'read';
+  return RV_DEFAULT_FIELDS.indexOf(db) !== -1;
+}
+// Extra (non-core) fields the admin made visible, as app field names.
+const RV_CORE_FIELDS = ['Theme','Subdomain','Instrument','variable_name_CBS','variable_label_NL','variable_label_EN',
+  'value_labels_NL','value_labels_EN','variable_name_FAIR_merged','variable_name_FAIR'];
+function rvExtraFields() {
+  const m = window.researcherAccess; if (!m) return [];
+  const map = (typeof CLOUD_FIELD_CASE_MAP !== 'undefined') ? CLOUD_FIELD_CASE_MAP : {};
+  return Object.keys(m).filter(db => m[db] === 'read')
+    .map(db => map[db] || db)
+    .filter(f => RV_CORE_FIELDS.indexOf(f) === -1);
+}
 const RV_COLUMNS = [
   { key: 'Theme',                    cls: 'rv-col-theme',     label: 'Theme' },
   { key: 'Subdomain',                cls: 'rv-col-subdomain', label: 'Subdomain' },
@@ -3151,7 +3194,8 @@ function rvBuildListItems() {
         </div></div>`;
     }
     const name = r.variable_name_CBS || '';
-    const label = r.variable_label_NL || r.variable_label_EN || '';
+    const label = (rvFieldVisible('variable_label_NL') && r.variable_label_NL)
+               || (rvFieldVisible('variable_label_EN') && r.variable_label_EN) || '';
     if (q && !(name.toLowerCase().includes(q) || label.toLowerCase().includes(q))) return '';
     // Calculated variables: don't show a raw formula (or "(no label)") as the
     // list subtitle — a quiet "Derived variable" reads better.
@@ -3206,7 +3250,10 @@ function rvRenderDetail(r) {
     ['Values', ['value_labels_NL', 'value_labels_EN', 'variable_name_FAIR_merged']]
   ];
   const sections = groups.map(([title, keys]) => {
-    const present = keys.filter(k => RV_COLUMNS.some(c => c.key === k));
+    const present = keys.filter(k => RV_COLUMNS.some(c => c.key === k) &&
+      (k === 'variable_name_FAIR_merged'
+        ? (rvFieldVisible(k) || rvFieldVisible('variable_name_FAIR'))
+        : rvFieldVisible(k)));
     // Hide a group entirely when ALL of its fields are empty (e.g. a derived
     // variable with no labels/values). Within a partly-filled group, empty
     // fields still show as "—".
@@ -3241,7 +3288,32 @@ function rvRenderDetail(r) {
     </div>
     ${rvCalcSection(r)}
     ${sections}
+    ${rvExtraSections(r)}
   </div></div>`;
+}
+// Additional fields the admin made visible to researchers, grouped by their
+// field group. Groups whose fields are all empty for this variable are hidden.
+function rvExtraSections(r) {
+  const extras = rvExtraFields();
+  if (!extras.length) return '';
+  const byGroup = {}, order = [];
+  extras.forEach(f => {
+    const g = (typeof fieldGroupOf === 'function' && fieldGroupOf(f)) || 'Other';
+    if (!byGroup[g]) { byGroup[g] = []; order.push(g); }
+    byGroup[g].push(f);
+  });
+  return order.map(g => {
+    const fs = byGroup[g];
+    const has = fs.some(f => { const v = r[f]; return !(v === undefined || v === null || String(v).trim() === ''); });
+    if (!has) return '';
+    const rows = fs.map(f => {
+      const v = r[f]; const empty = (v === undefined || v === null || String(v).trim() === '');
+      const lbl = (typeof fieldDisplayLabel === 'function') ? fieldDisplayLabel(f) : f;
+      return `<tr><td class="rv-md-key">${rvEscape(lbl)}</td><td class="rv-md-val ${empty ? 'rv-cell-empty' : ''}">${empty ? '—' : rvEscape(typeof v === 'object' ? JSON.stringify(v) : String(v))}</td></tr>`;
+    }).join('');
+    const title = g.charAt(0).toUpperCase() + g.slice(1);
+    return `<div class="rv-md-section"><div class="rv-md-section-title">${rvEscape(title)}</div><table class="rv-md-table">${rows}</table></div>`;
+  }).join('');
 }
 
 function rvSelectedRow() {
@@ -3761,7 +3833,8 @@ window.applyCloudCodebook = function(rows, opts) {
 // underlying role stays 'admin' (so permissions are unaffected) — only the
 // body class is toggled so the existing CSS shows #rv-app and hides the editor.
 let _rvPreviewWired = false;
-function rvPreviewEnter() {
+async function rvPreviewEnter() {
+  await loadResearcherAccess();   // show exactly the fields researchers will see
   if (!_rvPreviewWired) { try { rvWireUp(); } catch (e) { console.warn('rvWireUp', e); } _rvPreviewWired = true; }
   RV_STATE.allRows = (state.codebook || []).filter(r => !r._deleted);
   RV_STATE.restrictedAtoms = rvComputeRestrictedAtoms();
@@ -4883,7 +4956,7 @@ let FM_STATE = { fields: [], dirty: false };
 async function openFieldManager() {
   if (!window.cloudAuth || window.cloudAuth.role !== 'admin') { cloudShowToast('error', 'Admins only'); return; }
   // Load current per-field access for the configurable roles (DB column name -> access).
-  const FM_ROLES = ['editor', 'ontology_engineer'];
+  const FM_ROLES = ['editor', 'ontology_engineer', 'researcher'];
   const accessByRole = { editor: {}, ontology_engineer: {} };
   try {
     const { data } = await window.cloudAuth.client
@@ -4926,7 +4999,7 @@ async function openFieldManager() {
   const groups = groupOrder.map(g => ({ name: g, orig_name: g, fields: buckets[g] }));
   const sel = document.getElementById('fm-access-role');
   FM_STATE = { groups: groups, dirty: false, access: accessByRole, accessRole: (sel && sel.value) || 'editor' };
-  renderFieldManager();
+  fmChangeAccessRole(FM_STATE.accessRole);
   document.getElementById('fm-error').style.display = 'none';
   document.getElementById('fm-status').textContent = '';
   document.getElementById('modal-field-manager').style.display = 'flex';
@@ -4960,7 +5033,15 @@ function renderFieldManager() {
         + '<span class="fm-star" title="Custom field">' + (fld.isCustom ? '★' : '') + '</span>'
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
         + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
-        + (function(){ var a = fmAccessOf(fld); return ''
+        + (function(){ var a = fmAccessOf(fld);
+            if (FM_STATE.accessRole === 'researcher') {
+              // Researchers only ever read: choose whether the field is shown.
+              return '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Show this field to researchers?" style="min-width:92px;">'
+                + '<option value="none"' + (a !== 'read' ? ' selected' : '') + '>hidden</option>'
+                + '<option value="read"' + (a === 'read' ? ' selected' : '') + '>visible</option>'
+                + '</select>';
+            }
+            return ''
               + '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Access for the selected role (works for custom fields too)" style="min-width:92px;">'
               +   '<option value="none"' + (a === 'none' ? ' selected' : '') + '>none</option>'
               +   '<option value="read"' + (a === 'read' ? ' selected' : '') + '>read</option>'
@@ -5040,12 +5121,16 @@ function fmEdit(gi, fi, val) {
   FM_STATE.dirty = true;
 }
 
-function fmDefaultAccess(role) { return role === 'editor' ? 'write' : 'none'; }
+function fmDefaultAccess(role, dbField) {
+  if (role === 'editor') return 'write';
+  if (role === 'researcher') return RV_DEFAULT_FIELDS.indexOf(dbField) !== -1 ? 'read' : 'none';
+  return 'none';
+}
 function fmAccessOf(fld) {
   const role = FM_STATE.accessRole;
   const m = (FM_STATE.access && FM_STATE.access[role]) || {};
   const db = oeDbName(fld.field_name);
-  return (db in m) ? m[db] : fmDefaultAccess(role);
+  return (db in m) ? m[db] : fmDefaultAccess(role, db);
 }
 function fmSetAccess(gi, fi, val) {
   const fld = FM_STATE.groups[gi].fields[fi];
@@ -5060,6 +5145,10 @@ function fmSetFallback(gi, fi, val) {
 }
 function fmChangeAccessRole(role) {
   FM_STATE.accessRole = role;
+  const hint = document.getElementById('fm-access-hint');
+  if (hint) hint.textContent = role === 'researcher'
+    ? 'visible = shown in the researcher viewer · hidden = never sent to researchers'
+    : 'none = hidden · read = view only · propose = edit needs approval · write = edit directly';
   renderFieldManager();
 }
 
@@ -5313,9 +5402,18 @@ async function loadCodebookFromCloud() {
     return sortByDisplayOrder(normalizeCloudRows(Array.isArray(data) ? data : (data || [])));
   }
 
+  if (role === 'researcher') {
+    await loadResearcherAccess();
+    // v6.36: server returns only the fields the admin made visible to
+    // researchers (Manage fields -> Researcher), published instruments only.
+    const { data, error } = await client.rpc('get_researcher_variables');
+    if (!error) return sortByDisplayOrder(normalizeCloudRows(Array.isArray(data) ? data : []));
+    console.warn('get_researcher_variables unavailable (migration 27 not applied?) — falling back to variables_public', error.message);
+  }
+
   let tableOrView;
   if (role === 'researcher') {
-    // 9-column public view (RLS allows researchers here)
+    // Fallback: fixed public view (used until migration 27 is applied)
     tableOrView = 'variables_public';
   } else {
     // admin/editor see full table
@@ -5747,7 +5845,7 @@ const IMP_COLMAP = {
   'fieldtypeother': '__fieldtype', 'fieldtype': '__fieldtype',
   'sourceotherstudies': '__source', 'sourceother': '__source',
   'gevraagdeaanpassing': '__note',
-  // v6.32.1 aliases: plurals, Dutch spellings, bracketed language tags
+  // v6.37 aliases: plurals, Dutch spellings, bracketed language tags
   'thema': 'Theme', 'subdomein': 'Subdomain', 'instrumentnaam': 'Instrument',
   'variablelabelsnl': 'variable_label_NL', 'variablelabeldutch': 'variable_label_NL', 'variablelabelnederlands': 'variable_label_NL',
   'variablelabelsen': 'variable_label_EN', 'variablelabelsengels': 'variable_label_EN',
@@ -5783,16 +5881,118 @@ function closeImportDialog() { document.getElementById('modal-import').style.dis
 function handleImportFile(ev) {
   const file = ev.target.files && ev.target.files[0];
   if (!file) return;
+  const isXml = /\.xml$/i.test(file.name);
   const reader = new FileReader();
   reader.onload = function(e) {
-    try { parseImportWorkbook(e.target.result); renderImportPreview(); }
+    try {
+      if (isXml) parseCastorXml(e.target.result);
+      else parseImportWorkbook(e.target.result);
+      renderImportPreview();
+    }
     catch (err) {
       console.error(err);
       document.getElementById('import-preview').innerHTML = '<div style="color:var(--danger,#b91c1c);">Could not read file: ' + escapeHtml(err.message || String(err)) + '</div>';
       document.getElementById('import-confirm-btn').disabled = true;
     }
   };
-  reader.readAsArrayBuffer(file);
+  if (isXml) reader.readAsText(file);
+  else reader.readAsArrayBuffer(file);
+}
+
+// ===== Castor form-structure XML import (v6.33) =====
+// Castor's "form structure" export is richer than the Excel route: option
+// groups, field types and calculations are all machine-readable, and its
+// calculation syntax already uses our {variable_name} token format.
+// NOTE: only the form STRUCTURE is read — this file contains no participant
+// data, and the codebook is metadata-only by design.
+function parseCastorXml(text) {
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('This XML could not be parsed.');
+  const txt = (el, tag) => { const n = el && el.getElementsByTagName(tag)[0]; return n ? (n.textContent || '').trim() : ''; };
+
+  // 1) Option groups: id -> "[value]Name [value]Name"
+  const ogs = {};
+  const ogRoot = doc.getElementsByTagName('optionLists')[0];
+  if (ogRoot) {
+    Array.from(ogRoot.children).forEach(g => {
+      const gid = txt(g, 'option_group_id');
+      const optsEl = g.getElementsByTagName('options')[0];
+      if (!gid || !optsEl) return;
+      const opts = Array.from(optsEl.children).map(o => ({
+        ord: parseInt(txt(o, 'option_group_order') || '0', 10),
+        val: txt(o, 'option_value'),
+        name: txt(o, 'option_name')
+      })).sort((a, b) => a.ord - b.ord);
+      ogs[gid] = opts.map(o => '[' + o.val + ']' + o.name).join(' ');
+    });
+  }
+
+  // 2) Surveys -> instruments; fields -> variables
+  const existingCbs = new Set((state.codebook || []).map(v => (v.variable_name_CBS || '').trim()).filter(Boolean));
+  const existingInstruments = new Set();
+  (state.codebook || []).forEach(v => { if (v.Instrument) String(v.Instrument).split(' + ').forEach(a => existingInstruments.add(a.trim())); });
+  const globalSeen = new Set();
+
+  const instruments = [], skipped = [];
+  const surveyEls = Array.from(doc.getElementsByTagName('survey_steps'))
+    .map(ss => ss.parentElement).filter(Boolean);
+  surveyEls.forEach(sv => {
+    const instrument = sv.getAttribute('survey_name') || sv.getAttribute('name') || '';
+    if (!instrument) return;
+    const warnings = [], rows = [];
+    let description = '';
+    if (existingInstruments.has(instrument)) warnings.push('Instrument "' + instrument + '" already exists in the codebook — new variables will be added to it.');
+
+    Array.from(sv.getElementsByTagName('fields')).forEach(fieldsEl => {
+      Array.from(fieldsEl.children).forEach(f => {
+        const ftype = txt(f, 'field_type');
+        const name  = txt(f, 'field_variable_name');
+        const label = txt(f, 'field_label');
+        const calc  = txt(f, 'field_summary_template');
+        const og    = txt(f, 'field_option_group');
+        const info  = txt(f, 'field_info');
+
+        // A "remark" with no variable name is intro/instruction text.
+        if (!name) {
+          if (ftype === 'remark' && label && !description) description = label;
+          return;
+        }
+        if (globalSeen.has(name)) warnings.push('Duplicate variable name: "' + name + '"');
+        globalSeen.add(name);
+        if (existingCbs.has(name)) warnings.push('variable_name_CBS "' + name + '" already exists in the codebook — importing will create a second one.');
+
+        // Value labels: from the option group, or a slider's min/max range.
+        let vals = '';
+        if (og && ogs[og]) vals = ogs[og];
+        else if (ftype === 'slider') {
+          const trim = s => String(s || '').replace(/\.?0+$/, '');
+          const a = trim(txt(f, 'field_min')), b = trim(txt(f, 'field_max'));
+          const al = txt(f, 'field_min_label'), bl = txt(f, 'field_max_label');
+          if (a || b) vals = (al || bl) ? ('[' + a + ']' + al + ' [' + b + ']' + bl) : (a + '-' + b);
+        } else if (og && !ogs[og]) warnings.push('Option group for "' + name + '" was not found in this file.');
+
+        if (calc) {
+          (calc.match(/\{([^}]+)\}/g) || []).forEach(t => {
+            const r = t.replace(/[{}]/g, '').trim();
+            if (r && !globalSeen.has(r)) warnings.push('Formula for "' + name + '" refers to "' + r + '" — check it exists.');
+          });
+        }
+        rows.push({
+          Theme: '', Subdomain: '',
+          variable_name_CBS: name,
+          variable_label_NL: label,   // Castor keeps label and formula separate
+          variable_label_EN: '',
+          value_labels_NL: vals, value_labels_EN: '',
+          field_type: ftype, source_other: info, calculation: calc,
+          _exists: existingCbs.has(name)
+        });
+      });
+    });
+    if (rows.length) instruments.push({ instrument, description, isInstruction: !!description, rows, warnings });
+    else skipped.push(instrument);
+  });
+  if (!instruments.length) throw new Error('No surveys with fields were found in this XML. Is it a Castor form-structure export?');
+  importParsed = { instruments, skipped };
 }
 
 // Parse a single sheet (array-of-arrays) into one instrument, or return null
@@ -5809,10 +6009,9 @@ function parseImportSheet(aoa, ctx) {
   }
   if (headerIdx === -1) return null;
 
-  // Resolve every column. A header may also sit in one of the 2 rows above the
-  // variable_name_CBS row (two-row / merged headers).
+  // Resolve every column (header may also sit 1-2 rows above the CBS row).
   const lookup = impFieldLookup();
-  const extraCols = {};            // column index -> codebook field
+  const extraCols = {};
   const mapping = [], ignored = [];
   const width = Math.max(...[0, 1, 2].map(o => (aoa[headerIdx - o] || []).length));
   for (let ci = 0; ci < width; ci++) {
@@ -5946,6 +6145,7 @@ function parseImportSheet(aoa, ctx) {
       field_type: get(row, '__fieldtype'),
       source_other: get(row, '__source'),
       calculation: calculation,
+      _exists: ctx.existingCbs.has(cbs),
       extra: Object.keys(extraCols).reduce((o, ci) => {
         const v = String(row[ci] == null ? '' : row[ci]).trim();
         if (v) o[extraCols[ci]] = v;
@@ -5986,30 +6186,46 @@ function parseImportWorkbook(arrayBuffer) {
   importParsed = { instruments, skipped };
 }
 
+function importSkipDupes() {
+  const cb = document.getElementById('import-skip-dupes');
+  return !cb || cb.checked;
+}
+function importRowsOf(ins) {
+  return importSkipDupes() ? ins.rows.filter(r => !r._exists) : ins.rows;
+}
 function renderImportPreview() {
   const p = importParsed, el = document.getElementById('import-preview');
   if (!p || !p.instruments || !p.instruments.length) { el.innerHTML = ''; return; }
-  const totalRows = p.instruments.reduce((n, ins) => n + ins.rows.length, 0);
+  const skip = importSkipDupes();
+  const totalRows = p.instruments.reduce((n, ins) => n + importRowsOf(ins).length, 0);
+  const dupeCount = p.instruments.reduce((n, ins) => n + ins.rows.filter(r => r._exists).length, 0);
   const totalWarn = p.instruments.reduce((n, ins) => n + ins.warnings.length, 0);
 
   const summary = `<div style="font-size:0.9rem; margin-bottom:8px;">`
-    + `<strong>${p.instruments.length}</strong> instrument(s) &nbsp;·&nbsp; <strong>${totalRows}</strong> variable(s)`
+    + `<strong>${p.instruments.length}</strong> instrument(s) &nbsp;·&nbsp; <strong>${totalRows}</strong> variable(s) to import`
+    + (dupeCount ? ` &nbsp;·&nbsp; <span style="color:${skip ? '#0f766e' : '#9a3412'};">${dupeCount} already in codebook — ${skip ? 'will be skipped' : '⚠ will be DUPLICATED'}</span>` : '')
     + (totalWarn ? ` &nbsp;·&nbsp; <span style="color:#9a3412;">${totalWarn} warning(s)</span>` : '')
     + (p.skipped && p.skipped.length ? ` &nbsp;·&nbsp; <span style="color:var(--text-faint);">skipped sheet(s): ${p.skipped.map(escapeHtml).join(', ')}</span>` : '')
     + `</div>`;
 
   const blocks = p.instruments.map(ins => {
+    const shown = importRowsOf(ins);
     const warnHtml = ins.warnings.length
       ? '<div style="margin:6px 0; padding:8px 10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; font-size:0.8rem; color:#9a3412;">⚠ ' + ins.warnings.length + ' warning(s):<ul style="margin:4px 0 0 16px;">' + ins.warnings.map(w => '<li>' + escapeHtml(w) + '</li>').join('') + '</ul></div>'
       : '<div style="margin:6px 0; font-size:0.8rem; color:var(--success,#15803d);">✓ No warnings.</div>';
-    const rowsHtml = ins.rows.map(r => `<tr>
-        <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.variable_name_CBS)}</td>
+    const rowsHtml = ins.rows.map(r => {
+      const skipped = skip && r._exists;
+      const style = skipped ? ' style="opacity:0.45; text-decoration:line-through;"' : '';
+      const tag = r._exists ? `<span style="font-size:0.7rem; margin-left:6px; padding:0 6px; border-radius:8px; background:${skip ? '#e5e7eb' : '#fee2e2'}; color:${skip ? '#4b5563' : '#b91c1c'};">${skip ? 'exists — skipped' : 'exists — duplicate!'}</span>` : '';
+      return `<tr${style}>
+        <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.variable_name_CBS)}${tag}</td>
         <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml((r.variable_label_EN || r.variable_label_NL || '').slice(0, 60))}</td>
         <td style="padding:3px 6px; border-bottom:1px solid var(--border);">${escapeHtml(r.field_type || '')}</td>
         <td style="padding:3px 6px; border-bottom:1px solid var(--border); font-family:monospace; font-size:0.72rem;">${escapeHtml(r.calculation || '')}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     return `<div style="margin-bottom:16px; padding-top:8px; border-top:1px solid var(--border);">
-      <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(ins.instrument)} &nbsp;·&nbsp; <strong>${ins.rows.length}</strong> variable(s)</div>
+      <div style="font-size:0.9rem; margin-bottom:6px;"><strong>Instrument:</strong> ${escapeHtml(ins.instrument)} &nbsp;·&nbsp; <strong>${shown.length}</strong> variable(s) to import${shown.length !== ins.rows.length ? ` <span style="color:var(--text-faint);">(of ${ins.rows.length} in file)</span>` : ''}</div>
       ${ins.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>${ins.isInstruction ? '📋 Instruction' : 'Description'}:</strong> ${escapeHtml(ins.description.slice(0, 200))}${ins.description.length > 200 ? '…' : ''}</div>` : ''}
       ${(ins.mapping && ins.mapping.length) ? `<details style="margin:4px 0 6px; font-size:0.78rem; color:var(--text-muted);"><summary style="cursor:pointer;">✓ ${ins.mapping.length} column(s) recognised${ins.ignored && ins.ignored.length ? ` · <span style="color:#9a3412;">${ins.ignored.length} ignored</span>` : ''}</summary><div style="margin-top:4px; line-height:1.6;">${ins.mapping.map(escapeHtml).join('<br>')}</div></details>` : ''}
       ${warnHtml}
@@ -6040,7 +6256,9 @@ async function confirmImport() {
   try {
     let totalVars = 0;
     for (const ins of p.instruments) {
-      const payloads = ins.rows.map(r => {
+      const useRows = importRowsOf(ins);
+      if (!useRows.length) continue;
+      const payloads = useRows.map(r => {
         // Always an object (never undefined/null) so a batch insert can't
         // set custom_fields = null on rows that happen to lack extras and
         // violate the NOT NULL constraint.
@@ -6073,7 +6291,7 @@ async function confirmImport() {
       // Instrument meta: description + pending_review (via SECURITY DEFINER RPC)
       const { error: mErr } = await c.rpc('import_instrument_meta', { p_name: ins.instrument, p_description: ins.description || null });
       if (mErr) console.warn('instrument meta rpc (' + ins.instrument + '):', mErr.message);
-      totalVars += ins.rows.length;
+      totalVars += useRows.length;
     }
     cloudShowToast('success', 'Imported ' + totalVars + ' variable(s) across ' + p.instruments.length + ' instrument(s) (pending review)');
     closeImportDialog();
@@ -6567,7 +6785,7 @@ function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   var _adminBtn = document.getElementById("admin-tab-btn");
-  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history"].indexOf(name) !== -1);
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   if (name === "variables") refreshVariablesTab();
   else if (name === "bulk") refreshBulkTab();
@@ -6576,6 +6794,7 @@ function switchTab(name) {
   else if (name === "settings") refreshSettingsTab();
   else if (name === "users") loadUsers();
   else if (name === "trash") loadTrash();
+  else if (name === "imports") loadImports();
   else if (name === "dashboard") renderDashboard();
 }
 
@@ -6657,6 +6876,81 @@ function dashGo(name) {
   if (sel) { sel.value = name; sel.dispatchEvent(new Event('change')); }
   switchTab('variables');
 }
+
+// ============ IMPORTS (undo a whole batch) — v6.35 ============
+// Rows inserted by one import share a created_at within the same second, so we
+// group by (Instrument + created_at truncated to the minute). Undo = soft-delete
+// the batch (reversible, same mechanism as Trash).
+let IMPORT_BATCHES = {};
+async function loadImports() {
+  const host = document.getElementById('imports-list');
+  if (!host) return;
+  if (!isAdminRole()) { host.innerHTML = '<div class="empty-state"><p>Admins only.</p></div>'; return; }
+  host.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  const { data, error } = await window.cloudAuth.client
+    .from('variables')
+    .select('id, variable_name_cbs, "Instrument", created_at, is_deleted')
+    .order('created_at', { ascending: false })
+    .range(0, 9999);
+  if (error) { host.innerHTML = '<div class="empty-state"><p>Could not load: ' + escapeHtml(error.message) + '</p></div>'; return; }
+
+  IMPORT_BATCHES = {};
+  (data || []).forEach(v => {
+    if (!v.created_at) return;
+    const key = (v.Instrument || '—') + '|' + String(v.created_at).slice(0, 16); // to the minute
+    if (!IMPORT_BATCHES[key]) IMPORT_BATCHES[key] = { instrument: v.Instrument || '—', when: v.created_at, ids: [], deleted: 0, names: [] };
+    const b = IMPORT_BATCHES[key];
+    b.ids.push(v.id);
+    if (v.is_deleted) b.deleted++;
+    if (b.names.length < 4 && v.variable_name_cbs) b.names.push(v.variable_name_cbs);
+  });
+  // A batch = 2+ rows created together; single rows are normal manual adds.
+  const list = Object.keys(IMPORT_BATCHES).filter(k => IMPORT_BATCHES[k].ids.length >= 2)
+    .sort((a, b) => String(IMPORT_BATCHES[b].when).localeCompare(String(IMPORT_BATCHES[a].when)));
+  if (!list.length) { host.innerHTML = '<div class="empty-state"><div style="font-size:28px;opacity:.5;">📥</div><p>No import batches found.</p></div>'; return; }
+
+  host.innerHTML = '<table class="dash-table"><thead><tr><th>When</th><th>Instrument</th><th>Variables</th><th>Status</th><th></th></tr></thead><tbody>'
+    + list.map(k => {
+      const b = IMPORT_BATCHES[k];
+      const n = b.ids.length, allDeleted = b.deleted === n, someDeleted = b.deleted > 0 && !allDeleted;
+      const status = allDeleted
+        ? '<span class="dash-pill hidden">undone — in Trash</span>'
+        : (someDeleted ? '<span class="dash-pill pending_review">' + (n - b.deleted) + ' of ' + n + ' active</span>'
+                       : '<span class="dash-pill published">active</span>');
+      const btn = allDeleted
+        ? '<button class="btn-mini" onclick="restoreImportBatch(\'' + escapeAttr(k) + '\', this)">♻️ Restore</button>'
+        : '<button class="btn-mini" style="color:#b91c1c; border-color:#f3c1c1;" onclick="undoImportBatch(\'' + escapeAttr(k) + '\', this)">⟲ Undo import</button>';
+      return '<tr><td style="white-space:nowrap;">' + escapeHtml(new Date(b.when).toLocaleString()) + '</td>'
+        + '<td><strong>' + escapeHtml(b.instrument) + '</strong></td>'
+        + '<td>' + n + ' <span style="color:var(--text-faint); font-size:11px;">' + escapeHtml(b.names.join(', ')) + (n > b.names.length ? '…' : '') + '</span></td>'
+        + '<td>' + status + '</td>'
+        + '<td style="text-align:right;">' + btn + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+async function _setBatchDeleted(key, el, deleted) {
+  const b = IMPORT_BATCHES[key];
+  if (!b) return;
+  const ids = b.ids;
+  if (deleted && !confirm('Undo this import?\n\n' + ids.length + ' variable(s) from "' + b.instrument + '" will be moved to the Trash.\nThey can be restored at any time.')) return;
+  if (el) { el.disabled = true; el.textContent = deleted ? 'Undoing…' : 'Restoring…'; }
+  const c = window.cloudAuth.client;
+  const uid = window.cloudAuth.user && window.cloudAuth.user.id;
+  let done = 0, failed = 0;
+  for (const id of ids) {
+    try {
+      const { error } = await c.rpc('admin_update_variable', { p_variable_id: id, p_updates: { is_deleted: deleted } });
+      if (error) { failed++; continue; }
+      done++;
+      try { await c.from('audit_log').insert({ variable_id: id, action: deleted ? 'delete' : 'restore', performed_by: uid }); } catch (_) {}
+    } catch (_) { failed++; }
+  }
+  cloudShowToast(failed ? 'error' : 'success',
+    (deleted ? 'Undone: ' : 'Restored: ') + done + ' variable(s)' + (failed ? ' — ' + failed + ' failed' : ''));
+  await loadImports();
+  if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
+}
+function undoImportBatch(key, el) { return _setBatchDeleted(key, el, true); }
+function restoreImportBatch(key, el) { return _setBatchDeleted(key, el, false); }
 
 // ============ TRASH TAB (admin) ============
 async function loadTrash() {
@@ -8776,8 +9070,9 @@ function resetAll() {
       <select id="fm-access-role" onchange="fmChangeAccessRole(this.value)" style="padding:4px 6px; border:1px solid var(--border); border-radius:4px;">
         <option value="editor">Editor</option>
         <option value="ontology_engineer">Ontology Engineer</option>
+        <option value="researcher">Researcher</option>
       </select>
-      <span style="color: var(--text-faint);">none = hidden · read = view only · propose = edit needs approval · write = edit directly</span>
+      <span id="fm-access-hint" style="color: var(--text-faint);">none = hidden · read = view only · propose = edit needs approval · write = edit directly</span>
     </div>
     <div class="modal-body" id="fm-list" style="overflow-y:auto; flex:1;"></div>
     <div class="modal-footer" style="justify-content:space-between;">
@@ -8832,8 +9127,12 @@ async function submitNewPassword() {
 <div class="modal-overlay" id="modal-import" style="display:none;">
   <div class="modal" style="max-width:820px; width:94vw; max-height:88vh; display:flex; flex-direction:column;">
     <h2 style="margin:0 0 4px;">Import instrument from Excel</h2>
-    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Upload an .xlsx file. Each sheet with a <code>variable_name_CBS</code> column becomes one instrument. New variables are added; each instrument is created as <strong>pending review</strong>.</p>
-    <input type="file" id="import-file" accept=".xlsx,.xls" onchange="handleImportFile(event)" style="margin-bottom:12px;">
+    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">Upload an .xlsx file (each sheet with a <code>variable_name_CBS</code> column becomes one instrument) or a Castor <strong>form-structure .xml</strong> export (each survey becomes one instrument). New variables are added; each instrument is created as <strong>pending review</strong>.</p>
+    <input type="file" id="import-file" accept=".xlsx,.xls,.xml" onchange="handleImportFile(event)" style="margin-bottom:12px;">
+    <label style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:400; margin-bottom:12px; cursor:pointer;">
+      <input type="checkbox" id="import-skip-dupes" checked onchange="renderImportPreview()">
+      Skip variables that already exist in the codebook (recommended — prevents duplicates when re-importing a form)
+    </label>
     <div id="import-preview" style="overflow:auto; flex:1; min-height:80px;"></div>
     <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn-secondary" onclick="closeImportDialog()">Cancel</button>
