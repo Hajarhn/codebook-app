@@ -1428,7 +1428,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.37.0
+      Codebook Editor — Cloud edition · v6.37.2
     </div>
   </div>
 </div>
@@ -1701,7 +1701,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.37.0 cloud</span>
+      <span class="version">v6.37.2 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2686,7 +2686,7 @@ const CLOUD_DB_MANAGED_FIELDS = new Set(['created_at', 'updated_at']);
 
 // The complete set of REAL columns in the variables table. Anything not in
 // this set is a UI-only field and must never be written.
-const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_EN', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
 
 // Same whitelist but expressed in actual DB column names (reverse-mapped),
 // so membership tests after cloudDenormalizeRow's case conversion succeed.
@@ -3528,7 +3528,7 @@ async function rvGenerateAndDownloadExcel() {
   const errEl = document.getElementById('rv-excel-error');
   errEl.style.display = 'none';
 
-  if (typeof loadSheetJS === 'function' && typeof XLSX === 'undefined') {
+  if (typeof loadSheetJS === 'function') {
     try { await loadSheetJS(); } catch (e) {
       errEl.textContent = 'Could not load Excel library: ' + (e.message || e);
       errEl.style.display = 'block';
@@ -3560,6 +3560,19 @@ async function rvGenerateAndDownloadExcel() {
     const parts = rvSplitInstrument(row.Instrument);
     return parts.some(a => selectedSet.has(a));
   });
+
+  // Multi-line cells (e.g. values "1\n0\n999") need wrap text, otherwise Excel shows "10999".
+  function rvWrapMultiline(ws) {
+    if (!ws['!ref']) return;
+    const rg = XLSX.utils.decode_range(ws['!ref']);
+    for (let r = rg.s.r; r <= rg.e.r; r++) for (let c = rg.s.c; c <= rg.e.c; c++) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      if (!cell) continue;
+      if (r === 0) cell.s = { font: { bold: true }, alignment: { vertical: 'center', wrapText: true } };
+      else if (typeof cell.v === 'string' && /\r|\n/.test(cell.v)) cell.s = { alignment: { vertical: 'top', wrapText: true } };
+      else cell.s = { alignment: { vertical: 'top' } };
+    }
+  }
 
   // Build header
   const headerLabels = RV_COLUMNS.map(c => c.label);
@@ -3601,6 +3614,7 @@ async function rvGenerateAndDownloadExcel() {
     const aoa = buildAOAForRows(matched, selectedSet);
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws['!cols'] = headerKeys.map(() => ({ wch: 22 }));
+    rvWrapMultiline(ws);
     XLSX.utils.book_append_sheet(wb, ws, 'Codebook');
   } else {
     // Per-instrument: one sheet per selected atom
@@ -3609,6 +3623,7 @@ async function rvGenerateAndDownloadExcel() {
       const aoa = buildAOAForRows(rowsForAtom, new Set([atom]));
       const ws = XLSX.utils.aoa_to_sheet(aoa);
       ws['!cols'] = headerKeys.map(() => ({ wch: 22 }));
+      rvWrapMultiline(ws);
       // Sheet name max 31 chars, no [ ] : * ? / \
       const safeName = atom.replace(/[\[\]:*?/\\]/g, '_').slice(0, 31);
       XLSX.utils.book_append_sheet(wb, ws, safeName);
@@ -8784,14 +8799,21 @@ function updateExcelSummary() {
 
 let _sheetJsPromise = null;
 function loadSheetJS() {
-  if (window.XLSX) return Promise.resolve(window.XLSX);
+  // The page loads the community SheetJS build at start-up (used for import). That build
+  // silently drops cell styles, so Excel exports lost wrap text and multi-line cells such as
+  // "values" (1 / 0 / 999) showed up glued together ("10999"). Exports therefore always use
+  // xlsx-js-style; it is a drop-in superset, so replacing window.XLSX keeps import working.
+  if (window.XLSX && window.XLSX.__codebookStyled) return Promise.resolve(window.XLSX);
   if (_sheetJsPromise) return _sheetJsPromise;
-  document.getElementById("excel-loading").style.display = "block";
+  const _loadEl = document.getElementById("excel-loading");
+  if (_loadEl) _loadEl.style.display = "block";
   _sheetJsPromise = new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js";
-    s.onload = () => { document.getElementById("excel-loading").style.display = "none"; resolve(window.XLSX); };
-    s.onerror = () => { document.getElementById("excel-loading").style.display = "none"; reject(new Error("Could not load Excel library. Check your internet connection.")); };
+    const loadingEl = document.getElementById("excel-loading");
+    const hideLoading = () => { if (loadingEl) loadingEl.style.display = "none"; };
+    s.onload = () => { hideLoading(); if (window.XLSX) window.XLSX.__codebookStyled = true; resolve(window.XLSX); };
+    s.onerror = () => { hideLoading(); _sheetJsPromise = null; reject(new Error("Could not load Excel library. Check your internet connection.")); };
     document.head.appendChild(s);
   });
   return _sheetJsPromise;
@@ -8921,7 +8943,7 @@ function buildSheet(XLSX, fields, vars) {
   const dataRows = vars.map(v => fields.map(f => {
     const val = v[f];
     if (val === undefined || val === null) return "";
-    return String(val);
+    return String(val).replace(/\r\n?/g, "\n");
   }));
   const aoa = [headerRow, ...dataRows];
   const sheet = XLSX.utils.aoa_to_sheet(aoa);
