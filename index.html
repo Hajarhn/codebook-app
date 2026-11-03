@@ -1428,7 +1428,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.37.2
+      Codebook Editor — Cloud edition · v6.38.0
     </div>
   </div>
 </div>
@@ -1701,7 +1701,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.37.2 cloud</span>
+      <span class="version">v6.38.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2083,17 +2083,25 @@
 </div>
 
 <div class="modal-overlay" id="modal-reorder" style="display: none;">
-  <div class="modal" style="max-width: 640px; width: 100%;">
+  <div class="modal" style="max-width: 760px; width: 100%;">
     <div class="modal-header">
       <h3 style="margin:0;">Reorder variables</h3>
       <button onclick="closeReorderModal()" style="background:none; border:none; font-size:1.5rem; line-height:1; cursor:pointer; color:var(--text-muted);">&times;</button>
     </div>
     <div class="modal-body">
-      <p id="reorder-instrument-label" style="color:var(--text-muted); font-size:0.85rem; margin:0 0 0.75rem;"></p>
-      <div id="reorder-list" style="display:flex; flex-direction:column; gap:6px; max-height:55vh; overflow:auto;"></div>
+      <p id="reorder-instrument-label" style="color:var(--text-muted); font-size:0.85rem; margin:0 0 0.4rem;"></p>
+      <p class="hint" style="margin:0 0 0.6rem; font-size:0.8rem; color:var(--text-muted);">Drag a row by its handle, or type a new position in the box. Variables shared with another instrument are included; each variable has one position, so the order is shared too.</p>
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+        <button class="btn-secondary btn-mini" onclick="reorderSortByItemNumber()" title="Order by the Item number field (original questionnaire)">Sort by item number</button>
+        <button class="btn-secondary btn-mini" onclick="reorderResetDraft()">Undo changes</button>
+        <span id="reorder-status" style="font-size:0.8rem; color:var(--text-muted); margin-left:auto;"></span>
+      </div>
+      <div id="reorder-list" style="display:flex; flex-direction:column; gap:4px; max-height:55vh; overflow:auto;"></div>
+      <div id="reorder-error" class="msg msg-error" style="display:none;"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeReorderModal()">Done</button>
+      <button class="btn-secondary" onclick="closeReorderModal()">Cancel</button>
+      <button class="btn-primary" id="reorder-save-btn" onclick="reorderSave()">Save order</button>
     </div>
   </div>
 </div>
@@ -2686,7 +2694,7 @@ const CLOUD_DB_MANAGED_FIELDS = new Set(['created_at', 'updated_at']);
 
 // The complete set of REAL columns in the variables table. Anything not in
 // this set is a UI-only field and must never be written.
-const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'item_number', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
 
 // Same whitelist but expressed in actual DB column names (reverse-mapped),
 // so membership tests after cloudDenormalizeRow's case conversion succeed.
@@ -5844,7 +5852,44 @@ function instVisible(name) {
   if (meta.status === 'pending_review' && myUid && meta.created_by === myUid) return true;
   return false;
 }
-window.addEventListener('cloud-authenticated', async () => { await loadInstrumentMeta(); });
+window.addEventListener('cloud-authenticated', async () => { await loadInstrumentMeta(); await loadInstrumentNotes(); });
+
+// ====== v6.38: internal instrument notes (staff only; table instrument_notes, migration 30) ======
+window.cloudInstrumentNotes = {};        // name -> { note, updated_by, updated_at }
+window.cloudInstrumentNotesReady = false; // false = table missing / not loaded
+function isStaffRole() { const r = window.cloudAuth && window.cloudAuth.role; return r === 'admin' || r === 'editor' || r === 'ontology_engineer'; }
+function canEditInstrumentNote() { const r = window.cloudAuth && window.cloudAuth.role; return r === 'admin' || r === 'editor'; }
+async function loadInstrumentNotes() {
+  window.cloudInstrumentNotes = {}; window.cloudInstrumentNotesReady = false;
+  if (!isStaffRole()) return;
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client; if (!c) return;
+    const { data, error } = await c.from('instrument_notes').select('instrument_name, note, updated_by, updated_at');
+    if (error) { console.warn('instrument notes unavailable (migration 30 not applied?):', error.message); return; }
+    (data || []).forEach(r => { window.cloudInstrumentNotes[r.instrument_name] = { note: r.note || '', updated_by: r.updated_by, updated_at: r.updated_at }; });
+    window.cloudInstrumentNotesReady = true;
+    if (typeof renderInstrumentInfoBar === 'function') renderInstrumentInfoBar();
+  } catch (e) { console.warn('instrument notes load failed', e); }
+}
+function openInstrumentNoteEditor() {
+  const name = state.selectedInstrument; if (!name) return;
+  document.getElementById('inst-note-name').textContent = name;
+  document.getElementById('inst-note-text').value = ((window.cloudInstrumentNotes[name] || {}).note) || '';
+  document.getElementById('modal-inst-note').style.display = 'flex';
+  setTimeout(() => document.getElementById('inst-note-text').focus(), 50);
+}
+async function saveInstrumentNote() {
+  const name = state.selectedInstrument; if (!name) return;
+  const text = document.getElementById('inst-note-text').value;
+  const c = window.cloudAuth && window.cloudAuth.client; if (!c) return;
+  // the instrument row must exist (FK); create it the same way the description does
+  if (!window.cloudInstrumentMeta[name]) { const ok = await saveInstrumentMeta(name, {}); if (!ok) return; }
+  const row = { instrument_name: name, note: text.trim() ? text : null, updated_by: window.cloudAuth.user ? window.cloudAuth.user.id : null, updated_at: new Date().toISOString() };
+  const { error } = await c.from('instrument_notes').upsert(row, { onConflict: 'instrument_name' });
+  if (error) { alert('Could not save the note: ' + error.message + (/instrument_notes/.test(error.message) ? '\n\nRun migration 30 in Supabase first.' : '')); return; }
+  window.cloudInstrumentNotes[name] = { note: row.note || '', updated_by: row.updated_by, updated_at: row.updated_at };
+  closeModal('inst-note'); renderInstrumentInfoBar();
+}
 
 // ====== v6.19: Import instrument from Excel ======
 let importParsed = null;
@@ -6431,10 +6476,26 @@ function renderInstrumentInfoBar() {
     ? `<div style="white-space:pre-wrap; font-size:0.86rem; color:var(--text-muted); line-height:1.5;">${escapeHtml(desc)}</div>`
     : (canEditDesc ? `<div style="font-size:0.82rem; color:var(--text-faint); font-style:italic;">No description yet.</div>` : '');
 
-  if (!desc && !canEditDesc) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  // v6.38: internal note (staff only; never shown to researchers or in the viewer)
+  let noteHtml = '';
+  if (isStaffRole() && window.cloudInstrumentNotesReady) {
+    const n = (window.cloudInstrumentNotes[name] || {});
+    const note = (n.note || '').trim();
+    const editBtn = canEditInstrumentNote() ? `<button class="btn-mini" onclick="openInstrumentNoteEditor()">🔒 ${note ? 'Edit' : 'Add'} internal note</button>` : '';
+    if (note || editBtn) {
+      const when = n.updated_at ? ` · updated ${escapeHtml(String(n.updated_at).slice(0, 10))}` : '';
+      noteHtml = `<div style="margin-top:8px; padding:8px 10px; border:1px dashed var(--border-strong,#c6ccd8); border-radius:6px; background:var(--surface,#fff);">`
+        + `<div style="font-size:0.72rem; letter-spacing:.04em; color:var(--text-faint); font-weight:600;">🔒 INTERNAL NOTE — staff only${when}</div>`
+        + (note ? `<div style="white-space:pre-wrap; font-size:0.84rem; color:var(--text); line-height:1.5; margin-top:3px;">${escapeHtml(note)}</div>`
+                : `<div style="font-size:0.8rem; color:var(--text-faint); font-style:italic; margin-top:3px;">No internal note yet.</div>`)
+        + (editBtn ? `<div style="margin-top:6px;">${editBtn}</div>` : '')
+        + `</div>`;
+    }
+  }
+  if (!desc && !canEditDesc && !noteHtml) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
   bar.style.display = 'block';
   bar.style.cssText = 'display:block; margin-bottom:14px; padding:12px 14px; background:var(--surface-2,#f3f4f6); border:1px solid var(--border,#e3e5e8); border-radius:8px;';
-  bar.innerHTML = `<div style="display:flex; align-items:center;"><strong style="font-size:0.9rem;">${escapeHtml(name)}</strong>${badge}</div>${descHtml}${controls}`;
+  bar.innerHTML = `<div style="display:flex; align-items:center;"><strong style="font-size:0.9rem;">${escapeHtml(name)}</strong>${badge}</div>${descHtml}${controls}${noteHtml}`;
 }
 
 function openInstrumentDescEditor() {
@@ -6721,56 +6782,155 @@ function reorderResortCodebook() {
     return ao - bo;
   });
 }
+// v6.38: drag-and-drop reorder of ALL variables of the selected (atomic)
+// instrument, incl. variables shared with other instruments ("A + B").
+// The draft is saved in one call (admin_set_variable_order, migration 30).
+window._reorderDraft = null;      // array of _uid in the new order
+window._reorderOriginal = null;   // array of _uid as loaded
+function reorderVarsForSelected() {
+  const instr = (document.getElementById('instrument-select') || {}).value || state.selectedInstrument || '';
+  return getVarsForInstrument(instr).slice()
+    .sort((a, b) => ((a.display_order ?? Infinity) - (b.display_order ?? Infinity)));
+}
+function reorderItemKey(v) {
+  // "Q13-2" -> [13, 2]; "13a" -> [13, 0, 'a']; empty -> null
+  const t = String((v && v.item_number) || '').trim();
+  if (!t) return null;
+  const m = t.match(/(\d+)(?:\D+(\d+))?\s*([a-z]*)/i);
+  if (!m) return [Infinity, 0, t.toLowerCase()];
+  return [parseInt(m[1], 10), m[2] ? parseInt(m[2], 10) : 0, (m[3] || '').toLowerCase()];
+}
+function reorderSetStatus() {
+  const st = document.getElementById('reorder-status'); if (!st) return;
+  const d = window._reorderDraft || [], o = window._reorderOriginal || [];
+  let moved = 0; d.forEach((u, i) => { if (o[i] !== u) moved++; });
+  st.textContent = moved ? (moved + ' position' + (moved === 1 ? '' : 's') + ' changed — not saved yet') : 'No changes';
+  const btn = document.getElementById('reorder-save-btn'); if (btn) btn.disabled = !moved;
+}
 function renderReorderList() {
   const host = document.getElementById('reorder-list');
   const instr = (document.getElementById('instrument-select') || {}).value || '';
   const lbl = document.getElementById('reorder-instrument-label');
-  if (lbl) lbl.textContent = instr ? ('Instrument: ' + instr) : '';
   if (!host) return;
-  const list = (state.codebook || [])
-    .filter(v => !v._deleted && (v.Instrument || '') === instr)
-    .sort((a, b) => ((a.display_order ?? Infinity) - (b.display_order ?? Infinity)));
-  if (!list.length) { host.innerHTML = '<div class="empty-state"><p>This instrument has no variables to reorder.</p></div>'; return; }
-  host.innerHTML = list.map((v, i) => {
-    const label = v.variable_name_CBS || v.variable_label_EN || v.variable_label_NL || v.id;
-    const up = i === 0 ? 'disabled' : '';
-    const down = i === list.length - 1 ? 'disabled' : '';
-    return '<div style="display:flex; align-items:center; gap:10px; padding:7px 10px; border:1px solid var(--border); border-radius:7px; background:var(--surface);">'
-      + '<div style="display:flex; flex-direction:column; gap:2px;">'
-      +   '<button class="btn-mini" ' + up + ' onclick="reorderMove(\'' + v._uid + '\',\'up\')" style="padding:1px 7px; line-height:1.1;">▲</button>'
-      +   '<button class="btn-mini" ' + down + ' onclick="reorderMove(\'' + v._uid + '\',\'down\')" style="padding:1px 7px; line-height:1.1;">▼</button>'
-      + '</div>'
-      + '<span style="font-size:13px; flex:1;">' + escapeHtml(String(label)) + '</span>'
+  const draft = window._reorderDraft || [];
+  if (lbl) lbl.textContent = instr ? ('Instrument: ' + instr + ' · ' + draft.length + ' variables') : '';
+  if (!draft.length) { host.innerHTML = '<div class="empty-state"><p>This instrument has no variables to reorder.</p></div>'; return; }
+  host.innerHTML = draft.map((uid, i) => {
+    const v = findVarByUid(uid) || {};
+    const name = v.variable_name_CBS || v.id || uid;
+    const label = v.variable_label_EN || v.variable_label_NL || '';
+    const item = v.item_number ? '<span style="font-family:var(--mono); font-size:11px; color:var(--text-muted); background:var(--surface-2); border-radius:4px; padding:0 5px;">' + escapeHtml(String(v.item_number)) + '</span>' : '';
+    const shared = splitInstrumentName(v.Instrument).length > 1
+      ? '<span title="' + escapeAttr(String(v.Instrument)) + '" style="font-size:10.5px; color:var(--text-faint);">shared</span>' : '';
+    return '<div class="reorder-row" draggable="true" data-uid="' + escapeAttr(uid) + '" style="display:flex; align-items:center; gap:8px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface);">'
+      + '<span class="reorder-handle" style="cursor:grab; color:var(--text-faint); font-size:15px; user-select:none;" title="Drag">⠿</span>'
+      + '<input type="number" min="1" max="' + draft.length + '" value="' + (i + 1) + '" data-pos-for="' + escapeAttr(uid) + '" style="width:58px; padding:2px 5px; font-size:12px;" title="Type a position and press Enter">'
+      + '<code style="font-size:12px; min-width:170px;">' + escapeHtml(String(name)) + '</code>'
+      + item
+      + '<span style="font-size:12px; color:var(--text-muted); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + escapeHtml(String(label)) + '</span>'
+      + shared
       + '</div>';
   }).join('');
+  // drag and drop
+  let dragUid = null;
+  host.querySelectorAll('.reorder-row').forEach(row => {
+    row.addEventListener('dragstart', e => { dragUid = row.dataset.uid; row.style.opacity = '0.4'; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', dragUid); } catch (_) {} });
+    row.addEventListener('dragend', () => { row.style.opacity = ''; host.querySelectorAll('.reorder-row').forEach(r => { r.style.borderTop = ''; r.style.borderBottom = ''; }); });
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+      const r = row.getBoundingClientRect(), after = (e.clientY - r.top) > r.height / 2;
+      row.style.borderTop = after ? '' : '2px solid var(--accent)';
+      row.style.borderBottom = after ? '2px solid var(--accent)' : '';
+    });
+    row.addEventListener('dragleave', () => { row.style.borderTop = ''; row.style.borderBottom = ''; });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      const target = row.dataset.uid; if (!dragUid || dragUid === target) return;
+      const r = row.getBoundingClientRect(), after = (e.clientY - r.top) > r.height / 2;
+      const d = window._reorderDraft.filter(u => u !== dragUid);
+      let idx = d.indexOf(target); if (after) idx++;
+      d.splice(idx, 0, dragUid);
+      window._reorderDraft = d; renderReorderList(); reorderSetStatus();
+    });
+  });
+  // type a position
+  host.querySelectorAll('input[data-pos-for]').forEach(inp => {
+    const go = () => {
+      const uid = inp.dataset.posFor; let n = parseInt(inp.value, 10);
+      const d = window._reorderDraft.filter(u => u !== uid);
+      if (isNaN(n)) { renderReorderList(); return; }
+      n = Math.max(1, Math.min(d.length + 1, n));
+      d.splice(n - 1, 0, uid);
+      window._reorderDraft = d; renderReorderList(); reorderSetStatus();
+      const again = host.querySelector('input[data-pos-for="' + CSS.escape(uid) + '"]'); if (again) again.focus();
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+    inp.addEventListener('change', go);
+  });
 }
+function reorderSortByItemNumber() {
+  const d = window._reorderDraft || [];
+  const withPos = d.map((uid, i) => ({ uid, i, k: reorderItemKey(findVarByUid(uid)) }));
+  const none = withPos.filter(x => !x.k).length;
+  withPos.sort((a, b) => {
+    if (!a.k && !b.k) return a.i - b.i;
+    if (!a.k) return 1; if (!b.k) return -1;
+    for (let j = 0; j < 3; j++) { if (a.k[j] < b.k[j]) return -1; if (a.k[j] > b.k[j]) return 1; }
+    return a.i - b.i;
+  });
+  window._reorderDraft = withPos.map(x => x.uid);
+  renderReorderList(); reorderSetStatus();
+  const st = document.getElementById('reorder-status');
+  if (st && none) st.textContent += ' · ' + none + ' without item number kept at the end';
+}
+function reorderResetDraft() { window._reorderDraft = (window._reorderOriginal || []).slice(); renderReorderList(); reorderSetStatus(); }
 function openReorderModal() {
   const instr = (document.getElementById('instrument-select') || {}).value || '';
   if (!instr) { alert('Pick an instrument first, then reorder its variables.'); return; }
-  renderReorderList();
+  const list = reorderVarsForSelected().filter(v => v.id);
+  window._reorderOriginal = list.map(v => v._uid);
+  window._reorderDraft = window._reorderOriginal.slice();
+  const err = document.getElementById('reorder-error'); if (err) err.style.display = 'none';
+  renderReorderList(); reorderSetStatus();
   const m = document.getElementById('modal-reorder'); if (m) m.style.display = 'flex';
 }
 function closeReorderModal() {
   const m = document.getElementById('modal-reorder'); if (m) m.style.display = 'none';
+  window._reorderDraft = null; window._reorderOriginal = null;
 }
-async function reorderMove(uid, dir) {
-  const v = (state.codebook || []).find(x => x._uid === uid);
-  if (!v || !v.id) return;
-  const instr = v.Instrument || '';
-  const list = (state.codebook || []).filter(x => !x._deleted && (x.Instrument || '') === instr)
-    .sort((a, b) => ((a.display_order ?? Infinity) - (b.display_order ?? Infinity)));
-  const idx = list.findIndex(x => x._uid === uid);
-  const nb = dir === 'up' ? list[idx - 1] : list[idx + 1];
-  if (!nb) return; // already at the edge
+async function reorderSave() {
+  const d = window._reorderDraft || []; if (!d.length) return;
+  const err = document.getElementById('reorder-error'); if (err) err.style.display = 'none';
+  const btn = document.getElementById('reorder-save-btn'); if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const vars = d.map(findVarByUid);
+  const ids = vars.map(v => v && v.id);
   try {
-    const { error } = await window.cloudAuth.client.rpc('admin_reorder_variable', { p_id: v.id, p_dir: dir });
-    if (error) { alert('Could not reorder: ' + error.message); return; }
-  } catch (e) { alert('Could not reorder: ' + (e.message || e)); return; }
-  // Mirror the swap locally so the UI updates without a full reload.
-  const tmp = v.display_order; v.display_order = nb.display_order; nb.display_order = tmp;
-  reorderResortCodebook();
-  renderReorderList();
-  if (typeof refreshAllPanels === 'function') refreshAllPanels();
+    if (ids.some(x => !x)) throw new Error('Some variables are not saved yet; save them first.');
+    const { error } = await window.cloudAuth.client.rpc('admin_set_variable_order', { p_ids: ids });
+    if (error) {
+      if (/admin_set_variable_order/.test(error.message || '') && /(not find|does not exist|schema cache)/i.test(error.message || ''))
+        throw new Error('The database is missing admin_set_variable_order. Run migration 30 in Supabase first.');
+      throw error;
+    }
+    // Mirror the server's rule locally: re-use the positions these variables had (sorted);
+    // if they were missing/duplicated, number on from the lowest one.
+    const old = vars.map(v => v.display_order).filter(x => x != null);
+    const uniq = [...new Set(old)].sort((a, b) => a - b);
+    let slots = uniq;
+    if (uniq.length !== vars.length) {
+      const base = old.length ? Math.min(...old) : 1;
+      slots = vars.map((_, i) => base + i);
+    }
+    vars.forEach((v, i) => { v.display_order = slots[i]; });
+    reorderResortCodebook();
+    if (typeof refreshAllPanels === 'function') refreshAllPanels();
+    if (typeof cloudShowToast === 'function') cloudShowToast('success', 'Order saved');
+    closeReorderModal();
+  } catch (e) {
+    if (err) { err.textContent = 'Could not save the order: ' + (e.message || e); err.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save order'; }
+  }
 }
 
 function toggleAdminMenu(e){
@@ -7163,6 +7323,40 @@ function updateFieldsSummary() {
   document.getElementById("bulk-preview-btn").disabled = n === 0;
 }
 
+// v6.38: bulk edit — modes per field type, editable per-variable table,
+// paste matched by variable name, find & replace, append/prepend, and a
+// searchable variable picker. All modes still end in the same preview.
+const BULK_SET_FIELDS = new Set(['sources']);   // multi-choice, stored as "a + b + c"
+const BULK_LABEL_FIELDS = ["variable_label_EN", "variable_label_NL", "Var_label_portal", "Var_label_biobank", "Var_label_platform_trials", "Var_label_expertise_clinics"];
+function bulkCur(v, field) { return (v && v[field] !== undefined && v[field] !== null) ? String(v[field]) : ""; }
+function bulkLabel(v) { return String((v && (v.variable_label_EN || v.variable_label_NL)) || ""); }
+function bulkModesFor(field) {
+  if (BULK_SET_FIELDS.has(field)) return [
+    { id: "set_add", label: "Add" }, { id: "set_remove", label: "Remove" }, { id: "set_replace", label: "Replace with" },
+  ];
+  const m = [
+    { id: "single", label: "Same value for all" },
+    { id: "single_subset", label: "Same value, choose variables" },
+    { id: "table", label: "Per variable (table)" },
+    { id: "find_replace", label: "Find & replace" },
+    { id: "append", label: "Add text before / after" },
+  ];
+  if (BULK_LABEL_FIELDS.includes(field)) m.push({ id: "stem", label: "Shared stem + per-item" });
+  return m;
+}
+function bulkEnsureCfg(field, vars) {
+  const cfg = state.fieldConfigs[field];
+  const modes = bulkModesFor(field).map(m => m.id);
+  if (!modes.includes(cfg.mode)) cfg.mode = modes[0];
+  if (!cfg.varSelections || cfg.varSelections.length !== vars.length) cfg.varSelections = vars.map(() => BULK_SET_FIELDS.has(field));
+  if (!cfg.tableVals) cfg.tableVals = {};
+  if (!cfg.setTokens) cfg.setTokens = [];
+  if (cfg.search == null) cfg.search = "";
+  if (cfg.appendSep == null) cfg.appendSep = "nl";
+  if (cfg.appendWhere == null) cfg.appendWhere = "end";
+  return cfg;
+}
+
 function renderFieldEditors() {
   const container = document.getElementById("field-editors-container");
   container.innerHTML = "";
@@ -7170,22 +7364,15 @@ function renderFieldEditors() {
   const vars = getVarsForInstrument(state.selectedInstrument);
 
   state.selectedFields.forEach(field => {
-    const cfg = state.fieldConfigs[field];
-    const isLabelField = ["variable_label_EN", "variable_label_NL", "Var_label_portal", "Var_label_biobank", "Var_label_platform_trials", "Var_label_expertise_clinics"].includes(field);
-    const modes = [
-      { id: "single", label: "Same value for all" },
-      { id: "single_subset", label: "Same value, choose variables" },
-      { id: "ordered", label: "One per variable (paste in order)" },
-    ];
-    if (isLabelField) modes.push({ id: "stem", label: "Shared stem + per-item" });
-
+    const cfg = bulkEnsureCfg(field, vars);
+    const modes = bulkModesFor(field);
     const card = document.createElement("div");
     card.className = "field-editor";
     card.innerHTML = `
       <div class="field-editor-header">
         <div>
           <div class="field-editor-title">${escapeHtml(field)}</div>
-          <div class="hint">${vars.length} variable${vars.length === 1 ? "" : "s"} in instrument</div>
+          <div class="hint">${vars.length} variable${vars.length === 1 ? "" : "s"} in instrument${BULK_SET_FIELDS.has(field) ? " · multiple choice" : ""}</div>
         </div>
       </div>
       <div class="mode-tabs">
@@ -7205,60 +7392,213 @@ function renderFieldEditors() {
   });
 }
 
-function renderModeBody(card, field, vars) {
-  const cfg = state.fieldConfigs[field];
-  const body = card.querySelector(".mode-body");
-  if (cfg.mode === "single") {
-    body.innerHTML = `<label>New value (applied to all ${vars.length} variables)</label>
-      <textarea data-input="value" rows="3" placeholder="Paste the new value here…"></textarea>
-      <div class="hint">For multi-line value labels, paste with line breaks.</div>`;
-    const ta = body.querySelector("[data-input='value']"); ta.value = cfg.value || ""; ta.addEventListener("input", e => cfg.value = e.target.value);
-  } else if (cfg.mode === "single_subset") {
-    if (!cfg.varSelections || cfg.varSelections.length !== vars.length) cfg.varSelections = vars.map(() => false);
-    body.innerHTML = `<label>New value</label>
-      <textarea data-input="value" rows="3" placeholder="Paste the new value here…"></textarea>
-      <label style="margin-top: 10px;">Apply to which variables?</label>
+function bulkOnlyEmptyBox(cfg) {
+  return `<label style="display:flex; gap:6px; align-items:center; font-weight:400; margin-top:8px; font-size:12px;"><input type="checkbox" data-input="onlyEmpty" ${cfg.onlyEmpty ? "checked" : ""}> Only fill variables where this field is empty (don't overwrite)</label>`;
+}
+function bulkBindOnlyEmpty(body, cfg) {
+  const cb = body.querySelector("[data-input='onlyEmpty']");
+  if (cb) cb.addEventListener("change", e => { cfg.onlyEmpty = e.target.checked; });
+}
+function bulkPickerHtml(title) {
+  return `<label style="margin-top: 10px;">${title}</label>
       <div class="var-select-list">
         <div class="var-select-toolbar">
-          <button class="btn-mini" data-action="all">Select all</button>
-          <button class="btn-mini" data-action="none">None</button>
+          <input type="search" data-input="search" placeholder="Filter by name, label or value…" style="width: 200px; padding: 3px 7px; font-size: 11px;">
+          <button class="btn-mini" data-action="all" title="Select all shown">All</button>
+          <button class="btn-mini" data-action="none" title="Clear all shown">None</button>
           <button class="btn-mini" data-action="invert">Invert</button>
-          <input type="text" data-input="range" placeholder="Range, e.g. 1-5,8" style="width: 160px; padding: 3px 7px; font-size: 11px;">
+          <button class="btn-mini" data-action="empty" title="Select the shown variables where this field is empty">Empty only</button>
+          <button class="btn-mini" data-action="filled" title="Select the shown variables where this field has a value">Filled only</button>
+          <input type="text" data-input="range" placeholder="Range, e.g. 1-5,8" style="width: 120px; padding: 3px 7px; font-size: 11px;">
           <button class="btn-mini" data-action="apply-range">Apply</button>
           <span class="selected-count" data-count></span>
         </div>
         <div data-list></div>
-      </div>`;
-    const ta = body.querySelector("[data-input='value']"); ta.value = cfg.value || ""; ta.addEventListener("input", e => cfg.value = e.target.value);
-    renderVarSelectList(body, field, vars);
-    body.querySelectorAll("[data-action]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const a = btn.dataset.action;
-        if (a === "all") cfg.varSelections = vars.map(() => true);
-        else if (a === "none") cfg.varSelections = vars.map(() => false);
-        else if (a === "invert") cfg.varSelections = cfg.varSelections.map(x => !x);
-        else if (a === "apply-range") {
-          const expr = body.querySelector("[data-input='range']").value;
-          const set = parseRangeExpr(expr, vars.length);
-          if (set) cfg.varSelections = vars.map((_, i) => set.has(i));
-        }
-        renderVarSelectList(body, field, vars);
-      });
+      </div>
+      <div class="hint">Tip: shift-click selects a range.</div>`;
+}
+function bulkBindPicker(body, field, vars) {
+  const cfg = state.fieldConfigs[field];
+  const s = body.querySelector("[data-input='search']");
+  s.value = cfg.search || "";
+  s.addEventListener("input", e => { cfg.search = e.target.value; renderVarSelectList(body, field, vars); });
+  body.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const a = btn.dataset.action;
+      const shown = bulkShownIdx(field, vars);
+      if (a === "all") shown.forEach(i => cfg.varSelections[i] = true);
+      else if (a === "none") shown.forEach(i => cfg.varSelections[i] = false);
+      else if (a === "invert") shown.forEach(i => cfg.varSelections[i] = !cfg.varSelections[i]);
+      else if (a === "empty") shown.forEach(i => cfg.varSelections[i] = !bulkCur(vars[i], field).trim());
+      else if (a === "filled") shown.forEach(i => cfg.varSelections[i] = !!bulkCur(vars[i], field).trim());
+      else if (a === "apply-range") {
+        const set = parseRangeExpr(body.querySelector("[data-input='range']").value, vars.length);
+        if (set) cfg.varSelections = vars.map((_, i) => set.has(i));
+      }
+      renderVarSelectList(body, field, vars);
     });
-  } else if (cfg.mode === "ordered") {
-    body.innerHTML = `<label>One value per line, in the order of variables (${vars.length} variables)</label>
-      <textarea data-input="lines" rows="${Math.min(12, Math.max(5, vars.length))}" placeholder="Value for variable 1\nValue for variable 2\n..."></textarea>
-      <div class="hint">Empty lines mean "no change" for that variable.</div>`;
-    const ta = body.querySelector("[data-input='lines']"); ta.value = cfg.lines || ""; ta.addEventListener("input", e => cfg.lines = e.target.value);
+  });
+  renderVarSelectList(body, field, vars);
+}
+function bulkShownIdx(field, vars) {
+  const cfg = state.fieldConfigs[field];
+  const q = String(cfg.search || "").trim().toLowerCase();
+  const out = [];
+  vars.forEach((v, i) => {
+    if (!q || (getId(v) + "\n" + bulkLabel(v) + "\n" + bulkCur(v, field)).toLowerCase().includes(q)) out.push(i);
+  });
+  return out;
+}
+
+function renderModeBody(card, field, vars) {
+  const cfg = state.fieldConfigs[field];
+  const body = card.querySelector(".mode-body");
+  const bindText = (sel, key) => { const el = body.querySelector(sel); if (!el) return; el.value = cfg[key] || ""; el.addEventListener("input", e => cfg[key] = e.target.value); };
+
+  if (cfg.mode === "single") {
+    body.innerHTML = `<label>New value (applied to all ${vars.length} variables)</label>
+      <textarea data-input="value" rows="3" placeholder="Paste the new value here…"></textarea>
+      <div class="hint">For multi-line value labels, paste with line breaks.</div>${bulkOnlyEmptyBox(cfg)}`;
+    bindText("[data-input='value']", "value"); bulkBindOnlyEmpty(body, cfg);
+
+  } else if (cfg.mode === "single_subset") {
+    body.innerHTML = `<label>New value</label>
+      <textarea data-input="value" rows="3" placeholder="Paste the new value here…"></textarea>
+      ${bulkOnlyEmptyBox(cfg)}${bulkPickerHtml("Apply to which variables?")}`;
+    bindText("[data-input='value']", "value"); bulkBindOnlyEmpty(body, cfg);
+    bulkBindPicker(body, field, vars);
+
+  } else if (cfg.mode === "table") {
+    body.innerHTML = `<div class="info-box">Every variable with its current value. Change only the ones that need it; untouched rows stay as they are. To fill from Excel, paste below: <strong>two columns</strong> (<code>variable_name</code> ⇥ value) are matched by name; <strong>one column</strong> fills the rows from top to bottom.</div>
+      <details style="margin-bottom:8px;"><summary style="cursor:pointer; font-size:12px; font-weight:500;">Paste from Excel</summary>
+        <textarea data-input="paste" rows="5" placeholder="dsq_fatigue_freq\tQ13-1\ndsq_fatigue_sev\tQ13-2" style="margin-top:6px;"></textarea>
+        <div style="display:flex; gap:6px; margin-top:6px; align-items:center;"><button class="btn-mini" data-action="fill">Fill table</button><button class="btn-mini" data-action="reset">Undo all edits in table</button><span class="hint" data-fillmsg style="margin:0;"></span></div>
+      </details>
+      <input type="search" data-input="search" placeholder="Filter rows…" style="width: 220px; padding: 3px 7px; font-size: 11px; margin-bottom:6px;">
+      <div class="var-select-list" style="max-height:420px;"><div data-table></div></div>
+      <div class="hint" data-tcount></div>`;
+    bindText("[data-input='paste']", "paste");
+    const sch = body.querySelector("[data-input='search']"); sch.value = cfg.search || "";
+    sch.addEventListener("input", e => { cfg.search = e.target.value; bulkRenderTable(body, field, vars); });
+    body.querySelector("[data-action='fill']").addEventListener("click", () => {
+      const msg = body.querySelector("[data-fillmsg]");
+      const lines = String(cfg.paste || "").split(/\r?\n/);
+      while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+      if (!lines.length) { msg.textContent = "Nothing to paste."; return; }
+      const twoCol = lines.some(l => l.includes("\t"));
+      let filled = 0; const unknown = [];
+      if (twoCol) {
+        const byName = new Map(); vars.forEach(v => byName.set(getId(v).toLowerCase(), v));
+        lines.forEach(l => {
+          const t = l.indexOf("\t"); if (t < 0) return;
+          const nm = l.slice(0, t).trim(), val = l.slice(t + 1);
+          const v = byName.get(nm.toLowerCase());
+          if (!v) { if (nm) unknown.push(nm); return; }
+          cfg.tableVals[v._uid] = val; filled++;
+        });
+      } else {
+        lines.slice(0, vars.length).forEach((l, i) => { if (l.trim() === "") return; cfg.tableVals[vars[i]._uid] = l; filled++; });
+      }
+      msg.textContent = `${filled} row${filled === 1 ? "" : "s"} filled` + (unknown.length ? ` · not in this instrument: ${unknown.slice(0, 6).join(", ")}${unknown.length > 6 ? "…" : ""}` : "")
+        + (!twoCol && lines.length !== vars.length ? ` · ${lines.length} lines for ${vars.length} variables — check the order` : "");
+      bulkRenderTable(body, field, vars);
+    });
+    body.querySelector("[data-action='reset']").addEventListener("click", () => { cfg.tableVals = {}; bulkRenderTable(body, field, vars); });
+    bulkRenderTable(body, field, vars);
+
+  } else if (cfg.mode === "find_replace") {
+    body.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div><label>Find</label><input type="text" data-input="find" placeholder="text to find"></div>
+        <div><label>Replace with</label><input type="text" data-input="repl" placeholder="(empty = delete it)"></div></div>
+      <div style="display:flex; gap:14px; margin-top:8px; font-size:12px;">
+        <label style="display:flex; gap:6px; align-items:center; font-weight:400;"><input type="checkbox" data-input="caseSens" ${cfg.caseSens ? "checked" : ""}> Match case</label>
+        <label style="display:flex; gap:6px; align-items:center; font-weight:400;"><input type="checkbox" data-input="regex" ${cfg.regex ? "checked" : ""}> Regular expression</label>
+      </div>
+      <div class="hint" data-frcount></div>`;
+    const count = () => {
+      const el = body.querySelector("[data-frcount]");
+      try { const re = bulkFindRegex(cfg); el.textContent = re ? `${vars.filter(v => { re.lastIndex = 0; return re.test(bulkCur(v, field)); }).length} of ${vars.length} variables contain it` : ""; }
+      catch (e) { el.textContent = "Invalid regular expression: " + e.message; }
+    };
+    ["find", "repl"].forEach(k => { const el = body.querySelector(`[data-input='${k}']`); el.value = cfg[k] || ""; el.addEventListener("input", e => { cfg[k] = e.target.value; count(); }); });
+    ["caseSens", "regex"].forEach(k => body.querySelector(`[data-input='${k}']`).addEventListener("change", e => { cfg[k] = e.target.checked; count(); }));
+    count();
+
+  } else if (cfg.mode === "append") {
+    body.innerHTML = `<label>Text to add</label>
+      <textarea data-input="appendText" rows="2" placeholder="e.g. 2026-11-03 | checked against the original DSQ-2"></textarea>
+      <div style="display:flex; gap:14px; margin-top:8px; font-size:12px; align-items:center; flex-wrap:wrap;">
+        <label style="display:flex; gap:6px; align-items:center; font-weight:400;"><input type="radio" name="aw-${escapeAttr(field)}" value="end" ${cfg.appendWhere === "end" ? "checked" : ""}> After the current value</label>
+        <label style="display:flex; gap:6px; align-items:center; font-weight:400;"><input type="radio" name="aw-${escapeAttr(field)}" value="start" ${cfg.appendWhere === "start" ? "checked" : ""}> Before</label>
+        <span>Separator <select data-input="appendSep" style="width:auto; padding:2px 6px;">
+          <option value="nl">new line</option><option value="semi">; </option><option value="space"> (space)</option><option value="none">none</option></select></span>
+      </div>
+      <div class="hint">If the field is empty, only the new text is written (no separator).</div>
+      ${bulkPickerHtml("Apply to which variables?")}`;
+    bindText("[data-input='appendText']", "appendText");
+    const sep = body.querySelector("[data-input='appendSep']"); sep.value = cfg.appendSep; sep.addEventListener("change", e => cfg.appendSep = e.target.value);
+    body.querySelectorAll(`input[name="aw-${CSS.escape(field)}"]`).forEach(r => r.addEventListener("change", e => cfg.appendWhere = e.target.value));
+    if (cfg.varSelections.every(x => !x)) cfg.varSelections = vars.map(() => true);
+    bulkBindPicker(body, field, vars);
+
+  } else if (cfg.mode.startsWith("set_")) {
+    const verb = { set_add: "Add these to the variables (existing ones are kept)", set_remove: "Remove these from the variables", set_replace: "Replace the whole value with exactly these" }[cfg.mode];
+    const sel = new Set(cfg.setTokens);
+    body.innerHTML = `<label>${verb}</label>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; padding:8px; border:1px solid var(--border-strong); border-radius:6px; background:var(--surface);">
+        ${SOURCE_OPTIONS.map(o => `<label style="display:flex; gap:6px; align-items:center; font-weight:400; margin:0;"><input type="checkbox" data-token="${escapeAttr(o.token)}" ${sel.has(o.token) ? "checked" : ""}> ${escapeHtml(o.label)}</label>`).join("")}
+      </div>
+      <div class="hint">Stored as <code>a + b + c</code> in a fixed order.${cfg.mode === "set_replace" ? " Ticking nothing clears the field." : ""}</div>
+      ${bulkPickerHtml("Apply to which variables?")}`;
+    body.querySelectorAll("[data-token]").forEach(cb => cb.addEventListener("change", () => {
+      cfg.setTokens = [...body.querySelectorAll("[data-token]:checked")].map(x => x.dataset.token);
+    }));
+    bulkBindPicker(body, field, vars);
+
   } else if (cfg.mode === "stem") {
     body.innerHTML = `<div class="info-box"><strong>Stem + per-item:</strong> the stem text is prepended to each item. Stored as <code>{stem} {item}</code>.</div>
       <label>Shared stem</label>
       <textarea data-input="stem" rows="2" placeholder="What are the consequences..."></textarea>
       <label style="margin-top: 10px;">Item text — one per line, in order (${vars.length} items)</label>
       <textarea data-input="items" rows="${Math.min(10, Math.max(5, vars.length))}" placeholder="Walking on a flat surface\nWalking up stairs\n..."></textarea>`;
-    const stemTa = body.querySelector("[data-input='stem']"); stemTa.value = cfg.stem || ""; stemTa.addEventListener("input", e => cfg.stem = e.target.value);
-    const itemsTa = body.querySelector("[data-input='items']"); itemsTa.value = cfg.items || ""; itemsTa.addEventListener("input", e => cfg.items = e.target.value);
+    bindText("[data-input='stem']", "stem"); bindText("[data-input='items']", "items");
   }
+}
+
+function bulkRenderTable(body, field, vars) {
+  const cfg = state.fieldConfigs[field];
+  const host = body.querySelector("[data-table]");
+  const shown = bulkShownIdx(field, vars);
+  host.innerHTML = shown.map(i => {
+    const v = vars[i], cur = bulkCur(v, field);
+    const edited = Object.prototype.hasOwnProperty.call(cfg.tableVals, v._uid);
+    const val = edited ? cfg.tableVals[v._uid] : cur;
+    const multi = val.includes("\n") || val.length > 70;
+    const input = multi
+      ? `<textarea data-uid="${escapeAttr(v._uid)}" rows="${Math.min(6, Math.max(2, val.split("\n").length))}" style="flex:1; font-size:12px;">${escapeHtml(val)}</textarea>`
+      : `<input type="text" data-uid="${escapeAttr(v._uid)}" value="${escapeAttr(val)}" style="flex:1; font-size:12px; padding:3px 6px;">`;
+    return `<div class="var-select-row" style="cursor:default; align-items:center; ${edited && val !== cur ? "background:var(--accent-bg);" : ""}">
+      <span class="var-idx">${i + 1}.</span>
+      <span style="min-width:170px; max-width:220px;"><span class="var-id">${escapeHtml(getId(v) || "?")}</span><br><span style="font-size:11px; color:var(--text-faint);">${escapeHtml(truncate(bulkLabel(v), 60))}</span></span>
+      ${input}</div>`;
+  }).join("") || `<div class="empty-state" style="padding:10px;"><p>No rows match.</p></div>`;
+  const upd = () => {
+    const n = vars.filter(v => Object.prototype.hasOwnProperty.call(cfg.tableVals, v._uid) && cfg.tableVals[v._uid] !== bulkCur(v, field)).length;
+    body.querySelector("[data-tcount]").textContent = `${n} variable${n === 1 ? "" : "s"} changed in this table`;
+  };
+  host.querySelectorAll("[data-uid]").forEach(el => el.addEventListener("input", e => {
+    cfg.tableVals[el.dataset.uid] = e.target.value;
+    const row = el.closest(".var-select-row"), v = findVarByUid(el.dataset.uid);
+    if (row && v) row.style.background = e.target.value !== bulkCur(v, field) ? "var(--accent-bg)" : "";
+    upd();
+  }));
+  upd();
+}
+
+function bulkFindRegex(cfg) {
+  if (!cfg.find) return null;
+  const flags = "g" + (cfg.caseSens ? "" : "i");
+  return cfg.regex ? new RegExp(cfg.find, flags) : new RegExp(cfg.find.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), flags);
 }
 
 function renderVarSelectList(body, field, vars) {
@@ -7266,18 +7606,28 @@ function renderVarSelectList(body, field, vars) {
   const listEl = body.querySelector("[data-list]");
   const countEl = body.querySelector("[data-count]");
   const updateCount = () => { countEl.textContent = `${cfg.varSelections.filter(Boolean).length} of ${vars.length} selected`; };
-  listEl.innerHTML = vars.map((v, i) => {
-    const cur = (v[field] !== undefined && v[field] !== null) ? String(v[field]) : "";
+  const shown = bulkShownIdx(field, vars);
+  listEl.innerHTML = shown.map(i => {
+    const v = vars[i], cur = bulkCur(v, field), lab = bulkLabel(v);
     return `<label class="var-select-row">
       <input type="checkbox" data-i="${i}" ${cfg.varSelections[i] ? "checked" : ""}>
       <span class="var-idx">${i + 1}.</span>
-      <span class="var-id">${escapeHtml(getId(v) || "?")}</span>
+      <span class="var-id" title="${escapeAttr(lab)}">${escapeHtml(getId(v) || "?")}<br><span style="font-family:var(--sans,inherit); color:var(--text-faint); font-size:10.5px;">${escapeHtml(truncate(lab, 50))}</span></span>
       <span class="var-current">${cur ? escapeHtml(truncate(cur, 80)) : "<em style='color: var(--text-faint);'>(empty)</em>"}</span>
     </label>`;
-  }).join("");
+  }).join("") || `<div class="empty-state" style="padding:10px;"><p>No variables match the filter.</p></div>`;
   updateCount();
+  let last = null;
   listEl.querySelectorAll("input[type='checkbox']").forEach(cb => {
-    cb.addEventListener("change", () => { cfg.varSelections[+cb.dataset.i] = cb.checked; updateCount(); });
+    cb.addEventListener("click", e => {
+      const i = +cb.dataset.i;
+      if (e.shiftKey && last != null) {
+        const lo = Math.min(last, i), hi = Math.max(last, i);
+        shown.filter(j => j >= lo && j <= hi).forEach(j => cfg.varSelections[j] = cb.checked);
+        renderVarSelectList(body, field, vars); return;
+      }
+      cfg.varSelections[i] = cb.checked; last = i; updateCount();
+    });
   });
 }
 
@@ -7327,19 +7677,44 @@ function buildPreview() {
 
 function computePerVarValues(field, cfg, vars, warnings) {
   const out = new Array(vars.length).fill(undefined);
+  const cur = i => bulkCur(vars[i], field);
+  const sel = i => !!(cfg.varSelections && cfg.varSelections[i]);
   if (cfg.mode === "single") {
-    if (!cfg.value) return out; out.fill(cfg.value);
+    if (!cfg.value) return out;
+    vars.forEach((v, i) => { if (cfg.onlyEmpty && cur(i).trim()) return; out[i] = cfg.value; });
   } else if (cfg.mode === "single_subset") {
     if (!cfg.varSelections || cfg.varSelections.every(x => !x)) return out;
     if (!cfg.value) throw new Error("Variables selected but no value provided");
-    cfg.varSelections.forEach((sel, i) => { if (sel) out[i] = cfg.value; });
-  } else if (cfg.mode === "ordered") {
-    if (!cfg.lines || !cfg.lines.trim()) return out;
-    const lines = cfg.lines.split(/\r?\n/);
-    if (lines.length > vars.length) warnings.push(`<code>${escapeHtml(field)}</code>: ${lines.length} lines provided, ${vars.length} variables — extra ignored.`);
-    if (lines.filter(l => l.trim()).length < vars.length) warnings.push(`<code>${escapeHtml(field)}</code>: fewer non-empty lines than variables — some variables left unchanged.`);
-    const limit = Math.min(lines.length, vars.length);
-    for (let i = 0; i < limit; i++) { if (lines[i].trim() === "") continue; out[i] = lines[i]; }
+    vars.forEach((v, i) => { if (!sel(i)) return; if (cfg.onlyEmpty && cur(i).trim()) return; out[i] = cfg.value; });
+  } else if (cfg.mode === "table") {
+    vars.forEach((v, i) => {
+      if (cfg.tableVals && Object.prototype.hasOwnProperty.call(cfg.tableVals, v._uid)) out[i] = cfg.tableVals[v._uid];
+    });
+  } else if (cfg.mode === "find_replace") {
+    const re = bulkFindRegex(cfg); if (!re) return out;
+    vars.forEach((v, i) => { const c = cur(i); re.lastIndex = 0; if (re.test(c)) { re.lastIndex = 0; out[i] = c.replace(re, cfg.repl || ""); } });
+  } else if (cfg.mode === "append") {
+    if (!cfg.appendText) return out;
+    const sepv = ({ nl: "\n", semi: "; ", space: " ", none: "" })[cfg.appendSep] ?? "\n";
+    vars.forEach((v, i) => {
+      if (!sel(i)) return;
+      const c = cur(i);
+      out[i] = !c.trim() ? cfg.appendText : (cfg.appendWhere === "start" ? cfg.appendText + sepv + c : c + sepv + cfg.appendText);
+    });
+  } else if (cfg.mode && cfg.mode.startsWith("set_")) {
+    const pick = new Set(cfg.setTokens || []);
+    if (cfg.mode !== "set_replace" && !pick.size) return out;
+    const order = SOURCE_OPTIONS.map(o => o.token);
+    const fmt = set => [...set].sort((a, b) => { const ia = order.indexOf(a), ib = order.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b); }).join(" + ");
+    vars.forEach((v, i) => {
+      if (!sel(i)) return;
+      const have = new Set(splitSources(cur(i)));
+      let next;
+      if (cfg.mode === "set_add") { next = new Set(have); pick.forEach(t => next.add(t)); }
+      else if (cfg.mode === "set_remove") { next = new Set([...have].filter(t => !pick.has(t))); }
+      else next = new Set(pick);
+      if (fmt(next) !== fmt(have)) out[i] = fmt(next);   // only when the set really changes
+    });
   } else if (cfg.mode === "stem") {
     const stem = (cfg.stem || "").trim();
     if (!cfg.items || !cfg.items.trim()) return out;
@@ -9143,6 +9518,17 @@ async function submitNewPassword() {
     <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn-secondary" onclick="closeModal('inst-desc')">Cancel</button>
       <button class="btn-primary" onclick="saveInstrumentDesc()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-inst-note" style="display:none;">
+  <div class="modal" style="max-width:560px;">
+    <h2 style="margin:0 0 4px;">🔒 Internal note</h2>
+    <p style="margin:0 0 12px; color:var(--text-muted); font-size:0.85rem;">For the team only, about the whole instrument <strong id="inst-note-name"></strong> (e.g. where the item texts were copied from). Not shown to researchers or in the public viewer.</p>
+    <textarea id="inst-note-text" rows="6" style="width:100%; box-sizing:border-box; padding:9px 11px; border:1px solid var(--border,#ccc); border-radius:7px; font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+    <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-secondary" onclick="closeModal('inst-note')">Cancel</button>
+      <button class="btn-primary" onclick="saveInstrumentNote()">Save</button>
     </div>
   </div>
 </div>
