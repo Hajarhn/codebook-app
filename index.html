@@ -1510,7 +1510,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.41.0
+      Codebook Editor — Cloud edition · v6.42.0
     </div>
   </div>
 </div>
@@ -1783,7 +1783,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.41.0 cloud</span>
+      <span class="version">v6.42.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2016,6 +2016,7 @@
         <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Every change made to the codebook. Filter it, switch the view, or make a Word report of what is filtered.</p>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
+        <label class="hl-date" title="Add a table with every single field change at the end"><input type="checkbox" id="hl-detail"> full detail</label>
         <button class="btn-mini" id="hl-report-btn" onclick="histMakeReport()" title="Word report of all changes that match the filters">📄 Report (Word)</button>
         <button class="btn-mini" onclick="histReload()">↻ Refresh</button>
       </div>
@@ -4979,7 +4980,13 @@ try { const v = localStorage.getItem('cb_log_view_v1'); if (v) HISTORY_STATE.vie
     const orig = window.switchTab;
     window.switchTab = function(name) {
       orig.apply(this, arguments);
-      if (name === 'history') { histFillFilterOptions(); loadHistory(); }
+      if (name === 'history') {
+        if ((state.selectedInstrument || '') !== (HISTORY_STATE.lastMainInst || '')) {   // v6.42: follow the instrument chosen at the top
+          HISTORY_STATE.lastMainInst = state.selectedInstrument || '';
+          HISTORY_STATE.f.inst = HISTORY_STATE.lastMainInst;
+        }
+        histFillFilterOptions(); loadHistory();
+      }
     };
     window.switchTab.__cloudHistoryPatched = true;
   }
@@ -5052,6 +5059,7 @@ function histFillFilterOptions() {
       (typeof splitInstrumentName === 'function' ? splitInstrumentName(s) : [s]).forEach(a => a && set.add(a));
     });
     const cur = HISTORY_STATE.f.inst;
+    if (cur) set.add(cur);
     inst.innerHTML = '<option value="">All instruments</option>' + [...set].sort((a, b) => a.localeCompare(b))
       .map(a => `<option value="${histEscape(a)}"${a === cur ? ' selected' : ''}>${histEscape(a)}</option>`).join('');
   }
@@ -5300,7 +5308,8 @@ function histRowHtml(it, local, opts) {
   const field = it.field_name && !['delete', 'restore'].includes(it.action) ? ' <code>' + histEscape(histFieldLabel(it.field_name)) + '</code>' : '';
   const varPart = opts.noVar ? '' : ' · ' + histVarHtml(it.variable_id, local, true);
   const change = histChangeHtml(it);
-  const custom = it.context && it.context.custom ? ' <span class="hl-tag">custom field</span>' : '';
+  const custom = (it.context && it.context.custom ? ' <span class="hl-tag">custom field</span>' : '')
+    + (it.action === 'update_field' && it.old_value !== it.new_value && hNorm(it.old_value) === hNorm(it.new_value) ? ' <span class="hl-tag" title="Only spaces or line breaks differ">spacing only</span>' : '');
   return '<div class="hist-row">'
     + '<div class="hist-icon">' + (HIST_ICON[it.action] || '•') + '</div>'
     + '<div class="hist-main">'
@@ -5457,15 +5466,39 @@ async function histFetchAllForReport() {
   await histResolveNames(all);
   return histDedupe(all);
 }
+// v6.42: report in the style of the CBRQ report — per instrument: what changed,
+// in plain tables, then what is still to do. Full detail only on request.
+function hNorm(s) { return s == null ? '' : String(s).replace(/\s+/g, ' ').trim(); }
+async function histFetchCreatedForReport() {
+  // New variables, found by creation date (also catches Excel imports, which
+  // did not log 'create' before migration 32).
+  const f = HISTORY_STATE.f;
+  if (f.action && f.action !== 'create') return [];
+  if (f.field || f.q) return [];
+  const client = window.cloudAuth.client;
+  let q = client.from('variables').select('id, variable_name_cbs, "Instrument", created_at, created_by, is_deleted')
+    .order('created_at', { ascending: true }).limit(5000);
+  if (f.from) q = q.gte('created_at', new Date(f.from + 'T00:00:00').toISOString());
+  if (f.to) q = q.lt('created_at', new Date(new Date(f.to + 'T00:00:00').getTime() + 86400000).toISOString());
+  if (f.person === '__none') q = q.is('created_by', null); else if (f.person) q = q.eq('created_by', f.person);
+  const ids = histVariableIdFilter();
+  if (ids) { if (!ids.size) return []; q = q.in('id', [...ids]); }
+  const { data, error } = await q;
+  if (error) { console.warn('created variables not loaded:', error.message); return []; }
+  (data || []).forEach(v => { if (!HISTORY_STATE.varMap[v.id]) HISTORY_STATE.varMap[v.id] = v; });
+  return data || [];
+}
 async function histMakeReport() {
   const btn = document.getElementById('hl-report-btn');
   const label = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = 'Making report…'; }
   try {
     histReadFilters();
-    const [D, items] = await Promise.all([histLoadDocx(), histFetchAllForReport()]);
-    if (!items.length) { cloudShowToast('error', 'No changes match these filters — nothing to report.'); return; }
-    const blob = await histBuildReport(D, items.slice().reverse());   // oldest first
+    if (typeof loadInstrumentNotes === 'function' && !window.cloudInstrumentNotesReady) await loadInstrumentNotes();
+    const [D, items, created] = await Promise.all([histLoadDocx(), histFetchAllForReport(), histFetchCreatedForReport()]);
+    if (!items.length && !created.length) { cloudShowToast('error', 'No changes match these filters — nothing to report.'); return; }
+    const detail = !!(document.getElementById('hl-detail') || {}).checked;
+    const blob = await histBuildReport(D, items.slice().reverse(), created, detail);   // oldest first
     const f = HISTORY_STATE.f;
     const name = 'Codebook_changes' + (f.inst ? '_' + f.inst.replace(/[^\w-]+/g, '_') : '')
       + (f.from ? '_from_' + f.from : '') + (f.to ? '_to_' + f.to : '') + '.docx';
@@ -5479,13 +5512,14 @@ async function histMakeReport() {
     cloudShowToast('error', 'Could not make the report: ' + (e.message || e));
   } finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
 }
-async function histBuildReport(D, items) {
+async function histBuildReport(D, items, created, withDetail) {
   const local = histLocalMap();
   const f = HISTORY_STATE.f;
-  const P = (text, o) => new D.Paragraph(Object.assign({ children: [new D.TextRun({ text: String(text == null ? '' : text), ...(o && o.run || {}) })] }, o && o.para || {}));
-  const H = (text, level) => new D.Paragraph({ text, heading: level });
+  const P = (text, o) => new D.Paragraph(Object.assign({ children: [new D.TextRun({ text: String(text == null ? '' : text), ...(o && o.run || {}) })], spacing: { after: 80 } }, o && o.para || {}));
+  const B = text => new D.Paragraph({ text: String(text), bullet: { level: 0 } });
+  const H = (text, level) => new D.Paragraph({ text, heading: level, spacing: { before: 200, after: 80 } });
   const cell = (text, head) => new D.TableCell({
-    children: [new D.Paragraph({ children: [new D.TextRun({ text: String(text == null ? '' : text), bold: !!head, size: 18 })] })],
+    children: String(text == null ? '' : text).split('\n').map(line => new D.Paragraph({ children: [new D.TextRun({ text: line, bold: !!head, size: 18 })] })),
     shading: head ? { fill: 'E7ECEF', type: D.ShadingType.CLEAR, color: 'auto' } : undefined
   });
   const table = (head, rows) => new D.Table({
@@ -5493,90 +5527,211 @@ async function histBuildReport(D, items) {
     rows: [new D.TableRow({ tableHeader: true, children: head.map(h => cell(h, true)) })]
       .concat(rows.map(r => new D.TableRow({ children: r.map(c => cell(c)) })))
   });
-  const cut = (s, n) => { s = s == null ? '' : String(s); return s.length > (n || 400) ? s.slice(0, n || 400) + '…' : s; };
-  const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const gap = () => new D.Paragraph({ text: '' });
+  const cut = (s, n) => { s = s == null ? '' : String(s); return s.length > (n || 300) ? s.slice(0, n || 300) + '…' : s; };
+  const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const info = id => histVarInfo(id, local);
-  const labelOf = id => { const v = local.get(id); return v ? (v.variable_label_EN || v.variable_label_en || v.variable_label_NL || v.variable_label_nl || '') : ''; };
+  const lv = (id, k) => { const v = local.get(id); return v ? qv(v, k) : ''; };
+  const question = id => lv(id, 'Var_label_portal') || lv(id, 'variable_label_NL') || lv(id, 'variable_label_EN');
+  const portalVar = id => lv(id, 'Var_portal_FAIR_colnames') || lv(id, 'Var_portal_variable_raw_name');
+  const listNames = (names, max) => { max = max || 30; return names.length > max ? names.slice(0, max).join(', ') + ' and ' + (names.length - max) + ' more' : names.join(', '); };
+  const lf = s => String(s || '').toLowerCase();
+  const SPECIAL = new Set(['variable_name_cbs', 'instrument', 'display_order', 'is_deleted']);
 
-  const vars = new Set(items.map(i => i.variable_id).filter(Boolean));
-  const first = items[0].performed_at, last = items[items.length - 1].performed_at;
-  const period = (f.from ? day(f.from + 'T00:00:00') : day(first)) + ' – ' + (f.to ? day(f.to + 'T00:00:00') : day(last));
+  // ---------- gather per variable ----------
+  const createdSet = new Map();
+  (created || []).forEach(v => createdSet.set(v.id, v));
+  items.filter(i => i.action === 'create' && i.variable_id).forEach(i => { if (!createdSet.has(i.variable_id)) createdSet.set(i.variable_id, { id: i.variable_id, created_at: i.performed_at }); });
+  const instOf = id => { const v = local.get(id); if (v) return histInstOf(v) || '(no instrument)'; const d = HISTORY_STATE.varMap[id]; return (d && d.Instrument) || '(no instrument)'; };
+
+  const groups = new Map();   // instrument -> data
+  const G = inst => {
+    if (!groups.has(inst)) groups.set(inst, { vars: new Set(), changes: 0, people: {}, renames: new Map(), instMoves: new Map(),
+      created: [], delres: new Map(), fields: new Map(), moved: new Set(), approved: 0, rejected: 0, detail: [] });
+    return groups.get(inst);
+  };
+  createdSet.forEach((v, id) => { const g = G(instOf(id)); g.vars.add(id); g.created.push(v); });
+  const who = i => histWho(i);
+  items.forEach(i => {
+    if (!i.variable_id) return;
+    const g = G(instOf(i.variable_id));
+    const fl = lf(i.field_name);
+    if (i.action === 'update_field' && hNorm(i.old_value) === hNorm(i.new_value)) return;   // spacing only
+    if (i.action === 'create') return;
+    g.vars.add(i.variable_id); g.changes++;
+    g.people[who(i)] = (g.people[who(i)] || 0) + 1;
+    if (i.action === 'approve_change') { g.approved++; return; }
+    if (i.action === 'reject_change') { g.rejected++; return; }
+    if (i.action === 'reorder' || fl === 'display_order') { g.moved.add(i.variable_id); return; }
+    if (i.action === 'delete' || i.action === 'restore') {
+      const e = g.delres.get(i.variable_id) || []; e.push(i.action); g.delres.set(i.variable_id, e); return;
+    }
+    if (i.action !== 'update_field') return;
+    if (fl === 'variable_name_cbs') {
+      const e = g.renames.get(i.variable_id) || { old: i.old_value, neu: i.new_value }; e.neu = i.new_value; g.renames.set(i.variable_id, e); return;
+    }
+    if (fl === 'instrument') {
+      const e = g.instMoves.get(i.variable_id) || { old: i.old_value, neu: i.new_value }; e.neu = i.new_value; g.instMoves.set(i.variable_id, e); return;
+    }
+    const key = histFieldLabel(i.field_name);
+    if (!g.fields.has(key)) g.fields.set(key, new Map());
+    const m = g.fields.get(key);
+    const e = m.get(i.variable_id) || { old: i.old_value, neu: i.new_value, n: 0, last: i };
+    e.neu = i.new_value; e.n++; e.last = i; m.set(i.variable_id, e);
+  });
+
+  // ---------- document ----------
+  const period = (f.from ? day(f.from + 'T00:00:00') : day((items[0] || {}).performed_at || (created[0] || {}).created_at || new Date().toISOString()))
+    + ' – ' + (f.to ? day(f.to + 'T00:00:00') : day(new Date().toISOString()));
   const me = (window.cloudAuth.profile && (window.cloudAuth.profile.display_name || window.cloudAuth.profile.email)) || '';
   const filt = histActiveFilterText();
-
-  const created = items.filter(i => i.action === 'create');
-  const renamed = items.filter(i => i.action === 'update_field' && String(i.field_name || '').toLowerCase() === 'variable_name_cbs');
-  const delres = items.filter(i => i.action === 'delete' || i.action === 'restore');
-  const moved = items.filter(i => i.action === 'reorder');
-  const decisions = items.filter(i => i.action === 'approve_change' || i.action === 'reject_change');
-  const edits = items.filter(i => i.action === 'update_field' && String(i.field_name || '').toLowerCase() !== 'variable_name_cbs');
-
-  // net change per variable + field over the period
-  const net = new Map();
-  edits.forEach(i => {
-    const k = i.variable_id + '|' + String(i.field_name).toLowerCase();
-    if (!net.has(k)) net.set(k, { id: i.variable_id, field: i.field_name, old: i.old_value, neu: i.new_value, n: 0, last: i });
-    const e = net.get(k); e.neu = i.new_value; e.n++; e.last = i;
-  });
-  const netRows = [...net.values()].filter(e => (e.old || '') !== (e.neu || ''));
-
-  // summary per instrument
-  const byInst = new Map();
-  const bump = (id, key) => {
-    const inst = info(id).inst || '(no instrument)';
-    if (!byInst.has(inst)) byInst.set(inst, { vars: new Set(), create: 0, del: 0, edit: 0 });
-    const s = byInst.get(inst); s.vars.add(id); if (key) s[key]++;
-  };
-  items.forEach(i => { if (!i.variable_id) return; bump(i.variable_id, i.action === 'create' ? 'create' : i.action === 'delete' ? 'del' : i.action === 'update_field' ? 'edit' : null); });
-
+  const insts = [...groups.keys()].sort((a, b) => a === '(no instrument)' ? 1 : b === '(no instrument)' ? -1 : a.localeCompare(b));
   const ch = [];
-  ch.push(H('Codebook changes' + (f.inst ? ': ' + f.inst : ''), D.HeadingLevel.TITLE));
-  ch.push(P('Central PCNN codebook. Changes made ' + period + (filt ? ' (' + filt + ')' : '') + '. '
-    + items.length + ' logged change' + (items.length === 1 ? '' : 's') + ' on ' + vars.size + ' variable' + (vars.size === 1 ? '' : 's') + '. '
-    + 'Made from the Editor log on ' + day(new Date().toISOString()) + (me ? ' by ' + me : '') + '.'));
+  ch.push(H('Changes in the central codebook' + (insts.length === 1 && insts[0] !== '(no instrument)' ? ': ' + insts[0] : ''), D.HeadingLevel.TITLE));
+  ch.push(P('Central PCNN codebook. Changes made ' + period + (filt ? ' (' + filt + ')' : '') + '. Made from the Editor log on ' + day(new Date().toISOString()) + (me ? ' by ' + me : '') + '.'));
 
-  let sec = 0;
-  ch.push(H((++sec) + '. Summary per instrument', D.HeadingLevel.HEADING_1));
-  ch.push(table(['Instrument', 'Variables changed', 'New', 'Deleted', 'Field edits'],
-    [...byInst.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([k, s]) => [k, s.vars.size, s.create, s.del, s.edit])));
+  if (insts.length > 1) {
+    ch.push(H('Overview', D.HeadingLevel.HEADING_1));
+    ch.push(table(['Instrument', 'Variables changed', 'New', 'Renamed', 'Deleted', 'Fields changed'],
+      insts.map(k => { const g = groups.get(k); return [k, g.vars.size, g.created.length, g.renames.size,
+        [...g.delres.values()].filter(a => a[a.length - 1] === 'delete').length, g.fields.size]; })));
+  }
 
-  if (created.length) {
-    ch.push(H((++sec) + '. New variables', D.HeadingLevel.HEADING_1));
-    ch.push(table(['Variable', 'Instrument', 'Label', 'Date', 'By'],
-      created.map(i => [info(i.variable_id).name, info(i.variable_id).inst, cut(labelOf(i.variable_id), 200), day(i.performed_at), histWho(i)])));
-  }
-  if (renamed.length) {
-    ch.push(H((++sec) + '. Renamed variables', D.HeadingLevel.HEADING_1));
-    ch.push(table(['Old name', 'New name', 'Instrument', 'Date', 'By'],
-      renamed.map(i => [i.old_value || '(empty)', i.new_value || '(empty)', info(i.variable_id).inst, day(i.performed_at), histWho(i)])));
-  }
-  if (delres.length) {
-    ch.push(H((++sec) + '. Deleted and restored', D.HeadingLevel.HEADING_1));
-    ch.push(table(['Variable', 'Instrument', 'Action', 'Date', 'By'],
-      delres.map(i => [info(i.variable_id).name, info(i.variable_id).inst, HIST_LABEL[i.action], day(i.performed_at), histWho(i)])));
-  }
-  if (netRows.length) {
-    ch.push(H((++sec) + '. Field changes', D.HeadingLevel.HEADING_1));
-    ch.push(P('One row per variable and field: the value at the start of the period and at the end. Fields that were changed and then set back are left out.'));
-    const perInst = new Map();
-    netRows.forEach(e => { const inst = info(e.id).inst || '(no instrument)'; if (!perInst.has(inst)) perInst.set(inst, []); perInst.get(inst).push(e); });
-    [...perInst.keys()].sort((a, b) => a.localeCompare(b)).forEach(inst => {
-      ch.push(H(inst, D.HeadingLevel.HEADING_2));
-      ch.push(table(['Variable', 'Field', 'Old', 'New', 'Date', 'By'],
-        perInst.get(inst).map(e => [info(e.id).name, histFieldLabel(e.field) + (e.n > 1 ? ' (' + e.n + ' edits)' : ''),
-          cut(e.old) || '(empty)', cut(e.neu) || '(empty)', day(e.last.performed_at), histWho(e.last)])));
+  const notes = window.cloudInstrumentNotes || {};
+  let qF = null;
+  try { qF = runQualityChecks(qRows()); } catch (_) { qF = []; }
+  const exc = (window._q && window._q.exc) || new Map();
+  const missingFields = (window._q && window._q.missingFields && window._q.missingFields.length ? window._q.missingFields : Q_DEFAULT_MISSING)
+    .filter(x => (state.allFields || []).some(y => y.toLowerCase() === x.toLowerCase()));
+  const VALUE_FIELDS = new Set(['value_labels_en', 'value_labels_nl', 'value_coding_fair', 'value_coding', 'value_fair_status', 'value_labels_fair']);
+
+  insts.forEach(inst => {
+    const g = groups.get(inst);
+    const atoms = inst === '(no instrument)' ? [] : splitInstrumentName(inst);
+    ch.push(H(inst, D.HeadingLevel.HEADING_1));
+    const people = Object.entries(g.people).sort((a, b) => b[1] - a[1]).map(([n, c]) => n + (Object.keys(g.people).length > 1 ? ' (' + c + ')' : ''));
+    ch.push(P(g.vars.size + ' variable' + (g.vars.size === 1 ? '' : 's') + ' changed' + (g.created.length ? ', of which ' + g.created.length + ' new' : '')
+      + (people.length ? '. Changes by ' + people.join(', ') : '') + '.'));
+    let n = 0;
+
+    if (g.instMoves.size) {
+      const pairs = new Map();
+      g.instMoves.forEach((e, id) => { const k = (e.old || '(none)') + '→' + (e.neu || '(none)'); if (!pairs.has(k)) pairs.set(k, { e, ids: [] }); pairs.get(k).ids.push(id); });
+      ch.push(H((++n) + '. Instrument', D.HeadingLevel.HEADING_2));
+      pairs.forEach(({ e, ids }) => ch.push(P('The instrument was changed from ' + (e.old || '(empty)') + ' to ' + (e.neu || '(empty)') + ' for ' + ids.length + ' variable' + (ids.length === 1 ? '' : 's')
+        + (ids.length <= 10 ? ': ' + ids.map(id => info(id).name).join(', ') : '') + '.')));
+    }
+    if (g.renames.size) {
+      const rows = [...g.renames.entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
+      if (rows.length) {
+        ch.push(H((++n) + '. Renamed variables', D.HeadingLevel.HEADING_2));
+        ch.push(table(['Old (variable_name_CBS)', 'Changed to', 'Portal variable'], rows.map(([id, e]) => [e.old || '(empty)', e.neu || '(empty)', portalVar(id) || '–'])));
+      }
+    }
+    if (g.created.length) {
+      ch.push(H((++n) + '. New variables added', D.HeadingLevel.HEADING_2));
+      ch.push(table(['variable_name_CBS', 'Question', 'Portal variable', 'Added'],
+        g.created.map(v => [info(v.id).name, cut(question(v.id), 200) || '–', portalVar(v.id) || '–', v.created_at ? day(v.created_at) : ''])));
+    }
+    if (g.delres.size) {
+      ch.push(H((++n) + '. Deleted and restored', D.HeadingLevel.HEADING_2));
+      ch.push(table(['Variable', 'Change'], [...g.delres.entries()].map(([id, acts]) => {
+        const last = acts[acts.length - 1];
+        return [info(id).name, acts.length > 1 ? (last === 'delete' ? 'Deleted (after being restored)' : 'Deleted and restored again — no net change') : (last === 'delete' ? 'Deleted' : 'Restored')];
+      })));
+    }
+    // fields
+    const instCount = qRows().filter(v => histInstOf(v) === inst).length;
+    const fieldRows = [];
+    [...g.fields.keys()].sort((a, b) => a.localeCompare(b)).forEach(field => {
+      const m = g.fields.get(field);
+      const net = [...m.entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
+      if (!net.length) return;
+      const filled = net.filter(([, e]) => !hNorm(e.old)), cleared = net.filter(([, e]) => hNorm(e.old) && !hNorm(e.neu)),
+            changed = net.filter(([, e]) => hNorm(e.old) && hNorm(e.neu));
+      const parts = [];
+      if (filled.length) parts.push('filled in for ' + filled.length);
+      if (changed.length) parts.push('changed for ' + changed.length);
+      if (cleared.length) parts.push('emptied for ' + cleared.length);
+      const newVals = new Set(net.map(([, e]) => hNorm(e.neu)));
+      let what = parts.join(', ');
+      const same = newVals.size === 1 && hNorm(net[0][1].neu) && hNorm(net[0][1].neu).length <= 60 && net.length > 1;
+      if (same) what += ' — set to “' + hNorm(net[0][1].neu) + '”';
+      let vars;
+      if (!same && net.length <= 3) vars = net.map(([id, e]) => info(id).name + ': ' + (cut(hNorm(e.old), 140) || '(empty)') + ' → ' + (cut(hNorm(e.neu), 140) || '(empty)')).join('\n');
+      else if (instCount && net.length === instCount && net.length > 5) vars = 'all ' + instCount + ' variables of ' + inst;
+      else vars = listNames(net.map(([id]) => info(id).name));
+      fieldRows.push([field, what, vars]);
+      net.forEach(([id, e]) => g.detail.push([info(id).name, field + (e.n > 1 ? ' (' + e.n + ' edits)' : ''), cut(e.old) || '(empty)', cut(e.neu) || '(empty)', day(e.last.performed_at), histWho(e.last)]));
     });
-  }
-  if (moved.length) {
-    const mv = new Map();
-    moved.forEach(i => { const inst = info(i.variable_id).inst || '(no instrument)'; if (!mv.has(inst)) mv.set(inst, new Set()); mv.get(inst).add(i.variable_id); });
-    ch.push(H((++sec) + '. Order of questions', D.HeadingLevel.HEADING_1));
-    ch.push(P('The order was changed for: ' + [...mv.entries()].map(([k, s]) => k + ' (' + s.size + ' variable' + (s.size === 1 ? '' : 's') + ')').join(', ') + '.'));
-  }
-  if (decisions.length) {
-    const ap = decisions.filter(i => i.action === 'approve_change').length;
-    ch.push(H((++sec) + '. Suggested changes reviewed', D.HeadingLevel.HEADING_1));
-    ch.push(P(ap + ' approved, ' + (decisions.length - ap) + ' rejected.'));
+    if (fieldRows.length) {
+      ch.push(H((++n) + '. Fields filled in or changed', D.HeadingLevel.HEADING_2));
+      ch.push(table(['Field', 'What changed', 'Variables'], fieldRows));
+    }
+    if (g.moved.size) {
+      ch.push(H((++n) + '. Order of the questions', D.HeadingLevel.HEADING_2));
+      ch.push(P('The order was changed (' + g.moved.size + ' variable' + (g.moved.size === 1 ? '' : 's') + ' moved).'));
+    }
+    if (g.approved || g.rejected) {
+      ch.push(H((++n) + '. Suggested changes reviewed', D.HeadingLevel.HEADING_2));
+      ch.push(P(g.approved + ' approved, ' + g.rejected + ' rejected.'));
+    }
+    // notes
+    const noteTexts = atoms.map(a => ({ a, t: ((notes[a] || {}).note || '').trim() })).filter(x => x.t);
+    if (noteTexts.length) {
+      ch.push(H((++n) + '. Notes', D.HeadingLevel.HEADING_2));
+      noteTexts.forEach(({ a, t }) => {
+        if (noteTexts.length > 1) ch.push(P(a, { run: { bold: true } }));
+        t.split(/\n/).map(s => s.trim()).filter(Boolean).forEach(line => {
+          const b = line.match(/^[-•*]\s*(.*)$/);
+          ch.push(b ? B(b[1]) : P(line));
+        });
+      });
+    }
+    // still to do: as the codebook is now
+    const cur = qRows().filter(v => histInstOf(v) === inst);
+    const todo = [];
+    if (cur.length) {
+      missingFields.forEach(fld => {
+        const isVal = VALUE_FIELDS.has(fld.toLowerCase());
+        const base = isVal ? cur.filter(v => qv(v, 'values') || qv(v, 'value_labels_NL')) : cur;
+        if (!base.length) return;
+        const empty = base.filter(v => !qv(v, fld));
+        if (!empty.length) return;
+        todo.push(fld + ': ' + (empty.length === base.length ? 'empty for all ' + base.length + (isVal ? ' variables with answer options' : '')
+          : 'empty for ' + empty.length + ' of ' + base.length + ' (' + listNames(empty.map(v => qName(v)), 15) + ')'));
+      });
+    }
+    const curIds = new Set(cur.map(v => v.id || v._uid));
+    const noteAll = lf(noteTexts.map(x => x.t).join(' '));
+    const seen = new Set();
+    const checks = (qF || []).filter(x => x.vars.some(v => curIds.has(v.id || v._uid)))
+      .filter(x => !exc.has(x.check + '#' + x.key))
+      .filter(x => { const k = x.check + '#' + x.key; if (seen.has(k)) return false; seen.add(k); return true; })
+      .filter(x => { const ids = (x.detail.match(/[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+/g) || []); return !ids.some(t => noteAll.includes(t.toLowerCase())); });
+    if (todo.length || checks.length) {
+      ch.push(H((++n) + '. Still to do', D.HeadingLevel.HEADING_2));
+      if (todo.length) {
+        ch.push(P('For the ' + cur.length + ' variables of ' + inst + ', as the codebook is now, these fields are not filled in:'));
+        todo.forEach(t => ch.push(B(t)));
+      }
+      if (checks.length) {
+        ch.push(P(noteTexts.length ? 'Also to check (from the Quality tab; points already in the notes are left out):' : 'Also to check (from the Quality tab):'));
+        checks.slice(0, 60).forEach(x => ch.push(B((Q_CHECKS[x.check] ? Q_CHECKS[x.check].title : x.check) + ' — ' + x.detail + ' (' + x.vars.map(qName).join(', ') + ')')));
+        if (checks.length > 60) ch.push(P('… and ' + (checks.length - 60) + ' more in the Quality tab.'));
+      }
+    }
+  });
+
+  if (withDetail) {
+    ch.push(H('Full detail', D.HeadingLevel.HEADING_1));
+    ch.push(P('Every field change in the period, one row per variable and field: the value at the start and at the end. Changes in spacing only are left out.'));
+    insts.forEach(inst => {
+      const g = groups.get(inst);
+      if (!g.detail.length) return;
+      ch.push(H(inst, D.HeadingLevel.HEADING_2));
+      ch.push(table(['Variable', 'Field', 'Old', 'New', 'Date', 'By'], g.detail));
+    });
   }
 
   const doc = new D.Document({
