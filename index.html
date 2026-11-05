@@ -1397,6 +1397,41 @@
   .hist-detail .hist-new { color: #1B5E20; font-weight: 500; }
   .hist-detail code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; }
   .hist-meta { color: var(--text-faint); font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; text-align: right; }
+  .hl-head { margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  .hl-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+  .hl-filters input[type=search] { flex: 1 1 260px; min-width: 200px; padding: 6px 9px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 0.85rem; background: var(--surface); color: var(--text); }
+  .hl-filters select, .hl-filters input[type=date] { padding: 5px 7px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 0.82rem; background: var(--surface); color: var(--text); max-width: 200px; }
+  .hl-date { font-size: 0.8rem; color: var(--text-muted); display: inline-flex; gap: 4px; align-items: center; }
+  .hl-quick { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 6px; overflow: hidden; }
+  .hl-quick button, .hl-views button { border: none; background: var(--surface); color: var(--text); padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-right: 1px solid var(--border); }
+  .hl-quick button:last-child, .hl-views button:last-of-type { border-right: none; }
+  .hl-quick button.active, .hl-views button.active { background: var(--accent); color: #fff; }
+  .hl-views { display: flex; align-items: center; gap: 0; margin: 6px 0 4px; }
+  .hl-views button { border: 1px solid var(--border-strong); padding: 7px 14px; font-size: 0.85rem; font-weight: 600; }
+  .hl-views button:first-child { border-radius: 6px 0 0 6px; } .hl-views button:last-of-type { border-radius: 0 6px 6px 0; }
+  #hl-count { margin-left: 12px; font-size: 0.8rem; color: var(--text-muted); }
+  .hl-filterchip { display: inline-flex; gap: 6px; align-items: center; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 14px; padding: 3px 4px 3px 10px; font-size: 0.8rem; margin: 2px 0 6px; }
+  .hl-filterchip button { border: none; background: transparent; cursor: pointer; color: var(--text-muted); }
+  .hl-var { color: var(--accent-text, var(--accent)); font-weight: 600; cursor: pointer; text-decoration: underline dotted; }
+  .hl-inst { font-size: 0.75rem; color: var(--text-muted); background: var(--surface-2); border-radius: 4px; padding: 0 5px; }
+  .hl-muted { color: var(--text-faint); font-size: 0.78rem; }
+  .hl-tag { font-size: 0.7rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; font-weight: 400; }
+  .hist-action .q-ib { margin-left: 3px; font-weight: 400; }
+  .hist-action code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; font-weight: 500; }
+  .hist-diff { white-space: pre-wrap; color: var(--text); }
+  .hist-diff del { background: #FDECEA; color: #B71C1C; text-decoration: line-through; }
+  .hist-diff ins { background: #E6F4EA; color: #1B5E20; text-decoration: none; font-weight: 500; }
+  .hist-gap { color: var(--text-faint); }
+  .hist-diff del + ins, .hist-diff ins + del { margin-left: 3px; }
+  .hl-card { border: 1px solid var(--border); border-radius: 8px; margin: 6px 0; background: var(--surface); }
+  .hl-card > summary { cursor: pointer; padding: 9px 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; list-style: revert; }
+  .hl-card[open] > summary { border-bottom: 1px solid var(--border); background: var(--surface-2); border-radius: 8px 8px 0 0; }
+  .hl-card-title { font-size: 0.88rem; }
+  .hl-card-time { font-size: 0.78rem; color: var(--text-muted); margin-left: auto; }
+  .hl-chips { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 4px; }
+  .hl-chip { font-size: 0.72rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0 7px; color: var(--text-muted); }
+  .hl-card .hist-row { padding-left: 12px; padding-right: 12px; }
+  .hl-viewbox .hist-row { padding: 0.45rem 0; }
   .hist-day-header { font-weight: 600; font-size: 0.8rem; color: var(--text-muted); padding: 0.6rem 0.5rem 0.3rem; border-bottom: 2px solid var(--border-strong); margin-top: 0.5rem; }
 </style>
 <style id="cloud-v670-styles">
@@ -1475,7 +1510,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.40.1
+      Codebook Editor — Cloud edition · v6.41.0
     </div>
   </div>
 </div>
@@ -1748,7 +1783,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.40.1 cloud</span>
+      <span class="version">v6.41.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1975,25 +2010,45 @@
   </div>
 
   <div class="tab-panel admin-only" id="panel-history" role="tabpanel">
-    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div class="hl-head">
       <div>
-        <h2 style="margin: 0; font-size: 1.1rem;">History</h2>
-        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">A dated log of every change made to the codebook.</p>
+        <h2 style="margin: 0; font-size: 1.1rem;">Log</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Every change made to the codebook. Filter it, switch the view, or make a Word report of what is filtered.</p>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
-        <select id="history-filter" class="btn-mini" style="padding: 5px 8px;">
-          <option value="all">All actions</option>
-          <option value="update_field">Field edits</option>
-          <option value="create">New variables</option>
-          <option value="delete">Deletions</option>
-          <option value="restore">Restores</option>
-          <option value="approve_change">Approvals</option>
-          <option value="reject_change">Rejections</option>
-        </select>
-        <button class="btn-mini" id="history-refresh-btn">↻ Refresh</button>
+        <button class="btn-mini" id="hl-report-btn" onclick="histMakeReport()" title="Word report of all changes that match the filters">📄 Report (Word)</button>
+        <button class="btn-mini" onclick="histReload()">↻ Refresh</button>
       </div>
     </div>
+    <div class="hl-filters">
+      <input id="hl-q" type="search" placeholder="Search variable name, field or old/new value…" oninput="histSearchTyped()">
+      <select id="hl-inst" onchange="histFilterChanged()"><option value="">All instruments</option></select>
+      <select id="hl-field" onchange="histFilterChanged()"><option value="">All fields</option></select>
+      <select id="hl-person" onchange="histFilterChanged()"><option value="">All people</option></select>
+      <select id="hl-action" onchange="histFilterChanged()">
+        <option value="">All actions</option>
+        <option value="update_field">Field edits</option>
+        <option value="create">New variables</option>
+        <option value="delete">Deletions</option>
+        <option value="restore">Restores</option>
+        <option value="reorder">Order changes</option>
+        <option value="approve_change">Approvals</option>
+        <option value="reject_change">Rejections</option>
+      </select>
+      <label class="hl-date">From <input type="date" id="hl-from" onchange="histFilterChanged()"></label>
+      <label class="hl-date">To <input type="date" id="hl-to" onchange="histFilterChanged()"></label>
+      <span class="hl-quick">
+        <button type="button" data-q="today" onclick="histQuick('today')">Today</button><button type="button" data-q="7" onclick="histQuick('7')">7 days</button><button type="button" data-q="30" onclick="histQuick('30')">30 days</button><button type="button" data-q="all" class="active" onclick="histQuick('all')">All time</button>
+      </span>
+      <button class="btn-mini" onclick="histClearFilters()">Clear filters</button>
+    </div>
+    <div id="hl-varchip"></div>
+    <div class="hl-views">
+      <button type="button" data-v="all" class="active" onclick="histSetView('all')">All changes</button><button type="button" data-v="session" onclick="histSetView('session')">By session</button><button type="button" data-v="variable" onclick="histSetView('variable')">By variable</button>
+      <span id="hl-count"></span>
+    </div>
     <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
+    <div id="hl-more" style="text-align:center; padding: 12px 0;"></div>
   </div>
 
   <div class="tab-panel admin-only" id="panel-users" role="tabpanel">
@@ -4234,7 +4289,7 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
     }
     // Audit log entries (one per field) — admin & editor only.
     // ontology_engineer writes are audited inside oe_update_variable().
-    if (role !== 'ontology_engineer') {
+    if (role !== 'ontology_engineer' && cloudClientAuditOn()) {
       const auditRows = Object.entries(immediate).map(([f, ch]) => ({
         variable_id: dbId,
         action: 'update_field',
@@ -4353,7 +4408,7 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
           if (error) throw error;
           // Update local record with the DB id (in case it was generated)
           if (data && data.id) newVar.id = data.id;
-          await window.cloudAuth.client.from('audit_log').insert({
+          if (cloudClientAuditOn()) await window.cloudAuth.client.from('audit_log').insert({
             variable_id: data.id,
             action: 'create',
             performed_by: userId
@@ -4403,7 +4458,7 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
               p_updates: { is_deleted: true }
             });
             if (error) throw error;
-            await client.from('audit_log').insert({
+            if (cloudClientAuditOn()) await client.from('audit_log').insert({
               variable_id: dbId, action: 'delete', performed_by: userId
             });
           } else if (role === 'editor') {
@@ -4443,7 +4498,7 @@ async function cloudPersistVariableChanges(uid, fieldChanges) {
             p_updates: { is_deleted: false }
           });
           if (error) throw error;
-          await window.cloudAuth.client.from('audit_log').insert({
+          if (cloudClientAuditOn()) await window.cloudAuth.client.from('audit_log').insert({
             variable_id: dbId, action: 'restore',
             performed_by: window.cloudAuth.user.id
           });
@@ -4907,8 +4962,15 @@ window.addEventListener('cloud-authenticated', (e) => {
 
 // ====== END v6.0 pending UI ======
 
-// ====== v6.6: History / Audit Log tab ======
-const HISTORY_STATE = { items: [], filter: 'all' };
+// ====== v6.41: Log tab — filters, 3 views, per-variable history, Word report ======
+// Rows come from audit_log. Since migration 32 the database writes them itself
+// (trigger on variables); older rows were written by the Editor.
+const HISTORY_STATE = {
+  items: [], userMap: {}, varMap: {}, people: null, total: null,
+  page: 0, pageSize: 200, hasMore: false, loading: false, view: 'all',
+  f: { q: '', inst: '', field: '', person: '', action: '', from: '', to: '', varId: '', varLabel: '' }
+};
+try { const v = localStorage.getItem('cb_log_view_v1'); if (v) HISTORY_STATE.view = v; } catch (_) {}
 
 (function patchSwitchTabHistory() {
   function tryPatch() {
@@ -4917,120 +4979,613 @@ const HISTORY_STATE = { items: [], filter: 'all' };
     const orig = window.switchTab;
     window.switchTab = function(name) {
       orig.apply(this, arguments);
-      if (name === 'history') loadHistory();
+      if (name === 'history') { histFillFilterOptions(); loadHistory(); }
     };
     window.switchTab.__cloudHistoryPatched = true;
   }
   window.addEventListener('cloud-authenticated', tryPatch);
 })();
 
+// Does the database write the log itself (migration 32)? Then the Editor stops
+// writing its own rows, so nothing is logged twice.
+window.addEventListener('cloud-authenticated', async () => {
+  try {
+    const { data, error } = await window.cloudAuth.client.rpc('audit_log_server_side');
+    window.cloudAuth.serverAudit = !error && data === true;
+  } catch (_) { window.cloudAuth.serverAudit = false; }
+});
+function cloudClientAuditOn() { return !(window.cloudAuth && window.cloudAuth.serverAudit); }
+
 function histEscape(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-async function loadHistory() {
+const HIST_ICON  = { create: '➕', update_field: '✏️', delete: '🗑️', restore: '♻️', reorder: '↕️', approve_change: '✅', reject_change: '❌' };
+const HIST_LABEL = { create: 'Created', update_field: 'Edited', delete: 'Deleted', restore: 'Restored', reorder: 'Moved', approve_change: 'Approved change', reject_change: 'Rejected change' };
+
+function histFieldLabel(f) {
+  if (!f) return '';
+  return (typeof CLOUD_FIELD_CASE_MAP !== 'undefined' && CLOUD_FIELD_CASE_MAP[f]) || f;
+}
+function histDbField(f) {
+  return (typeof CLOUD_FIELD_CASE_REVERSE !== 'undefined' && CLOUD_FIELD_CASE_REVERSE[f]) || f;
+}
+function histLocalMap() {
+  const m = new Map();
+  (state.codebook || []).forEach(v => { if (v && v.id) m.set(v.id, v); });
+  return m;
+}
+function histInstOf(v) {
+  if (!v) return '';
+  return v[state.instrumentField] != null ? String(v[state.instrumentField]) : (v.Instrument || '');
+}
+function histVarInfo(id, local) {
+  const v = local.get(id);
+  if (v) return { local: v, name: getId(v) || v.variable_name_CBS || v.variable_name_FAIR_merged || id.slice(0, 8) + '…', inst: histInstOf(v) };
+  const d = HISTORY_STATE.varMap[id];
+  if (d) return { local: null, name: d.variable_name_cbs || id.slice(0, 8) + '…', inst: d.Instrument || '' };
+  return { local: null, name: id ? id.slice(0, 8) + '…' : '', inst: '' };
+}
+function histWho(it) {
+  if (!it.performed_by) return 'database (no user)';
+  return HISTORY_STATE.userMap[it.performed_by] || 'unknown user';
+}
+function histFmtTime(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function histFmtDay(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function histDateStr(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+// ---------- filters ----------
+function histFillFilterOptions() {
+  const inst = document.getElementById('hl-inst');
+  if (inst) {
+    const set = new Set();
+    (state.codebook || []).forEach(v => {
+      const s = histInstOf(v);
+      if (!s) return;
+      (typeof splitInstrumentName === 'function' ? splitInstrumentName(s) : [s]).forEach(a => a && set.add(a));
+    });
+    const cur = HISTORY_STATE.f.inst;
+    inst.innerHTML = '<option value="">All instruments</option>' + [...set].sort((a, b) => a.localeCompare(b))
+      .map(a => `<option value="${histEscape(a)}"${a === cur ? ' selected' : ''}>${histEscape(a)}</option>`).join('');
+  }
+  const fld = document.getElementById('hl-field');
+  if (fld) {
+    const names = new Set((state.allFields || []).filter(f => f && !f.startsWith('_') && f !== 'id' && f !== 'variable_name'));
+    ['display_order', 'is_deleted'].forEach(f => names.add(f));
+    const cur = HISTORY_STATE.f.field;
+    fld.innerHTML = '<option value="">All fields</option>' + [...names].sort((a, b) => a.localeCompare(b))
+      .map(f => { const db = histDbField(f); return `<option value="${histEscape(db)}"${db === cur ? ' selected' : ''}>${histEscape(f)}</option>`; }).join('');
+  }
+  histFillPeople();
+}
+async function histFillPeople() {
+  const sel = document.getElementById('hl-person');
+  if (!sel) return;
+  if (!HISTORY_STATE.people) {
+    try {
+      const { data } = await window.cloudAuth.client.from('profiles').select('id, email, display_name');
+      HISTORY_STATE.people = (data || []).map(p => ({ id: p.id, name: p.display_name || p.email || p.id }));
+      HISTORY_STATE.people.forEach(p => { HISTORY_STATE.userMap[p.id] = p.name; });
+    } catch (_) { HISTORY_STATE.people = []; }
+  }
+  const cur = HISTORY_STATE.f.person;
+  sel.innerHTML = '<option value="">All people</option>'
+    + HISTORY_STATE.people.slice().sort((a, b) => a.name.localeCompare(b.name))
+      .map(p => `<option value="${histEscape(p.id)}"${p.id === cur ? ' selected' : ''}>${histEscape(p.name)}</option>`).join('')
+    + `<option value="__none"${cur === '__none' ? ' selected' : ''}>database (no user)</option>`;
+}
+function histReadFilters() {
+  const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const f = HISTORY_STATE.f;
+  f.q = g('hl-q').trim(); f.inst = g('hl-inst'); f.field = g('hl-field'); f.person = g('hl-person');
+  f.action = g('hl-action'); f.from = g('hl-from'); f.to = g('hl-to');
+}
+function histFilterChanged() { histReadFilters(); histMarkQuick(); loadHistory(); }
+let _histQTimer = null;
+function histSearchTyped() { clearTimeout(_histQTimer); _histQTimer = setTimeout(histFilterChanged, 400); }
+function histQuick(kind) {
+  const from = document.getElementById('hl-from'), to = document.getElementById('hl-to');
+  const now = new Date();
+  if (kind === 'all') { from.value = ''; }
+  else if (kind === 'today') { from.value = histDateStr(now); }
+  else { const d = new Date(now); d.setDate(d.getDate() - (parseInt(kind, 10) - 1)); from.value = histDateStr(d); }
+  to.value = '';
+  histFilterChanged();
+}
+function histMarkQuick() {
+  const f = HISTORY_STATE.f, now = new Date();
+  const d7 = new Date(now); d7.setDate(d7.getDate() - 6);
+  const d30 = new Date(now); d30.setDate(d30.getDate() - 29);
+  const active = f.to ? '' : !f.from ? 'all' : f.from === histDateStr(now) ? 'today' : f.from === histDateStr(d7) ? '7' : f.from === histDateStr(d30) ? '30' : '';
+  document.querySelectorAll('#panel-history .hl-quick button').forEach(b => b.classList.toggle('active', b.dataset.q === active));
+}
+function histClearFilters() {
+  ['hl-q', 'hl-inst', 'hl-field', 'hl-person', 'hl-action', 'hl-from', 'hl-to'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  HISTORY_STATE.f.varId = ''; HISTORY_STATE.f.varLabel = '';
+  histFilterChanged();
+}
+function histClearVar() { HISTORY_STATE.f.varId = ''; HISTORY_STATE.f.varLabel = ''; loadHistory(); }
+function histOpenForVariable(id, label) {
+  if (typeof closeModal === 'function') closeModal('view');
+  HISTORY_STATE.f.varId = id; HISTORY_STATE.f.varLabel = label || id;
+  switchTab('history');
+}
+function histSetView(v) {
+  HISTORY_STATE.view = v;
+  try { localStorage.setItem('cb_log_view_v1', v); } catch (_) {}
+  renderHistory();
+}
+function histActiveFilterText() {
+  const f = HISTORY_STATE.f, parts = [];
+  if (f.varLabel) parts.push('variable ' + f.varLabel);
+  if (f.inst) parts.push('instrument ' + f.inst);
+  if (f.field) parts.push('field ' + histFieldLabel(f.field));
+  if (f.person) parts.push('by ' + (f.person === '__none' ? 'database (no user)' : (HISTORY_STATE.userMap[f.person] || 'one person')));
+  if (f.action) parts.push('action ' + (HIST_LABEL[f.action] || f.action).toLowerCase());
+  if (f.q) parts.push('matching “' + f.q + '”');
+  return parts.join(', ');
+}
+
+// ---------- query ----------
+// Returns null when the filters can't match anything (e.g. empty instrument).
+function histVariableIdFilter() {
+  const f = HISTORY_STATE.f;
+  let ids = null;
+  if (f.inst) {
+    ids = new Set((state.codebook || []).filter(v => v.id && (typeof splitInstrumentName === 'function'
+      ? splitInstrumentName(histInstOf(v)) : [histInstOf(v)]).includes(f.inst)).map(v => v.id));
+  }
+  if (f.varId) ids = ids ? new Set([...ids].filter(x => x === f.varId)) : new Set([f.varId]);
+  return ids;
+}
+function histBuildQuery(client, from, to, withCount) {
+  const f = HISTORY_STATE.f;
+  let q = client.from('audit_log').select('*', withCount ? { count: 'exact' } : undefined)
+    .order('performed_at', { ascending: false }).order('id', { ascending: false }).range(from, to);
+  if (f.action) q = q.eq('action', f.action);
+  if (f.field) {
+    const variants = [...new Set([f.field, f.field.toLowerCase(), histFieldLabel(f.field)])];
+    q = q.in('field_name', variants);
+  }
+  if (f.person === '__none') q = q.is('performed_by', null);
+  else if (f.person) q = q.eq('performed_by', f.person);
+  if (f.from) q = q.gte('performed_at', new Date(f.from + 'T00:00:00').toISOString());
+  if (f.to) q = q.lt('performed_at', new Date(new Date(f.to + 'T00:00:00').getTime() + 86400000).toISOString());
+  const ids = histVariableIdFilter();
+  if (ids) {
+    if (ids.size === 0) return null;
+    q = q.in('variable_id', [...ids]);
+  }
+  const text = f.q.replace(/[,()*"\\%]/g, ' ').trim();
+  if (text) {
+    const low = text.toLowerCase();
+    const nameIds = (state.codebook || []).filter(v => v.id && (!ids || ids.has(v.id)) &&
+      ['variable_name_CBS', 'variable_name_FAIR_merged', 'variable_name_FAIR', state.identifierField]
+        .some(k => v[k] != null && String(v[k]).toLowerCase().includes(low)))
+      .slice(0, 150).map(v => v.id);
+    const ors = [`old_value.ilike.*${text}*`, `new_value.ilike.*${text}*`, `field_name.ilike.*${text}*`];
+    if (nameIds.length) ors.push(`variable_id.in.(${nameIds.join(',')})`);
+    q = q.or(ors.join(','));
+  }
+  return q;
+}
+
+// Hide rows the old Editor wrote in the browser when the database already
+// logged the same change (only happens while an old Editor is still in use).
+function histDedupe(items) {
+  const srv = items.filter(i => i.context && i.context.source === 'db');
+  if (!srv.length) return items;
+  const key = i => i.variable_id + '|' + (i.action === 'update_field'
+    ? 'u|' + String(i.field_name || '').toLowerCase() + '|' + (i.new_value == null ? '' : i.new_value)
+    : i.action);
+  const map = new Map();
+  srv.forEach(s => { const k = key(s); if (!map.has(k)) map.set(k, []); map.get(k).push(new Date(s.performed_at).getTime()); });
+  return items.filter(i => {
+    if (i.context && i.context.source === 'db') return true;
+    if (!['update_field', 'create', 'delete', 'restore'].includes(i.action)) return true;
+    const ts = map.get(key(i));
+    if (!ts) return true;
+    const t = new Date(i.performed_at).getTime();
+    return !ts.some(x => Math.abs(x - t) < 120000);
+  });
+}
+
+async function histResolveNames(items) {
+  const client = window.cloudAuth.client;
+  const userIds = [...new Set(items.map(d => d.performed_by).filter(id => id && !HISTORY_STATE.userMap[id]))];
+  if (userIds.length) {
+    const { data: profs } = await client.from('profiles').select('id, email, display_name').in('id', userIds);
+    (profs || []).forEach(p => { HISTORY_STATE.userMap[p.id] = p.display_name || p.email; });
+  }
+  const local = histLocalMap();
+  const varIds = [...new Set(items.map(d => d.variable_id).filter(id => id && !local.has(id) && !HISTORY_STATE.varMap[id]))];
+  for (let i = 0; i < varIds.length; i += 100) {
+    const { data: vars } = await client.from('variables').select('id, variable_name_cbs, "Instrument"').in('id', varIds.slice(i, i + 100));
+    (vars || []).forEach(v => { HISTORY_STATE.varMap[v.id] = v; });
+  }
+}
+
+async function loadHistory(append) {
   const listEl = document.getElementById('history-list');
   if (!listEl || !window.cloudAuth || window.cloudAuth.role !== 'admin') return;
-  listEl.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  if (HISTORY_STATE.loading) return;
+  HISTORY_STATE.loading = true;
+  if (!append) { HISTORY_STATE.page = 0; HISTORY_STATE.items = []; listEl.innerHTML = '<div class="empty-state"><p>Loading…</p></div>'; }
   try {
     const client = window.cloudAuth.client;
-    let query = client.from('audit_log').select('*').order('performed_at', { ascending: false }).limit(500);
-    if (HISTORY_STATE.filter !== 'all') query = query.eq('action', HISTORY_STATE.filter);
-    const { data, error } = await query;
-    if (error) throw error;
-
-    // Resolve performer names + variable names
-    const userIds = [...new Set((data || []).map(d => d.performed_by).filter(Boolean))];
-    let userMap = {};
-    if (userIds.length > 0) {
-      const { data: profs } = await client.from('profiles').select('id, email, display_name').in('id', userIds);
-      (profs || []).forEach(p => { userMap[p.id] = p.display_name || p.email; });
+    const from = HISTORY_STATE.page * HISTORY_STATE.pageSize, to = from + HISTORY_STATE.pageSize - 1;
+    const q = histBuildQuery(client, from, to, !append);
+    let data = [], count = 0;
+    if (q) {
+      const res = await q;
+      if (res.error) throw res.error;
+      data = res.data || []; count = res.count;
     }
-    const varIds = [...new Set((data || []).map(d => d.variable_id).filter(Boolean))];
-    let varMap = {};
-    if (varIds.length > 0) {
-      const { data: vars } = await client.from('variables').select('id, variable_name_cbs, "Instrument"').in('id', varIds);
-      (vars || []).forEach(v => { varMap[v.id] = v; });
-    }
-    HISTORY_STATE.items = data || [];
-    HISTORY_STATE.userMap = userMap;
-    HISTORY_STATE.varMap = varMap;
+    if (!append) HISTORY_STATE.total = q ? count : 0;
+    await histResolveNames(data);
+    HISTORY_STATE.items = HISTORY_STATE.items.concat(data);
+    HISTORY_STATE.hasMore = data.length === HISTORY_STATE.pageSize;
+    HISTORY_STATE.page++;
     renderHistory();
   } catch (err) {
     console.error('loadHistory failed:', err);
-    listEl.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Error: ' + (err.message || err) + '</p></div>';
+    listEl.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Error: ' + histEscape(err.message || err) + '</p></div>';
+  } finally { HISTORY_STATE.loading = false; }
+}
+function histReload() { HISTORY_STATE.people = null; histFillFilterOptions(); loadHistory(); }
+
+// ---------- word-level difference ----------
+function histDiffHtml(a, b) {
+  a = a == null ? '' : String(a); b = b == null ? '' : String(b);
+  const plain = () => '<span class="hist-old">' + (histEscape(a) || '(empty)') + '</span><span class="hist-arrow">→</span><span class="hist-new">' + (histEscape(b) || '(empty)') + '</span>';
+  if (!a || !b || a.length + b.length < 70) return plain();
+  const ta = a.split(/(\s+)/), tb = b.split(/(\s+)/);
+  if (ta.length * tb.length > 300000) return plain();
+  const n = ta.length, m = tb.length;
+  const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    dp[i][j] = ta[i] === tb[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const ops = []; let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (ta[i] === tb[j]) { ops.push(['=', ta[i]]); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push(['-', ta[i]]); i++; }
+    else { ops.push(['+', tb[j]]); j++; }
   }
+  while (i < n) ops.push(['-', ta[i++]]);
+  while (j < m) ops.push(['+', tb[j++]]);
+  // merge runs, shorten long unchanged runs
+  const runs = [];
+  ops.forEach(([t, s]) => { const r = runs[runs.length - 1]; if (r && r[0] === t) r[1].push(s); else runs.push([t, [s]]); });
+  return '<span class="hist-diff">' + runs.map(([t, toks], idx) => {
+    if (t === '=') {
+      if (toks.length > 24) {
+        const head = idx === 0 ? '' : toks.slice(0, 8).join('');
+        const tail = idx === runs.length - 1 ? '' : toks.slice(-8).join('');
+        return histEscape(head) + '<span class="hist-gap"> … </span>' + histEscape(tail);
+      }
+      return histEscape(toks.join(''));
+    }
+    return (t === '-' ? '<del>' : '<ins>') + histEscape(toks.join('')) + (t === '-' ? '</del>' : '</ins>');
+  }).join('') + '</span>';
+}
+
+// ---------- rendering ----------
+function histVarHtml(id, local, withButtons) {
+  if (!id) return '';
+  const info = histVarInfo(id, local);
+  const inst = info.inst ? ' <span class="hl-inst">' + histEscape(info.inst) + '</span>' : '';
+  if (info.local && info.local._uid) {
+    const u = escapeAttr(info.local._uid);
+    return `<span class="hl-var" onclick="openViewDialog('${u}')" title="Open this variable">${histEscape(info.name)}</span>${inst}`
+      + (withButtons ? ` <button class="q-ib" onclick="openViewDialog('${u}')">👁 View</button>`
+        + (typeof qCanEdit === 'function' && qCanEdit() ? `<button class="q-ib q-ib-edit" onclick="openEditDialog('${u}')">✎ Edit</button>` : '') : '');
+  }
+  return `<strong>${histEscape(info.name)}</strong>${inst} <span class="hl-muted" title="Not in the loaded codebook (deleted or filtered out)">· not loaded</span>`;
+}
+function histChangeHtml(it) {
+  if (it.action === 'update_field' || it.action === 'reorder') return histDiffHtml(it.old_value, it.new_value);
+  if (it.action === 'approve_change')
+    return (it.new_value ? 'new value: <span class="hist-new">' + histEscape(truncate(it.new_value, 300)) + '</span>' : '');
+  return '';
+}
+function histRowHtml(it, local, opts) {
+  opts = opts || {};
+  const field = it.field_name && !['delete', 'restore'].includes(it.action) ? ' <code>' + histEscape(histFieldLabel(it.field_name)) + '</code>' : '';
+  const varPart = opts.noVar ? '' : ' · ' + histVarHtml(it.variable_id, local, true);
+  const change = histChangeHtml(it);
+  const custom = it.context && it.context.custom ? ' <span class="hl-tag">custom field</span>' : '';
+  return '<div class="hist-row">'
+    + '<div class="hist-icon">' + (HIST_ICON[it.action] || '•') + '</div>'
+    + '<div class="hist-main">'
+    + '<div class="hist-action">' + histEscape(HIST_LABEL[it.action] || it.action) + field + custom + varPart + '</div>'
+    + (change ? '<div class="hist-detail">' + change + '</div>' : '')
+    + '</div>'
+    + '<div class="hist-meta">' + histEscape(histWho(it)) + '<br>' + histEscape(opts.timeOnly
+        ? new Date(it.performed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : histFmtTime(it.performed_at)) + '</div>'
+    + '</div>';
+}
+function histChips(items) {
+  const c = {};
+  items.forEach(it => {
+    const k = it.action === 'update_field' ? histFieldLabel(it.field_name) : (HIST_LABEL[it.action] || it.action).toLowerCase();
+    c[k] = (c[k] || 0) + 1;
+  });
+  return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([k, n]) => '<span class="hl-chip">' + histEscape(k) + ' ×' + n + '</span>').join('')
+    + (Object.keys(c).length > 6 ? '<span class="hl-chip">+' + (Object.keys(c).length - 6) + ' more</span>' : '');
+}
+
+function histSessions(items) {
+  const out = [];
+  items.forEach(it => {
+    const g = out[out.length - 1];
+    const t = new Date(it.performed_at).getTime();
+    const tx = it.context && it.context.tx;
+    if (g && g.who === (it.performed_by || '') && ((tx && g.txs.has(tx)) || (g.lastT - t) < 3 * 60000)) {
+      g.items.push(it); g.lastT = t; if (tx) g.txs.add(tx);
+    } else {
+      out.push({ who: it.performed_by || '', items: [it], firstT: t, lastT: t, txs: new Set(tx ? [tx] : []) });
+    }
+  });
+  return out;
 }
 
 function renderHistory() {
   const listEl = document.getElementById('history-list');
-  const items = HISTORY_STATE.items || [];
-  const userMap = HISTORY_STATE.userMap || {};
-  const varMap = HISTORY_STATE.varMap || {};
+  if (!listEl) return;
+  document.querySelectorAll('#panel-history .hl-views button').forEach(b => b.classList.toggle('active', b.dataset.v === HISTORY_STATE.view));
+  const chip = document.getElementById('hl-varchip');
+  if (chip) chip.innerHTML = HISTORY_STATE.f.varId
+    ? `<span class="hl-filterchip">Only variable: <strong>${histEscape(HISTORY_STATE.f.varLabel)}</strong> <button onclick="histClearVar()" title="Show all variables">✕</button></span>` : '';
+  const items = histDedupe(HISTORY_STATE.items || []);
+  const hidden = (HISTORY_STATE.items || []).length - items.length;
+  const cnt = document.getElementById('hl-count');
+  if (cnt) {
+    const total = HISTORY_STATE.total;
+    cnt.textContent = (total != null ? total + ' change' + (total === 1 ? '' : 's') + ' found' : '')
+      + (HISTORY_STATE.hasMore ? ' · showing the newest ' + HISTORY_STATE.items.length : '')
+      + (hidden ? ' · ' + hidden + ' duplicate' + (hidden === 1 ? '' : 's') + ' hidden' : '');
+  }
+  const more = document.getElementById('hl-more');
+  if (more) more.innerHTML = HISTORY_STATE.hasMore ? '<button class="btn-mini" onclick="loadHistory(true)">Load more</button>' : '';
   if (items.length === 0) {
-    listEl.innerHTML = '<div class="empty-state"><p>No history yet.</p></div>';
+    listEl.innerHTML = '<div class="empty-state"><p>' + (histActiveFilterText() || HISTORY_STATE.f.from || HISTORY_STATE.f.to
+      ? 'No changes match these filters.' : 'No history yet.') + '</p></div>';
     return;
   }
-
-  const ICON = { create: '➕', update_field: '✏️', delete: '🗑️', restore: '♻️', approve_change: '✅', reject_change: '❌' };
-  const ACTION_LABEL = { create: 'Created variable', update_field: 'Edited field', delete: 'Deleted variable', restore: 'Restored variable', approve_change: 'Approved change', reject_change: 'Rejected change' };
-
+  const local = histLocalMap();
   let out = '';
-  let lastDay = '';
-  items.forEach(it => {
-    const dt = it.performed_at ? new Date(it.performed_at) : null;
-    const day = dt ? dt.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '';
-    if (day !== lastDay) {
-      out += '<div class="hist-day-header">' + histEscape(day) + '</div>';
-      lastDay = day;
-    }
-    const who = userMap[it.performed_by] || 'unknown';
-    const time = dt ? dt.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-    const v = varMap[it.variable_id];
-    const vname = v ? (v.variable_name_cbs || (it.variable_id ? it.variable_id.slice(0,8)+'…' : '')) : (it.variable_id ? it.variable_id.slice(0,8)+'…' : '');
-    const vinst = v && v.Instrument ? ' · ' + histEscape(v.Instrument) : '';
-
-    let detail = '';
-    if (it.action === 'update_field' && it.field_name) {
-      detail = 'Field <code>' + histEscape(it.field_name) + '</code> on <strong>' + histEscape(vname) + '</strong>' + vinst
-        + '<br><span class="hist-old">' + (histEscape(it.old_value) || '(empty)') + '</span>'
-        + '<span class="hist-arrow">→</span>'
-        + '<span class="hist-new">' + (histEscape(it.new_value) || '(empty)') + '</span>';
-    } else if (it.action === 'create') {
-      detail = 'New variable <strong>' + histEscape(vname) + '</strong>' + vinst;
-    } else if (it.action === 'delete') {
-      detail = 'Deleted <strong>' + histEscape(vname) + '</strong>' + vinst;
-    } else if (it.action === 'restore') {
-      detail = 'Restored <strong>' + histEscape(vname) + '</strong>' + vinst;
-    } else if (it.action === 'approve_change' || it.action === 'reject_change') {
-      detail = 'On <strong>' + histEscape(vname) + '</strong>' + vinst
-        + (it.field_name ? ' · field <code>' + histEscape(it.field_name) + '</code>' : '')
-        + (it.new_value ? ' → <span class="hist-new">' + histEscape(it.new_value) + '</span>' : '');
-    }
-
-    out += '<div class="hist-row">'
-      + '<div class="hist-icon">' + (ICON[it.action] || '•') + '</div>'
-      + '<div class="hist-main">'
-      + '<div class="hist-action">' + (ACTION_LABEL[it.action] || it.action) + '</div>'
-      + '<div class="hist-detail">' + detail + '</div>'
-      + '</div>'
-      + '<div class="hist-meta">' + histEscape(who) + '<br>' + histEscape(time) + '</div>'
-      + '</div>';
-  });
+  if (HISTORY_STATE.view === 'session') {
+    histSessions(items).forEach(g => {
+      const vars = new Set(g.items.map(i => i.variable_id).filter(Boolean));
+      const t1 = histFmtTime(g.items[g.items.length - 1].performed_at), t2 = new Date(g.items[0].performed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      const span = t1.endsWith(t2) ? t1 : t1 + '–' + t2;
+      const single = vars.size === 1 ? ' on ' + histVarHtml([...vars][0], local, false) : ' on ' + vars.size + ' variables';
+      out += `<details class="hl-card"${g.items.length <= 3 ? ' open' : ''}><summary>`
+        + `<span class="hl-card-title"><strong>${histEscape(histWho(g.items[0]))}</strong> · ${g.items.length} change${g.items.length === 1 ? '' : 's'}${single}</span>`
+        + `<span class="hl-card-time">${histEscape(span)}</span>`
+        + `<div class="hl-chips">${histChips(g.items)}</div></summary>`
+        + g.items.map(it => histRowHtml(it, local, { timeOnly: true })).join('') + '</details>';
+    });
+  } else if (HISTORY_STATE.view === 'variable') {
+    const groups = new Map();
+    items.forEach(it => { const k = it.variable_id || '(none)'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(it); });
+    groups.forEach((gi, id) => {
+      const last = gi[0];
+      out += `<details class="hl-card"${groups.size <= 3 ? ' open' : ''}><summary>`
+        + `<span class="hl-card-title">${id === '(none)' ? '<em>No variable</em>' : histVarHtml(id, local, true)}</span>`
+        + `<span class="hl-card-time">${gi.length} change${gi.length === 1 ? '' : 's'} · last ${histEscape(histFmtTime(last.performed_at))} by ${histEscape(histWho(last))}</span>`
+        + `<div class="hl-chips">${histChips(gi)}</div></summary>`
+        + gi.map(it => histRowHtml(it, local, { noVar: true })).join('') + '</details>';
+    });
+  } else {
+    let lastDay = '';
+    items.forEach(it => {
+      const day = histFmtDay(it.performed_at);
+      if (day !== lastDay) { out += '<div class="hist-day-header">' + histEscape(day) + '</div>'; lastDay = day; }
+      out += histRowHtml(it, local, { timeOnly: true });
+    });
+  }
   listEl.innerHTML = out;
 }
 
-window.addEventListener('cloud-authenticated', (e) => {
-  if (e.detail.profile.role !== 'admin') return;
+// ---------- History section in the View dialog ----------
+async function histAppendToView(uid) {
+  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') return;
+  const v = findVarByUid(uid);
+  const body = document.getElementById('modal-view-body');
+  if (!v || !v.id || !body) return;
+  const box = document.createElement('div');
+  box.className = 'field-group hl-viewbox';
+  const label = getId(v) || v.variable_name_CBS || v.id;
+  box.innerHTML = `<div class="field-group-title" style="display:flex;justify-content:space-between;align-items:center;">History`
+    + ` <button class="btn-mini" onclick="histOpenForVariable('${escapeAttr(v.id)}','${escapeAttr(label)}')">Open in Log</button></div><div class="hl-viewlist">Loading…</div>`;
+  body.appendChild(box);
+  try {
+    const { data, error } = await window.cloudAuth.client.from('audit_log').select('*')
+      .eq('variable_id', v.id).order('performed_at', { ascending: false }).order('id', { ascending: false }).limit(30);
+    if (error) throw error;
+    await histResolveNames(data || []);
+    const rows = histDedupe(data || []);
+    const list = box.querySelector('.hl-viewlist');
+    list.innerHTML = rows.length ? rows.map(it => histRowHtml(it, histLocalMap(), { noVar: true })).join('')
+      + (rows.length >= 30 ? '<div class="hl-muted" style="padding:6px 0;">Newest 30 shown — open in Log for all.</div>' : '')
+      : '<div class="hl-muted" style="padding:6px 0;">No changes logged yet.</div>';
+  } catch (e) {
+    box.querySelector('.hl-viewlist').innerHTML = '<span class="hl-muted">Could not load history: ' + histEscape(e.message || e) + '</span>';
+  }
+}
+window.addEventListener('cloud-authenticated', () => {
   setTimeout(() => {
-    const f = document.getElementById('history-filter');
-    if (f && !f.__wired) { f.addEventListener('change', ev => { HISTORY_STATE.filter = ev.target.value; loadHistory(); }); f.__wired = true; }
-    const r = document.getElementById('history-refresh-btn');
-    if (r && !r.__wired) { r.addEventListener('click', loadHistory); r.__wired = true; }
-  }, 500);
+    ['openViewDialog', 'openViewDialogCompact'].forEach(name => {
+      const orig = window[name];
+      if (typeof orig !== 'function' || orig.__histPatched) return;
+      window[name] = function(uid) { const r = orig.apply(this, arguments); histAppendToView(uid); return r; };
+      window[name].__histPatched = true;
+    });
+  }, 600);
 });
-// ====== END v6.6 history tab ======
+
+// ---------- Word report of what is filtered ----------
+async function histLoadDocx() {
+  if (window.docx) return window.docx;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
+    s.onload = res; s.onerror = () => rej(new Error('Could not load the Word library (docx). Check the internet connection.'));
+    document.head.appendChild(s);
+  });
+  return window.docx;
+}
+async function histFetchAllForReport() {
+  const client = window.cloudAuth.client, all = [];
+  for (let page = 0; page < 50; page++) {
+    const q = histBuildQuery(client, page * 1000, page * 1000 + 999, false);
+    if (!q) break;
+    const { data, error } = await q;
+    if (error) throw error;
+    all.push(...(data || []));
+    if (!data || data.length < 1000) break;
+  }
+  await histResolveNames(all);
+  return histDedupe(all);
+}
+async function histMakeReport() {
+  const btn = document.getElementById('hl-report-btn');
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Making report…'; }
+  try {
+    histReadFilters();
+    const [D, items] = await Promise.all([histLoadDocx(), histFetchAllForReport()]);
+    if (!items.length) { cloudShowToast('error', 'No changes match these filters — nothing to report.'); return; }
+    const blob = await histBuildReport(D, items.slice().reverse());   // oldest first
+    const f = HISTORY_STATE.f;
+    const name = 'Codebook_changes' + (f.inst ? '_' + f.inst.replace(/[^\w-]+/g, '_') : '')
+      + (f.from ? '_from_' + f.from : '') + (f.to ? '_to_' + f.to : '') + '.docx';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    cloudShowToast('success', 'Report ready: ' + name);
+  } catch (e) {
+    console.error('Report failed:', e);
+    cloudShowToast('error', 'Could not make the report: ' + (e.message || e));
+  } finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
+}
+async function histBuildReport(D, items) {
+  const local = histLocalMap();
+  const f = HISTORY_STATE.f;
+  const P = (text, o) => new D.Paragraph(Object.assign({ children: [new D.TextRun({ text: String(text == null ? '' : text), ...(o && o.run || {}) })] }, o && o.para || {}));
+  const H = (text, level) => new D.Paragraph({ text, heading: level });
+  const cell = (text, head) => new D.TableCell({
+    children: [new D.Paragraph({ children: [new D.TextRun({ text: String(text == null ? '' : text), bold: !!head, size: 18 })] })],
+    shading: head ? { fill: 'E7ECEF', type: D.ShadingType.CLEAR, color: 'auto' } : undefined
+  });
+  const table = (head, rows) => new D.Table({
+    width: { size: 100, type: D.WidthType.PERCENTAGE },
+    rows: [new D.TableRow({ tableHeader: true, children: head.map(h => cell(h, true)) })]
+      .concat(rows.map(r => new D.TableRow({ children: r.map(c => cell(c)) })))
+  });
+  const cut = (s, n) => { s = s == null ? '' : String(s); return s.length > (n || 400) ? s.slice(0, n || 400) + '…' : s; };
+  const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const info = id => histVarInfo(id, local);
+  const labelOf = id => { const v = local.get(id); return v ? (v.variable_label_EN || v.variable_label_en || v.variable_label_NL || v.variable_label_nl || '') : ''; };
+
+  const vars = new Set(items.map(i => i.variable_id).filter(Boolean));
+  const first = items[0].performed_at, last = items[items.length - 1].performed_at;
+  const period = (f.from ? day(f.from + 'T00:00:00') : day(first)) + ' – ' + (f.to ? day(f.to + 'T00:00:00') : day(last));
+  const me = (window.cloudAuth.profile && (window.cloudAuth.profile.display_name || window.cloudAuth.profile.email)) || '';
+  const filt = histActiveFilterText();
+
+  const created = items.filter(i => i.action === 'create');
+  const renamed = items.filter(i => i.action === 'update_field' && String(i.field_name || '').toLowerCase() === 'variable_name_cbs');
+  const delres = items.filter(i => i.action === 'delete' || i.action === 'restore');
+  const moved = items.filter(i => i.action === 'reorder');
+  const decisions = items.filter(i => i.action === 'approve_change' || i.action === 'reject_change');
+  const edits = items.filter(i => i.action === 'update_field' && String(i.field_name || '').toLowerCase() !== 'variable_name_cbs');
+
+  // net change per variable + field over the period
+  const net = new Map();
+  edits.forEach(i => {
+    const k = i.variable_id + '|' + String(i.field_name).toLowerCase();
+    if (!net.has(k)) net.set(k, { id: i.variable_id, field: i.field_name, old: i.old_value, neu: i.new_value, n: 0, last: i });
+    const e = net.get(k); e.neu = i.new_value; e.n++; e.last = i;
+  });
+  const netRows = [...net.values()].filter(e => (e.old || '') !== (e.neu || ''));
+
+  // summary per instrument
+  const byInst = new Map();
+  const bump = (id, key) => {
+    const inst = info(id).inst || '(no instrument)';
+    if (!byInst.has(inst)) byInst.set(inst, { vars: new Set(), create: 0, del: 0, edit: 0 });
+    const s = byInst.get(inst); s.vars.add(id); if (key) s[key]++;
+  };
+  items.forEach(i => { if (!i.variable_id) return; bump(i.variable_id, i.action === 'create' ? 'create' : i.action === 'delete' ? 'del' : i.action === 'update_field' ? 'edit' : null); });
+
+  const ch = [];
+  ch.push(H('Codebook changes' + (f.inst ? ': ' + f.inst : ''), D.HeadingLevel.TITLE));
+  ch.push(P('Central PCNN codebook. Changes made ' + period + (filt ? ' (' + filt + ')' : '') + '. '
+    + items.length + ' logged change' + (items.length === 1 ? '' : 's') + ' on ' + vars.size + ' variable' + (vars.size === 1 ? '' : 's') + '. '
+    + 'Made from the Editor log on ' + day(new Date().toISOString()) + (me ? ' by ' + me : '') + '.'));
+
+  let sec = 0;
+  ch.push(H((++sec) + '. Summary per instrument', D.HeadingLevel.HEADING_1));
+  ch.push(table(['Instrument', 'Variables changed', 'New', 'Deleted', 'Field edits'],
+    [...byInst.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([k, s]) => [k, s.vars.size, s.create, s.del, s.edit])));
+
+  if (created.length) {
+    ch.push(H((++sec) + '. New variables', D.HeadingLevel.HEADING_1));
+    ch.push(table(['Variable', 'Instrument', 'Label', 'Date', 'By'],
+      created.map(i => [info(i.variable_id).name, info(i.variable_id).inst, cut(labelOf(i.variable_id), 200), day(i.performed_at), histWho(i)])));
+  }
+  if (renamed.length) {
+    ch.push(H((++sec) + '. Renamed variables', D.HeadingLevel.HEADING_1));
+    ch.push(table(['Old name', 'New name', 'Instrument', 'Date', 'By'],
+      renamed.map(i => [i.old_value || '(empty)', i.new_value || '(empty)', info(i.variable_id).inst, day(i.performed_at), histWho(i)])));
+  }
+  if (delres.length) {
+    ch.push(H((++sec) + '. Deleted and restored', D.HeadingLevel.HEADING_1));
+    ch.push(table(['Variable', 'Instrument', 'Action', 'Date', 'By'],
+      delres.map(i => [info(i.variable_id).name, info(i.variable_id).inst, HIST_LABEL[i.action], day(i.performed_at), histWho(i)])));
+  }
+  if (netRows.length) {
+    ch.push(H((++sec) + '. Field changes', D.HeadingLevel.HEADING_1));
+    ch.push(P('One row per variable and field: the value at the start of the period and at the end. Fields that were changed and then set back are left out.'));
+    const perInst = new Map();
+    netRows.forEach(e => { const inst = info(e.id).inst || '(no instrument)'; if (!perInst.has(inst)) perInst.set(inst, []); perInst.get(inst).push(e); });
+    [...perInst.keys()].sort((a, b) => a.localeCompare(b)).forEach(inst => {
+      ch.push(H(inst, D.HeadingLevel.HEADING_2));
+      ch.push(table(['Variable', 'Field', 'Old', 'New', 'Date', 'By'],
+        perInst.get(inst).map(e => [info(e.id).name, histFieldLabel(e.field) + (e.n > 1 ? ' (' + e.n + ' edits)' : ''),
+          cut(e.old) || '(empty)', cut(e.neu) || '(empty)', day(e.last.performed_at), histWho(e.last)])));
+    });
+  }
+  if (moved.length) {
+    const mv = new Map();
+    moved.forEach(i => { const inst = info(i.variable_id).inst || '(no instrument)'; if (!mv.has(inst)) mv.set(inst, new Set()); mv.get(inst).add(i.variable_id); });
+    ch.push(H((++sec) + '. Order of questions', D.HeadingLevel.HEADING_1));
+    ch.push(P('The order was changed for: ' + [...mv.entries()].map(([k, s]) => k + ' (' + s.size + ' variable' + (s.size === 1 ? '' : 's') + ')').join(', ') + '.'));
+  }
+  if (decisions.length) {
+    const ap = decisions.filter(i => i.action === 'approve_change').length;
+    ch.push(H((++sec) + '. Suggested changes reviewed', D.HeadingLevel.HEADING_1));
+    ch.push(P(ap + ' approved, ' + (decisions.length - ap) + ' rejected.'));
+  }
+
+  const doc = new D.Document({
+    styles: { default: { document: { run: { font: 'Calibri', size: 21 } } } },
+    sections: [{ properties: { page: { margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: ch }]
+  });
+  return D.Packer.toBlob(doc);
+}
+// ====== END v6.41 Log tab ======
 
 // ====== v6.7: Field Manager ======
 let FM_STATE = { fields: [], dirty: false };
@@ -6602,7 +7157,7 @@ async function deleteInstrument() {
     for (const v of own) {
       const { error } = await c.rpc('admin_update_variable', { p_variable_id: v.id, p_updates: { is_deleted: true } });
       if (error) throw error;
-      try { await c.from('audit_log').insert({ variable_id: v.id, action: 'delete', performed_by: uid }); } catch (_) {}
+      try { if (cloudClientAuditOn()) await c.from('audit_log').insert({ variable_id: v.id, action: 'delete', performed_by: uid }); } catch (_) {}
     }
     const { error: mErr } = await c.from('instruments').delete().eq('name', name);
     if (mErr) console.warn('instrument meta delete:', mErr.message);
@@ -7606,7 +8161,7 @@ async function _setBatchDeleted(key, el, deleted) {
       const { error } = await c.rpc('admin_update_variable', { p_variable_id: id, p_updates: { is_deleted: deleted } });
       if (error) { failed++; continue; }
       done++;
-      try { await c.from('audit_log').insert({ variable_id: id, action: deleted ? 'delete' : 'restore', performed_by: uid }); } catch (_) {}
+      try { if (cloudClientAuditOn()) await c.from('audit_log').insert({ variable_id: id, action: deleted ? 'delete' : 'restore', performed_by: uid }); } catch (_) {}
     } catch (_) { failed++; }
   }
   cloudShowToast(failed ? 'error' : 'success',
