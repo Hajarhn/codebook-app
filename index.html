@@ -188,6 +188,28 @@
   .var-select-toolbar { display: flex; gap: 6px; align-items: center; padding: 6px 8px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 11px; flex-wrap: wrap; }
   .selected-count { color: var(--text-muted); margin-left: auto; }
 
+  /* ============ QUALITY (v6.39) ============ */
+  .q-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+  .q-sub { display:flex; gap:3px; background:var(--surface-2); padding:3px; border-radius:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .q-sub button { border:none; background:transparent; padding:6px 12px; border-radius:4px; font-size:12px; color:var(--text-muted); cursor:pointer; }
+  .q-sub button.active { background:var(--surface); color:var(--text); box-shadow:0 1px 2px rgba(0,0,0,.05); font-weight:500; }
+  .q-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .q-chip { border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:3px 10px; font-size:12px; cursor:pointer; }
+  .q-chip.on { border-color:var(--accent); background:var(--accent-bg); color:var(--accent-text); }
+  .q-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:10px; }
+  .q-card-h { padding:9px 12px; border-bottom:1px solid var(--border); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .q-row { padding:7px 12px; border-bottom:1px solid var(--border); font-size:12.5px; display:flex; gap:10px; align-items:flex-start; }
+  .q-row:last-child { border-bottom:none; }
+  .q-sev { width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .q-sev.error { background:#b42318; } .q-sev.warn { background:#d97706; } .q-sev.info { background:#3b82f6; }
+  .q-var { font-family:var(--mono); font-size:11.5px; color:var(--accent-text); cursor:pointer; text-decoration:underline dotted; }
+  .q-muted { color:var(--text-muted); font-size:11.5px; }
+  .q-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .q-table th { text-align:left; font-size:11px; color:var(--text-muted); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--border-strong); background:var(--surface-2); position:sticky; top:0; }
+  .q-table td { padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top; word-break:break-word; }
+  .q-scroll { max-height:62vh; overflow:auto; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+  .q-pill { display:inline-block; font-size:11px; border-radius:10px; padding:1px 8px; background:var(--surface-2); border:1px solid var(--border); white-space:nowrap; }
+
   /* ============ PREVIEW ============ */
   .preview-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .preview-table th { text-align: left; padding: 8px 10px; font-weight: 500; color: var(--text-muted); border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--surface-2); position: sticky; top: 0; z-index: 1; }
@@ -1428,7 +1450,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.38.0
+      Codebook Editor — Cloud edition · v6.39.0
     </div>
   </div>
 </div>
@@ -1701,7 +1723,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.38.0 cloud</span>
+      <span class="version">v6.39.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1768,6 +1790,7 @@
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab staff-only" data-tab="dashboard" role="tab" onclick="switchTab('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
+    <button class="tab staff-only" data-tab="quality" role="tab" onclick="switchTab('quality')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Quality</button>
     <div class="tab-dropdown admin-only" id="admin-dropdown">
       <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Admin ▾</button>
       <div class="admin-menu" id="admin-menu">
@@ -1963,6 +1986,17 @@
       <span id="newuser-msg" style="font-size:12px; color:var(--text-muted); flex:1; min-width:200px;"></span>
     </div>
     <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
+  </div>
+
+  <div class="tab-panel staff-only" id="panel-quality" role="tabpanel">
+    <div style="margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Quality</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Duplicates, missing values, answer scales, FAIR status and automatic checks — with the list behind every number.</p>
+      </div>
+      <button class="btn-mini" onclick="renderQuality(true)">↻ Refresh</button>
+    </div>
+    <div id="quality-body"></div>
   </div>
 
   <div class="tab-panel staff-only" id="panel-dashboard" role="tabpanel">
@@ -2694,7 +2728,7 @@ const CLOUD_DB_MANAGED_FIELDS = new Set(['created_at', 'updated_at']);
 
 // The complete set of REAL columns in the variables table. Anything not in
 // this set is a UI-only field and must never be written.
-const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'item_number', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'item_number', 'fair_status', 'value_fair_status', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
 
 // Same whitelist but expressed in actual DB column names (reverse-mapped),
 // so membership tests after cloudDenormalizeRow's case conversion succeed.
@@ -6971,6 +7005,400 @@ function switchTab(name) {
   else if (name === "trash") loadTrash();
   else if (name === "imports") loadImports();
   else if (name === "dashboard") renderDashboard();
+  else if (name === "quality") renderQuality(true);
+}
+
+// ============ QUALITY TAB (v6.39) ============
+// Client-side reports over the loaded codebook: automatic checks, duplicates,
+// missing values, answer scales and FAIR status. Findings an admin marks as
+// "OK, intentional" are stored in quality_exceptions (migration 31).
+const FAIR_STATUS_LABELS = { confirmed: '✅ Confirmed', needs_review: '🟠 Needs review', proposed: '🔵 Proposed by us', not_coded: '⚪ Not coded' };
+const FAIR_STATUS_FIELDS = new Set(['fair_status', 'value_fair_status']);
+const Q_DEFAULT_MISSING = ['sources', 'Theme', 'Subdomain', 'variable_label_EN', 'value_labels_EN', 'variable_name_FAIR', 'value_coding_FAIR', 'fair_status', 'value_fair_status'];
+const Q_KNOWN_PREFIX = ['sct', 'lnc', 'ncit', 'pcnn'];
+const Q_PREFIX_TYPO = { nci: 'ncit', snct: 'sct', svg: 'sct', sctid: 'sct', loinc: 'lnc', snomed: 'sct' };
+const Q_MAPPING_OK = ['exact match', 'close match', 'broad match', 'narrow match', 'related match'];
+const Q_CHECKS = {
+  name_dup:        { sev: 'error', title: 'Same variable name' },
+  formula_ref:     { sev: 'error', title: 'Formula refers to a variable that does not exist' },
+  name_near:       { sev: 'info',  title: 'Very similar variable names' },
+  same_question:   { sev: 'warn',  title: 'Same question text on different variables' },
+  similar_question:{ sev: 'info',  title: 'Very similar question text' },
+  same_q_diff_fair:{ sev: 'warn',  title: 'Same question, different FAIR code' },
+  fair_shared:     { sev: 'info',  title: 'Same FAIR code on different questions' },
+  fair_format:     { sev: 'warn',  title: 'FAIR code format' },
+  value_mismatch:  { sev: 'warn',  title: 'Answer options do not line up' },
+  untranslated:    { sev: 'info',  title: 'English label is the same as the Dutch label' },
+  portal_link:     { sev: 'warn',  title: 'Source is portal, but no portal variable name' },
+  portal_dup:      { sev: 'warn',  title: 'Same portal variable name on several variables' },
+  item_dup:        { sev: 'warn',  title: 'Same item number twice in one instrument' },
+  note_in_by:      { sev: 'info',  title: 'A note is stored in a "checked/reviewed by" field' },
+  mapping_value:   { sev: 'info',  title: 'Mapping relationship is not one of the standard values' },
+  status_conflict: { sev: 'warn',  title: 'FAIR status does not match the code' },
+};
+window._q = { sub: 'checks', inst: '', showOk: false, checkFilter: '', exc: new Map(), excReady: false,
+              missingFields: Q_DEFAULT_MISSING.slice(), missingOpen: '', fairKind: 'variable', fairOnlyDiff: true,
+              fairSel: new Set(), scaleQ: '' };
+
+function qv(v, k) { if (!v) return ''; let x = v[k]; if (x == null) { const lk = Object.keys(v).find(z => z.toLowerCase() === k.toLowerCase()); x = lk ? v[lk] : ''; } return x == null ? '' : String(x).trim(); }
+function qNorm(s) { return String(s || '').toLowerCase().replace(/[‘’'"`]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim(); }
+function qWords(s) { return new Set(qNorm(s).split(' ').filter(w => w.length > 1)); }
+function qJacc(a, b) { if (!a.size || !b.size) return 0; let n = 0; a.forEach(w => { if (b.has(w)) n++; }); return n / (a.size + b.size - n); }
+function qLev(a, b) {
+  if (a === b) return 0; const m = a.length, n = b.length; if (!m || !n) return m || n;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+  return prev[n];
+}
+function qCodes(text) { const out = []; String(text || '').replace(/\[\s*([^\]\s]+)\s*\]/g, (_, c) => { out.push(c); return ''; }); return out; }
+function qLabelsOnly(text) { return String(text || '').split(/\[\s*[^\]]+\]/).map(qNorm).filter(Boolean); }
+function qName(v) { return getId(v) || v.id || '?'; }
+function qRows() { return (state.codebook || []).filter(v => !v._deleted); }
+function qInScope(v) { return !window._q.inst || variableBelongsTo(v, window._q.inst); }
+function qVarLink(v) { return `<span class="q-var" title="${escapeAttr(qv(v, 'variable_label_EN') || qv(v, 'variable_label_NL'))}" onclick="openEditDialog('${escapeAttr(v._uid)}')">${escapeHtml(qName(v))}</span>`; }
+function qKey(vs) { return vs.map(v => v.id || v._uid).sort().join('|'); }
+
+async function loadQualityExceptions() {
+  const q = window._q; q.exc = new Map(); q.excReady = false;
+  try {
+    const c = window.cloudAuth && window.cloudAuth.client; if (!c) return;
+    const { data, error } = await c.from('quality_exceptions').select('id, check_id, item_key, note, created_at');
+    if (error) { console.warn('quality_exceptions unavailable (migration 31 not applied?):', error.message); return; }
+    (data || []).forEach(r => q.exc.set(r.check_id + '#' + r.item_key, r));
+    q.excReady = true;
+  } catch (e) { console.warn(e); }
+}
+async function qMarkOk(check, key) {
+  if (!isAdminRole()) return;
+  const note = prompt('Why is this OK? (optional)', '') ; if (note === null) return;
+  const c = window.cloudAuth.client;
+  const { data, error } = await c.from('quality_exceptions').insert({ check_id: check, item_key: key, note: note || null }).select('id, check_id, item_key, note, created_at').single();
+  if (error) { alert('Could not save: ' + error.message + (/quality_exceptions/.test(error.message) ? '\n\nRun migration 31 in Supabase first.' : '')); return; }
+  window._q.exc.set(check + '#' + key, data); renderQuality();
+}
+async function qUnmark(check, key) {
+  const r = window._q.exc.get(check + '#' + key); if (!r) return;
+  const { error } = await window.cloudAuth.client.from('quality_exceptions').delete().eq('id', r.id);
+  if (error) { alert('Could not undo: ' + error.message); return; }
+  window._q.exc.delete(check + '#' + key); renderQuality();
+}
+
+// ---------- the checks ----------
+function runQualityChecks(rows) {
+  const F = [];
+  const add = (check, vars, detail, keyExtra) => F.push({ check, vars, detail, key: qKey(vars) + (keyExtra ? '@' + keyExtra : '') });
+  const byLower = new Map();
+  rows.forEach(v => { const n = qName(v).toLowerCase(); if (!byLower.has(n)) byLower.set(n, []); byLower.get(n).push(v); });
+
+  // names: exact (case-insensitive) and near
+  byLower.forEach(vs => { if (vs.length > 1) add('name_dup', vs, `"${qName(vs[0])}" is used ${vs.length} times`); });
+  // near names: only typo-like differences inside ONE name part (e.g. CBSRQ/CBRSQ,
+  // fatige/fatigue). Different words (mother/father), item letters (05a/05b) and
+  // added parts (_n, _other) are left out on purpose.
+  const dam = (a, b) => { // Damerau-Levenshtein (adjacent swaps count 1)
+    const m = a.length, n = b.length, d = [];
+    for (let i = 0; i <= m; i++) { d[i] = [i]; } for (let j = 0; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+      const c = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+    return d[m][n];
+  };
+  const tok = rows.map(v => ({ v, t: qName(v).toLowerCase().split(/[_\-.]+/).filter(Boolean) }));
+  const isIndex = x => /^\d+[a-z]?$/.test(x) || /^[a-z]\d*$/.test(x);
+  const byLen = new Map(); tok.forEach(x => { const k = x.t.length; if (!byLen.has(k)) byLen.set(k, []); byLen.get(k).push(x); });
+  byLen.forEach(group => {
+    for (let i = 0; i < group.length; i++) for (let j = i + 1; j < group.length; j++) {
+      const A = group[i].t, B = group[j].t; let diff = -1, n = 0;
+      for (let k = 0; k < A.length; k++) if (A[k] !== B[k]) { diff = k; n++; if (n > 1) break; }
+      if (n !== 1) continue;
+      const a = A[diff], b = B[diff];
+      if (isIndex(a) || isIndex(b) || Math.min(a.length, b.length) < 4) continue;
+      if (a.replace(/\d+/g, '#') === b.replace(/\d+/g, '#')) continue;   // only numbers differ (PFA11 / PFA21)
+      if (/^\d+$/.test(a.length > b.length ? a.slice(b.length) : b.slice(a.length)) && (a.startsWith(b) || b.startsWith(a))) continue;   // visual / visual1
+      const d = dam(a, b);
+      if (d === 1 || (d === 2 && a.length >= 6 && [...a].sort().join('') === [...b].sort().join('')))
+        add('name_near', [group[i].v, group[j].v], `“${a}” vs “${b}” — a typo, or really two different variables?`);
+    }
+  });
+
+  // question texts
+  const lab = rows.map(v => ({ v, nl: qNorm(qv(v, 'variable_label_NL')), en: qNorm(qv(v, 'variable_label_EN')) }));
+  ['nl', 'en'].forEach(lang => {
+    const g = new Map();
+    lab.forEach(x => { const t = x[lang]; if (t && t.split(' ').length >= 3) { if (!g.has(t)) g.set(t, []); g.get(t).push(x.v); } });
+    g.forEach((vs, t) => {
+      if (vs.length < 2) return;
+      add('same_question', vs, `${lang.toUpperCase()}: “${truncate(t, 110)}”`, lang);
+      const codes = new Set(vs.map(v => qv(v, 'variable_name_FAIR')).filter(Boolean));
+      if (codes.size > 1) add('same_q_diff_fair', vs, `${lang.toUpperCase()} text identical, codes: ${[...codes].join(', ')}`, lang);
+    });
+  });
+  const ws = lab.map(x => ({ v: x.v, t: x.nl, w: qWords(x.nl) })).filter(x => x.w.size >= 4);
+  for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) {
+    if (ws[i].t === ws[j].t) continue;
+    const r = qJacc(ws[i].w, ws[j].w); if (r >= 0.85) add('similar_question', [ws[i].v, ws[j].v], `${Math.round(r * 100)}% the same words`);
+  }
+
+  // FAIR codes
+  const byCode = new Map();
+  rows.forEach(v => { const c = qv(v, 'variable_name_FAIR'); if (c) { if (!byCode.has(c)) byCode.set(c, []); byCode.get(c).push(v); } });
+  byCode.forEach((vs, c) => {
+    if (vs.length < 2) return;
+    const texts = new Set(vs.map(v => qNorm(qv(v, 'variable_label_EN') || qv(v, 'variable_label_NL'))));
+    if (texts.size > 1) add('fair_shared', vs, `${c} — fine for repeated measures, otherwise one of them may be wrong`, c);
+  });
+  const fmt = (v, field) => {
+    const txt = qv(v, field); if (!txt) return;
+    const issues = new Set();
+    txt.replace(/([A-Za-z]{2,7})([_\-])(\s*)([A-Za-z0-9][\w\-]*)/g, (m, pre, sep, sp, body) => {
+      const low = pre.toLowerCase();
+      const known = Q_KNOWN_PREFIX.includes(low), typo = Q_PREFIX_TYPO[low];
+      if (!known && !typo) return m;
+      if (typo) issues.add(`“${pre}${sep}” — did you mean “${typo}_”?`);
+      if (pre !== low) issues.add(`“${pre}${sep}” — prefixes are lower case (“${low}_”)`);
+      if (sep === '-') issues.add(`“${pre}-” — use “_” after the prefix`);
+      if (sp) issues.add(`space inside “${(pre + sep + sp + body).trim()}”`);
+      const k = typo || low;
+      // merged names use "_" instead of "-" on purpose (variable-name safe): lnc_78746_5
+      if (k === 'lnc' && !(field.endsWith('_merged') ? /^(LA|LP|LL)?\d{1,7}[-_]\d(\D|$)/i : /^(LA|LP|LL)?\d{1,7}-\d(\D|$)/i).test(body)) issues.add(`“${pre}${sep}${body}” — LOINC codes look like 12345-6 (or LA1234-5 / LP1234-5)`);
+      if (k === 'ncit' && !/^C\d+/i.test(body)) issues.add(`“${pre}${sep}${body}” — NCIt codes look like C12345`);
+      if (k === 'sct' && !/^\d{6,18}/.test(body)) issues.add(`“${pre}${sep}${body}” — SNOMED codes are numbers`);
+      return m;
+    });
+    if (issues.size) add('fair_format', [v], `${field}: ${[...issues].join(' · ')}`, field);
+  };
+  rows.forEach(v => { fmt(v, 'variable_name_FAIR'); fmt(v, 'variable_name_FAIR_merged'); fmt(v, 'value_coding_FAIR'); });
+
+  // answer options
+  rows.forEach(v => {
+    const nl = qCodes(qv(v, 'value_labels_NL')), en = qCodes(qv(v, 'value_labels_EN')), fc = qCodes(qv(v, 'value_coding_FAIR'));
+    const probs = [];
+    if (nl.length && en.length && nl.join('|') !== en.join('|')) probs.push(`NL codes [${nl.join(', ')}] vs EN codes [${en.join(', ')}]`);
+    const base = nl.length ? nl : en;
+    if (base.length && fc.length && fc.length !== base.length) probs.push(`${base.length} answer options but ${fc.length} FAIR value codes`);
+    if (probs.length) add('value_mismatch', [v], probs.join(' · '));
+    const n = qNorm(qv(v, 'variable_label_NL')), e = qNorm(qv(v, 'variable_label_EN'));
+    if (n && e && n === e && n.split(' ').length >= 2) add('untranslated', [v], truncate(qv(v, 'variable_label_EN'), 100));
+  });
+
+  // sources / portal names / item numbers / formulas
+  const portal = new Map();
+  rows.forEach(v => {
+    const src = splitSources(qv(v, 'sources')), raw = qv(v, 'Var_portal_variable_raw_name');
+    if (src.includes('portal') && !raw) add('portal_link', [v], 'Fill Var_portal_variable_raw_name (and Var_portal_FAIR_colnames)');
+    raw.split(/\s+and\s+|[;,\n]/i).map(x => x.trim()).filter(x => x && !/^(nvt|n\.v\.t|na|-)$/i.test(x)).forEach(t => { if (!portal.has(t)) portal.set(t, []); portal.get(t).push(v); });
+  });
+  portal.forEach((vs, t) => { if (vs.length > 1) add('portal_dup', vs, `${t}`, t); });
+  const items = new Map();
+  rows.forEach(v => { const it = qv(v, 'item_number'); if (!it) return; splitInstrumentName(v[state.instrumentField]).forEach(a => { const k = a + '#' + it; if (!items.has(k)) items.set(k, []); items.get(k).push(v); }); });
+  items.forEach((vs, k) => { if (vs.length > 1) add('item_dup', vs, k.replace('#', ': item '), k); });
+  rows.forEach(v => {
+    const calc = qv(v, 'calculation'); if (!calc) return;
+    const miss = []; calc.replace(/\{\s*([A-Za-z][\w.]*)\s*\}/g, (_, r) => { if (!byLower.has(r.toLowerCase())) miss.push(r); return ''; });
+    if (miss.length) add('formula_ref', [v], `Unknown: ${[...new Set(miss)].join(', ')}`);
+  });
+
+  // notes in "by" fields, mapping values, status vs code
+  rows.forEach(v => {
+    Object.keys(v).filter(k => /(_checked_by|_reviewed_by)$/i.test(k)).forEach(k => {
+      const t = qv(v, k); if (t && (t.length > 40 || /review|propos|must|check again|niet|todo/i.test(t))) add('note_in_by', [v], `${k}: “${truncate(t, 90)}”`, k);
+    });
+    const mr = qv(v, 'Mapping_relationship'); if (mr && !Q_MAPPING_OK.includes(mr.toLowerCase())) add('mapping_value', [v], `“${mr}” — expected one of: ${Q_MAPPING_OK.join(', ')}`);
+    [['fair_status', 'variable_name_FAIR'], ['value_fair_status', 'value_coding_FAIR']].forEach(([sf, cf]) => {
+      const st = qv(v, sf), code = qv(v, cf) || (sf === 'fair_status' ? qv(v, 'variable_name_FAIR_merged') : ''); if (!st) return;
+      if (st === 'not_coded' && code) add('status_conflict', [v], `${sf} is “not coded” but ${cf} has a code`, sf);
+      else if (st !== 'not_coded' && !code) add('status_conflict', [v], `${sf} is “${FAIR_STATUS_LABELS[st] || st}” but ${cf} is empty`, sf);
+    });
+  });
+  return F;
+}
+
+// ---------- FAIR status suggestions ----------
+function qSuggestStatus(v, kind) {
+  if (kind === 'variable') {
+    const merged = qv(v, 'variable_name_FAIR_merged'), code = merged || qv(v, 'variable_name_FAIR'), by = qv(v, 'Var_FAIR_code_checked_by');
+    const mr = qv(v, 'Mapping_relationship').toLowerCase(), note = qv(v, 'Mapping_note'), prop = qv(v, 'proposed_code');
+    if (!code) return ['not_coded', 'no FAIR code'];
+    if (/(^|[^a-z])pcnn_/i.test(code)) return ['proposed', 'own pcnn_ code'];
+    if (mr && mr !== 'exact match') return ['needs_review', 'mapping: ' + mr];
+    if (note) return ['needs_review', 'mapping note: ' + truncate(note, 50)];
+    if (/review|propos|must/i.test(by)) return ['needs_review', 'note in checked_by'];
+    if (prop && prop !== code) return ['needs_review', 'another code was proposed: ' + prop + (merged ? ' (merged code differs)' : '')];
+    if (by) return ['confirmed', 'checked by ' + truncate(by, 30)];
+    return ['needs_review', 'nobody checked it yet'];
+  }
+  const hasValues = qv(v, 'value_labels_NL') || qv(v, 'value_labels_EN');
+  if (!hasValues) return [null, 'no answer options'];
+  const code = qv(v, 'value_coding_FAIR'), by = qv(v, 'Val_FAIR_code_checked_by');
+  if (!code) return ['not_coded', 'no FAIR value codes'];
+  if (/(^|[^a-z])pcnn_/i.test(code)) return ['proposed', 'own pcnn_ codes'];
+  if (/review|different|must/i.test(by)) return ['needs_review', 'note in checked_by'];
+  if (by) return ['confirmed', 'checked by ' + truncate(by, 30)];
+  return ['needs_review', 'nobody checked them yet'];
+}
+
+// ---------- export ----------
+function qExport(name, header, rows) {
+  const d = new Date(), pad = n => String(n).padStart(2, '0');
+  const file = `quality_${name}_${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  if (window.XLSX && XLSX.utils) {
+    const ws = XLSX.utils.aoa_to_sheet([header].concat(rows));
+    ws['!cols'] = header.map((h, i) => ({ wch: Math.min(60, Math.max(10, ...[h].concat(rows.slice(0, 200).map(r => String(r[i] == null ? '' : r[i]).split('\n')[0])).map(x => String(x).length + 2))) }));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31)); XLSX.writeFile(wb, file + '.xlsx');
+  } else {
+    const csv = [header].concat(rows).map(r => r.map(x => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"').join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = file + '.csv'; a.click();
+  }
+}
+
+// ---------- rendering ----------
+async function renderQuality(reload) {
+  const host = document.getElementById('quality-body'); if (!host) return;
+  const q = window._q;
+  if (reload) await loadQualityExceptions();
+  const insts = getAllAtomicInstruments();
+  const subs = [['checks', 'Checks'], ['dups', 'Duplicates'], ['missing', 'Missing values'], ['scales', 'Answer scales'], ['fair', 'FAIR status']];
+  host.innerHTML = `<div class="q-bar">
+      <label class="field-inline" style="display:flex;gap:6px;align-items:center;font-size:12.5px;">Instrument
+        <select id="q-inst" style="width:auto; min-width:200px;"><option value="">All instruments</option>${insts.map(i => `<option value="${escapeAttr(i)}" ${q.inst === i ? 'selected' : ''}>${escapeHtml(i)}</option>`).join('')}</select></label>
+      ${(q.sub === 'checks' || q.sub === 'dups') ? `<label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;"><input type="checkbox" id="q-showok" ${q.showOk ? 'checked' : ''}> Show findings marked OK</label>` : ''}
+      ${!q.excReady && (q.sub === 'checks' || q.sub === 'dups') ? `<span class="q-muted">“Mark OK” needs migration 31.</span>` : ''}
+    </div>
+    <div class="q-sub">${subs.map(([id, l]) => `<button class="${q.sub === id ? 'active' : ''}" onclick="window._q.sub='${id}'; renderQuality();">${l}</button>`).join('')}</div>
+    <div id="q-content"></div>`;
+  host.querySelector('#q-inst').addEventListener('change', e => { q.inst = e.target.value; q.fairSel = new Set(); renderQuality(); });
+  const so = host.querySelector('#q-showok'); if (so) so.addEventListener('change', e => { q.showOk = e.target.checked; renderQuality(); });
+  const el = host.querySelector('#q-content');
+  if (q.sub === 'checks') qRenderChecks(el, null);
+  else if (q.sub === 'dups') qRenderChecks(el, ['name_dup', 'name_near', 'same_question', 'similar_question', 'same_q_diff_fair', 'portal_dup', 'item_dup']);
+  else if (q.sub === 'missing') qRenderMissing(el);
+  else if (q.sub === 'scales') qRenderScales(el);
+  else qRenderFair(el);
+}
+
+function qRenderChecks(el, only) {
+  const q = window._q, admin = isAdminRole();
+  let F = runQualityChecks(qRows()).filter(f => f.vars.some(qInScope));
+  if (only) F = F.filter(f => only.includes(f.check));
+  const okCount = F.filter(f => q.exc.has(f.check + '#' + f.key)).length;
+  if (!q.showOk) F = F.filter(f => !q.exc.has(f.check + '#' + f.key));
+  const by = {}; F.forEach(f => (by[f.check] = by[f.check] || []).push(f));
+  const order = Object.keys(Q_CHECKS).filter(k => by[k]);
+  if (q.checkFilter && !by[q.checkFilter]) q.checkFilter = '';
+  const sevCount = s => F.filter(f => Q_CHECKS[f.check].sev === s).length;
+  el.innerHTML = `<div class="q-bar" style="font-size:12.5px;">
+      <span><span class="q-sev error" style="display:inline-block;margin:0 4px 0 0;"></span>${sevCount('error')} errors</span>
+      <span><span class="q-sev warn" style="display:inline-block;margin:0 4px 0 0;"></span>${sevCount('warn')} warnings</span>
+      <span><span class="q-sev info" style="display:inline-block;margin:0 4px 0 0;"></span>${sevCount('info')} to look at</span>
+      ${okCount ? `<span class="q-muted">· ${okCount} marked OK${q.showOk ? ' (shown)' : ' (hidden)'}</span>` : ''}
+      <span style="flex:1"></span><button class="btn-mini" id="q-exp">Download list</button></div>
+    <div class="q-chips"><span class="q-chip ${!q.checkFilter ? 'on' : ''}" data-c="">All (${F.length})</span>${order.map(k => `<span class="q-chip ${q.checkFilter === k ? 'on' : ''}" data-c="${k}"><span class="q-sev ${Q_CHECKS[k].sev}" style="display:inline-block;margin:0 5px 0 0;vertical-align:1px;"></span>${escapeHtml(Q_CHECKS[k].title)} (${by[k].length})</span>`).join('')}</div>
+    ${F.length ? '' : '<div class="empty-state"><p>Nothing found. 🎉</p></div>'}
+    ${order.filter(k => !q.checkFilter || k === q.checkFilter).map(k => `<div class="q-card"><div class="q-card-h"><span class="q-sev ${Q_CHECKS[k].sev}" style="margin:0;"></span><strong style="font-size:13px;">${escapeHtml(Q_CHECKS[k].title)}</strong><span class="q-muted">${by[k].length}</span></div>
+      ${by[k].slice(0, 300).map(f => { const ok = q.exc.get(f.check + '#' + f.key);
+        return `<div class="q-row" style="${ok ? 'opacity:.55;' : ''}"><div style="flex:1;">${f.vars.map(qVarLink).join(' · ')}<div class="q-muted" style="margin-top:2px;">${escapeHtml(f.detail)}</div>${ok ? `<div class="q-muted">✔ marked OK${ok.note ? ': ' + escapeHtml(ok.note) : ''}</div>` : ''}</div>
+          ${admin && q.excReady ? (ok ? `<button class="btn-mini" onclick="qUnmark('${f.check}','${escapeAttr(f.key)}')">Undo OK</button>` : `<button class="btn-mini" onclick="qMarkOk('${f.check}','${escapeAttr(f.key)}')" title="Hide this finding for everyone">Mark OK</button>`) : ''}</div>`; }).join('')}
+      ${by[k].length > 300 ? `<div class="q-row q-muted">… ${by[k].length - 300} more — use “Download list”.</div>` : ''}</div>`).join('')}`;
+  el.querySelectorAll('.q-chip').forEach(c => c.addEventListener('click', () => { q.checkFilter = c.dataset.c; renderQuality(); }));
+  el.querySelector('#q-exp').addEventListener('click', () => qExport(only ? 'duplicates' : 'checks', ['severity', 'check', 'variables', 'instruments', 'detail', 'marked_ok'],
+    F.filter(f => !q.checkFilter || f.check === q.checkFilter).map(f => [Q_CHECKS[f.check].sev, Q_CHECKS[f.check].title, f.vars.map(qName).join(', '), [...new Set(f.vars.map(v => v[state.instrumentField] || ''))].join(' | '), f.detail, q.exc.has(f.check + '#' + f.key) ? 'yes' : ''])));
+}
+
+function qApplicable(v, f) {
+  if (f === 'value_labels_EN' || f === 'value_coding_FAIR' || f === 'value_fair_status') return !!(qv(v, 'value_labels_NL') || qv(v, 'value_labels_EN') || qv(v, 'value_coding_FAIR'));
+  return true;
+}
+function qRenderMissing(el) {
+  const q = window._q, rows = qRows().filter(qInScope);
+  const all = (state.allFields || []).filter(f => !f.startsWith('_') && f !== 'id');
+  const fields = q.missingFields.filter(f => all.includes(f) || FAIR_STATUS_FIELDS.has(f));
+  const stat = fields.map(f => { const app = rows.filter(v => qApplicable(v, f)); const miss = app.filter(v => !qv(v, f)); return { f, app: app.length, miss }; });
+  const open = stat.find(s => s.f === q.missingOpen);
+  el.innerHTML = `<div class="q-bar"><span class="q-muted">${rows.length} variables${q.inst ? ' in ' + escapeHtml(q.inst) : ''}. Value fields only count variables that have answer options.</span><span style="flex:1"></span>
+      <select id="q-addf" style="width:auto;"><option value="">+ add a field…</option>${all.filter(f => !fields.includes(f)).map(f => `<option>${escapeHtml(f)}</option>`).join('')}</select></div>
+    <div class="q-scroll" style="max-height:none;"><table class="q-table"><thead><tr><th>Field</th><th>Missing</th><th>Of</th><th style="width:40%">Filled</th><th></th></tr></thead><tbody>
+    ${stat.map(s => { const pct = s.app ? Math.round(100 * (s.app - s.miss.length) / s.app) : 100;
+      return `<tr style="${q.missingOpen === s.f ? 'background:var(--accent-bg);' : ''}"><td><code>${escapeHtml(s.f)}</code></td><td><strong>${s.miss.length}</strong></td><td class="q-muted">${s.app}</td>
+        <td><div style="background:var(--surface-2);border-radius:4px;height:8px;"><div style="width:${pct}%;height:8px;border-radius:4px;background:${pct > 90 ? '#0f766e' : pct > 60 ? '#d97706' : '#b42318'};"></div></div><span class="q-muted">${pct}%</span></td>
+        <td style="white-space:nowrap;">${s.miss.length ? `<button class="btn-mini" data-open="${escapeAttr(s.f)}">${q.missingOpen === s.f ? 'Hide list' : 'Show list'}</button>` : ''} <button class="btn-mini" data-rm="${escapeAttr(s.f)}" title="Remove from this report">×</button></td></tr>`; }).join('')}
+    </tbody></table></div>
+    ${open ? `<div class="q-card" style="margin-top:12px;"><div class="q-card-h"><strong style="font-size:13px;">Missing <code>${escapeHtml(open.f)}</code></strong><span class="q-muted">${open.miss.length}</span><span style="flex:1"></span><button class="btn-mini" id="q-mexp">Download list</button></div>
+      <div class="q-scroll" style="border:none;border-radius:0;"><table class="q-table"><thead><tr><th>#</th><th>Variable</th><th>Instrument</th><th>Label</th></tr></thead><tbody>
+      ${open.miss.map((v, i) => `<tr><td class="q-muted">${i + 1}</td><td>${qVarLink(v)}</td><td class="q-muted">${escapeHtml(v[state.instrumentField] || '')}</td><td>${escapeHtml(truncate(qv(v, 'variable_label_EN') || qv(v, 'variable_label_NL'), 110))}</td></tr>`).join('')}
+      </tbody></table></div></div>` : ''}`;
+  el.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { q.missingOpen = q.missingOpen === b.dataset.open ? '' : b.dataset.open; renderQuality(); }));
+  el.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { q.missingFields = q.missingFields.filter(f => f !== b.dataset.rm); if (q.missingOpen === b.dataset.rm) q.missingOpen = ''; renderQuality(); }));
+  el.querySelector('#q-addf').addEventListener('change', e => { if (e.target.value) { q.missingFields.push(e.target.value); renderQuality(); } });
+  const ex = el.querySelector('#q-mexp');
+  if (ex) ex.addEventListener('click', () => qExport('missing_' + open.f, ['variable', 'instrument', 'label_EN', 'label_NL'], open.miss.map(v => [qName(v), v[state.instrumentField] || '', qv(v, 'variable_label_EN'), qv(v, 'variable_label_NL')])));
+}
+
+function qRenderScales(el) {
+  const q = window._q, rows = qRows().filter(qInScope);
+  const g = new Map();
+  rows.forEach(v => { const t = qv(v, 'value_labels_EN'); if (!t) return; const k = qNorm(t); if (!g.has(k)) g.set(k, { text: t, vars: [], labels: qLabelsOnly(t), codes: qCodes(t) }); g.get(k).vars.push(v); });
+  const scales = [...g.values()].sort((a, b) => b.vars.length - a.vars.length);
+  scales.forEach((s, i) => { s.no = i + 1; s.w = new Set(s.labels.join(' ').split(' ')); });
+  scales.forEach(s => {
+    s.sameAnswers = scales.filter(o => o !== s && o.labels.join('|') === s.labels.join('|'));
+    s.similar = scales.filter(o => o !== s && !s.sameAnswers.includes(o) && qJacc(s.w, o.w) >= 0.8);
+  });
+  const nShared = scales.filter(s => s.vars.length > 1).length;
+  const flt = q.scaleQ.trim().toLowerCase();
+  const shown = scales.filter(s => !flt || s.text.toLowerCase().includes(flt) || s.vars.some(v => qName(v).toLowerCase().includes(flt)));
+  el.innerHTML = `<div class="q-bar"><span class="q-muted">${scales.length} different English answer scales${q.inst ? ' in ' + escapeHtml(q.inst) : ''} · ${nShared} used by more than one variable · ${scales.filter(s => s.sameAnswers.length).length} have the same answers with different codes</span>
+      <span style="flex:1"></span><input type="search" id="q-sq" placeholder="Filter scales…" style="width:200px;" value="${escapeAttr(q.scaleQ)}"><button class="btn-mini" id="q-sexp">Download list</button></div>
+    ${shown.map(s => `<div class="q-card"><div class="q-card-h"><span class="q-pill">#${s.no}</span><strong style="font-size:12.5px;">${s.vars.length} variable${s.vars.length === 1 ? '' : 's'}</strong>
+        ${s.sameAnswers.length ? `<span class="q-pill" style="background:#fff3dd;border-color:#f0d4a3;">same answers, other codes: ${s.sameAnswers.map(o => '#' + o.no).join(', ')}</span>` : ''}
+        ${s.similar.length ? `<span class="q-pill" style="background:var(--info-bg,#e7f0fb);">similar to ${s.similar.map(o => '#' + o.no).join(', ')}</span>` : ''}
+        <span class="q-muted">${escapeHtml([...new Set(s.vars.flatMap(v => splitInstrumentName(v[state.instrumentField])))].join(', '))}</span></div>
+      <div class="q-row"><div class="multiline" style="flex:1; font-size:11.5px;">${escapeHtml(s.text)}</div><div style="flex:1;">${s.vars.slice(0, 40).map(qVarLink).join(' · ')}${s.vars.length > 40 ? ` <span class="q-muted">+${s.vars.length - 40} more</span>` : ''}</div></div></div>`).join('') || '<div class="empty-state"><p>No answer scales.</p></div>'}`;
+  el.querySelector('#q-sq').addEventListener('input', e => { q.scaleQ = e.target.value; const pos = e.target.selectionStart; renderQuality(); const n = document.getElementById('q-sq'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } });
+  el.querySelector('#q-sexp').addEventListener('click', () => qExport('answer_scales', ['scale_no', 'value_labels_EN', 'n_variables', 'variables', 'instruments', 'same_answers_other_codes', 'similar_to'],
+    scales.map(s => [s.no, s.text, s.vars.length, s.vars.map(qName).join(', '), [...new Set(s.vars.flatMap(v => splitInstrumentName(v[state.instrumentField])))].join(', '), s.sameAnswers.map(o => o.no).join(', '), s.similar.map(o => o.no).join(', ')])));
+}
+
+function qRenderFair(el) {
+  const q = window._q, kind = q.fairKind, field = kind === 'variable' ? 'fair_status' : 'value_fair_status';
+  const codeField = kind === 'variable' ? 'variable_name_FAIR' : 'value_coding_FAIR';
+  const fieldExists = (state.allFields || []).includes(field) || qRows().some(v => field in v);
+  const canEdit = ['write', 'propose'].includes(accessOf(field));
+  const list = qRows().filter(qInScope).map(v => { const [sug, why] = qSuggestStatus(v, kind); return { v, cur: qv(v, field), sug, why }; }).filter(x => x.sug);
+  const counts = {}; list.forEach(x => { const k = x.cur || '(not set)'; counts[k] = (counts[k] || 0) + 1; });
+  const sugCounts = {}; list.forEach(x => { sugCounts[x.sug] = (sugCounts[x.sug] || 0) + 1; });
+  const shown = q.fairOnlyDiff ? list.filter(x => x.cur !== x.sug) : list;
+  el.innerHTML = `<div class="q-bar">
+      <div class="q-sub" style="margin:0;"><button class="${kind === 'variable' ? 'active' : ''}" onclick="window._q.fairKind='variable'; window._q.fairSel=new Set(); renderQuality();">Variable code</button><button class="${kind === 'values' ? 'active' : ''}" onclick="window._q.fairKind='values'; window._q.fairSel=new Set(); renderQuality();">Value codes</button></div>
+      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;"><input type="checkbox" id="q-fdiff" ${q.fairOnlyDiff ? 'checked' : ''}> Only where the status is not set or differs from the suggestion</label>
+      <span style="flex:1"></span><button class="btn-mini" id="q-fexp">Download list</button></div>
+    ${fieldExists ? '' : '<div class="msg msg-warn">The status fields do not exist yet — run migration 31 in Supabase, then reload. Suggestions are shown below already.</div>'}
+    <div class="q-bar" style="font-size:12.5px;"><strong>Stored:</strong> ${Object.keys(counts).map(k => `<span class="q-pill">${escapeHtml(FAIR_STATUS_LABELS[k] || k)}: ${counts[k]}</span>`).join(' ')}
+      <span style="margin-left:10px;"><strong>Suggested:</strong></span> ${Object.keys(sugCounts).map(k => `<span class="q-pill">${escapeHtml(FAIR_STATUS_LABELS[k])}: ${sugCounts[k]}</span>`).join(' ')}</div>
+    <div class="info-box">The suggestion comes from what is filled in now (code, <code>pcnn_</code> prefix, mapping relationship and note, checked-by). Nothing changes until you select rows and press <em>Apply suggested status</em> — then you see the usual preview first.</div>
+    ${canEdit && fieldExists ? `<div class="q-bar"><button class="btn-mini" id="q-fall">Select all shown (${shown.length})</button><button class="btn-mini" id="q-fnone">Clear</button>
+      <button class="btn-primary btn-mini" id="q-fapply" ${q.fairSel.size ? '' : 'disabled'}>Apply suggested status to ${q.fairSel.size} selected</button></div>` : ''}
+    <div class="q-scroll"><table class="q-table"><thead><tr>${canEdit && fieldExists ? '<th></th>' : ''}<th>Variable</th><th>Instrument</th><th>${escapeHtml(codeField)}</th><th>Stored</th><th>Suggested</th><th>Why</th></tr></thead><tbody>
+    ${shown.slice(0, 1000).map(x => `<tr>${canEdit && fieldExists ? `<td><input type="checkbox" data-fs="${escapeAttr(x.v._uid)}" ${q.fairSel.has(x.v._uid) ? 'checked' : ''}></td>` : ''}<td>${qVarLink(x.v)}</td><td class="q-muted">${escapeHtml(x.v[state.instrumentField] || '')}</td>
+      <td style="font-family:var(--mono);font-size:11px;">${escapeHtml(truncate(qv(x.v, codeField), 70)) || '<span class="q-muted">—</span>'}${kind === 'variable' && qv(x.v, 'variable_name_FAIR_merged') && qv(x.v, 'variable_name_FAIR_merged') !== qv(x.v, codeField) ? `<div class="q-muted">merged: ${escapeHtml(truncate(qv(x.v, 'variable_name_FAIR_merged'), 60))}</div>` : ''}</td>
+      <td>${x.cur ? escapeHtml(FAIR_STATUS_LABELS[x.cur] || x.cur) : '<span class="q-muted">not set</span>'}</td><td>${escapeHtml(FAIR_STATUS_LABELS[x.sug])}</td><td class="q-muted">${escapeHtml(x.why)}</td></tr>`).join('') || `<tr><td colspan="7" class="q-muted" style="padding:14px;">Nothing to show.</td></tr>`}
+    </tbody></table></div>`;
+  el.querySelector('#q-fdiff').addEventListener('change', e => { q.fairOnlyDiff = e.target.checked; renderQuality(); });
+  el.querySelector('#q-fexp').addEventListener('click', () => qExport('fair_status_' + kind, ['variable', 'instrument', codeField, 'stored_status', 'suggested_status', 'why'], shown.map(x => [qName(x.v), x.v[state.instrumentField] || '', qv(x.v, codeField), x.cur, x.sug, x.why])));
+  el.querySelectorAll('[data-fs]').forEach(cb => cb.addEventListener('change', () => { if (cb.checked) q.fairSel.add(cb.dataset.fs); else q.fairSel.delete(cb.dataset.fs); const b = document.getElementById('q-fapply'); if (b) { b.disabled = !q.fairSel.size; b.textContent = `Apply suggested status to ${q.fairSel.size} selected`; } }));
+  const all = el.querySelector('#q-fall'); if (all) all.addEventListener('click', () => { shown.forEach(x => q.fairSel.add(x.v._uid)); renderQuality(); });
+  const none = el.querySelector('#q-fnone'); if (none) none.addEventListener('click', () => { q.fairSel = new Set(); renderQuality(); });
+  const ap = el.querySelector('#q-fapply');
+  if (ap) ap.addEventListener('click', () => {
+    const changes = [];
+    list.filter(x => q.fairSel.has(x.v._uid) && x.cur !== x.sug).forEach(x => {
+      changes.push({ globalIndex: state.codebook.indexOf(x.v), variable_name: getId(x.v), fieldChanges: { [field]: { old: x.cur, new: x.sug } } });
+    });
+    if (!changes.length) { alert('The selected rows already have the suggested status.'); return; }
+    state.pendingChanges = changes; q.fairSel = new Set();
+    showPreviewModal(changes, []);
+  });
 }
 
 // ============ ADMIN DASHBOARD (v6.31) ============
@@ -7331,6 +7759,7 @@ const BULK_LABEL_FIELDS = ["variable_label_EN", "variable_label_NL", "Var_label_
 function bulkCur(v, field) { return (v && v[field] !== undefined && v[field] !== null) ? String(v[field]) : ""; }
 function bulkLabel(v) { return String((v && (v.variable_label_EN || v.variable_label_NL)) || ""); }
 function bulkModesFor(field) {
+  if (FAIR_STATUS_FIELDS.has(field)) return [{ id: "choice", label: "Set status (choose variables)" }];
   if (BULK_SET_FIELDS.has(field)) return [
     { id: "set_add", label: "Add" }, { id: "set_remove", label: "Remove" }, { id: "set_replace", label: "Replace with" },
   ];
@@ -7555,6 +7984,13 @@ function renderModeBody(card, field, vars) {
     }));
     bulkBindPicker(body, field, vars);
 
+  } else if (cfg.mode === "choice") {
+    body.innerHTML = `<label>New status</label>
+      <select data-input="choice" style="width:auto; min-width:240px;"><option value="">— clear the status —</option>${Object.keys(FAIR_STATUS_LABELS).map(k => `<option value="${k}" ${cfg.value === k ? "selected" : ""}>${escapeHtml(FAIR_STATUS_LABELS[k])}</option>`).join("")}</select>
+      ${bulkOnlyEmptyBox(cfg)}${bulkPickerHtml("Apply to which variables?")}`;
+    const sel = body.querySelector("[data-input='choice']"); cfg.value = sel.value; sel.addEventListener("change", e => cfg.value = e.target.value);
+    bulkBindOnlyEmpty(body, cfg); bulkBindPicker(body, field, vars);
+
   } else if (cfg.mode === "stem") {
     body.innerHTML = `<div class="info-box"><strong>Stem + per-item:</strong> the stem text is prepended to each item. Stored as <code>{stem} {item}</code>.</div>
       <label>Shared stem</label>
@@ -7686,6 +8122,9 @@ function computePerVarValues(field, cfg, vars, warnings) {
     if (!cfg.varSelections || cfg.varSelections.every(x => !x)) return out;
     if (!cfg.value) throw new Error("Variables selected but no value provided");
     vars.forEach((v, i) => { if (!sel(i)) return; if (cfg.onlyEmpty && cur(i).trim()) return; out[i] = cfg.value; });
+  } else if (cfg.mode === "choice") {
+    if (!cfg.varSelections || cfg.varSelections.every(x => !x)) return out;
+    vars.forEach((v, i) => { if (!sel(i)) return; if (cfg.onlyEmpty && cur(i).trim()) return; out[i] = cfg.value || ""; });
   } else if (cfg.mode === "table") {
     vars.forEach((v, i) => {
       if (cfg.tableVals && Object.prototype.hasOwnProperty.call(cfg.tableVals, v._uid)) out[i] = cfg.tableVals[v._uid];
@@ -8494,6 +8933,13 @@ function openEditDialog(uid) {
           }
           const curSrc = new Set(splitSources(v.sources));
           return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div>${buildSourceCheckboxes(curSrc, "data-src")}</div></div>`;
+        }
+        if (FAIR_STATUS_FIELDS.has(f)) {
+          const curS = v[f] ? String(v[f]) : "";
+          const opts = ['<option value="">— not set —</option>'].concat(Object.keys(FAIR_STATUS_LABELS).map(k =>
+            `<option value="${k}" ${curS === k ? "selected" : ""}>${escapeHtml(FAIR_STATUS_LABELS[k])}</option>`));
+          if (curS && !FAIR_STATUS_LABELS[curS]) opts.push(`<option value="${escapeAttr(curS)}" selected>${escapeHtml(curS)} (invalid)</option>`);
+          return `<div class="edit-form-row"><div class="edit-form-name">${escapeHtml(f)}</div><div><select data-field="${escapeAttr(f)}" ${editable ? "" : "disabled"}>${opts.join("")}</select></div></div>`;
         }
         const cur = v[f] !== undefined && v[f] !== null ? String(v[f]) : "";
         const isLong = cur.length > 80 || cur.includes("\n");
