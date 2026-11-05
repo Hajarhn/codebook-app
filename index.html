@@ -1398,6 +1398,30 @@
   .hist-detail .hist-new { color: #1B5E20; font-weight: 500; }
   .hist-detail code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; }
   .hist-meta { color: var(--text-faint); font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; text-align: right; }
+  .cmp-card { border:1px solid var(--border); border-radius:10px; background:var(--surface); padding:12px 14px; margin-bottom:12px; }
+  .cmp-h { font-weight:700; font-size:0.95rem; margin-bottom:8px; }
+  .cmp-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:6px 0; font-size:0.85rem; }
+  .cmp-row label { display:inline-flex; gap:6px; align-items:center; }
+  .cmp-row select, .cmp-row input[type=search] { padding:5px 7px; border:1px solid var(--border-strong); border-radius:6px; background:var(--surface); color:var(--text); font-size:0.82rem; }
+  .cmp-filters input[type=search] { min-width:240px; width:auto; }
+  .cmp-filters select, .cmp-row select { width:auto !important; max-width:300px; }
+  .cmp-bulk { margin-left:auto; display:inline-flex; gap:4px; align-items:center; font-size:0.78rem; color:var(--text-muted); }
+  .cmp-sheets { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:0.82rem; margin-bottom:10px; }
+  .cmp-t { width:100%; border-collapse:collapse; font-size:0.8rem; margin:4px 0; }
+  .cmp-t th { text-align:left; background:var(--surface-2); padding:5px 7px; border-bottom:1px solid var(--border-strong); font-weight:600; }
+  .cmp-t td { padding:5px 7px; border-bottom:1px solid var(--border); vertical-align:top; word-break:break-word; }
+  .cmp-t select { max-width:260px; font-size:0.8rem; padding:3px 5px; }
+  .cmp-unmapped td { opacity:.7; }
+  .cmp-val { white-space:pre-wrap; max-width:280px; }
+  .cmp-q { color:var(--text-muted); font-size:0.78rem; margin-top:2px; }
+  .cmp-stats { font-size:0.84rem; margin-bottom:10px; line-height:1.5; }
+  .cmp-warn { color:#B45309; font-weight:600; font-size:0.78rem; }
+  .cmp-log { color:var(--accent-text, var(--accent)); font-size:0.76rem; margin-top:2px; }
+  .cmp-dec { color:#1B5E20; font-weight:600; font-size:0.78rem; }
+  .cmp-decide { min-width:200px; }
+  .cmp-decide .q-ib { margin:2px 3px 0 0; }
+  .cmp-note { width:100%; box-sizing:border-box; font-size:0.75rem; padding:2px 5px; border:1px solid var(--border); border-radius:4px; margin-bottom:2px; background:var(--surface); color:var(--text); }
+  .cmp-chips { display:flex; flex-wrap:wrap; gap:4px; padding:6px 0; }
   .hl-head { margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
   .hl-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
   .hl-filters input[type=search] { flex: 1 1 260px; min-width: 200px; padding: 6px 9px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 0.85rem; background: var(--surface); color: var(--text); }
@@ -1511,7 +1535,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.42.1
+      Codebook Editor — Cloud edition · v6.43.0
     </div>
   </div>
 </div>
@@ -1784,7 +1808,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.42.1 cloud</span>
+      <span class="version">v6.43.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1856,6 +1880,7 @@
       <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Admin ▾</button>
       <div class="admin-menu" id="admin-menu">
         <div class="admin-menu-label">Overview</div>
+        <button type="button" onclick="switchTab('compare'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><path d="M12 3v18"/></svg>Compare with source</button>
         <button type="button" onclick="switchTab('history'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
         <div class="admin-menu-label">Content</div>
         <button type="button" onclick="switchTab('imports'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Imports</button>
@@ -2051,6 +2076,14 @@
     </div>
     <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
     <div id="hl-more" style="text-align:center; padding: 12px 0;"></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-compare" role="tabpanel">
+    <div style="margin-bottom: 0.8rem;">
+      <h2 style="margin: 0; font-size: 1.1rem;">Compare with source codebook</h2>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Upload a source codebook (portal, biobank, …), check which column belongs to which central field, and compare. Nothing is changed in central: you see both sides and decide.</p>
+    </div>
+    <div id="cmp-content"></div>
   </div>
 
   <div class="tab-panel admin-only" id="panel-users" role="tabpanel">
@@ -5782,6 +5815,886 @@ async function histBuildReport(D, items, created, withDetail) {
 }
 // ====== END v6.41 Log tab ======
 
+// ====== v6.43: Compare with source codebook — engine (no UI, no network) ======
+// Works on plain data: the sheets of a source codebook, the central rows, a
+// column map. Returns pairs, three lists and per-field findings. Nothing here
+// decides which side is right; it only reports, with evidence.
+var CMP = (function () {
+  const SOURCES = {
+    portal:            { label: 'Portal',            token: 'portal',            link: 'Var_portal_variable_raw_name', link2: 'Var_portal_FAIR_colnames',
+                         own: ['Var_portal_variable_raw_name', 'Var_portal_FAIR_colnames', 'Var_label_portal', 'Val_portal', 'field_type_portal', 'Dep_portal', 'Source_portal'] },
+    biobank:           { label: 'Biobank',           token: 'biobank',           link: 'Var_biobank',
+                         own: ['Var_biobank', 'Var_label_biobank', 'Val_biobank', 'field_type_biobank', 'Dep_biobank', 'Source_biobank'] },
+    platform_trials:   { label: 'Platform trials',   token: 'platform_trials',   link: 'Var_platform_trials',
+                         own: ['Var_platform_trials', 'Var_label_platform_trials', 'Val_platform_trials', 'Dep_platform_trials', 'Source_platform_trials'] },
+    expertise_clinics: { label: 'Expertise clinics', token: 'expertise_clinics', link: 'Var_expertise_clinics',
+                         own: ['Var_expertise_clinics', 'Var_label_expertise_clinics', 'Source_expertise_clinics'] }
+  };
+  // Known source headers -> central field (or a role starting with @).
+  const DICT = {
+    portal: {
+      'variable_raw_name': 'Var_portal_variable_raw_name', 'derived_variable_name': 'Var_portal_variable_raw_name',
+      'fair_cleaned_colnames': 'Var_portal_FAIR_colnames', 'question': 'Var_label_portal', 'answers': 'Val_portal',
+      'raw_answer_codes': 'values', 'fair_answer_codes': 'value_coding_FAIR', 'question_type': 'field_type_portal',
+      'routing': 'Dep_portal', 'calculation': 'calculation', 'cleaned_colnames': '@export', 'chapter': '@group',
+      'active_from_version': '@info', 'inactive_from_version': '@info', 'inactive_or_changed_from_version': '@info',
+      'studyphase flag (a or b)': '@info', 'confidential': '@info', 'validation': '@info', 'notes/source': '@info',
+      'description': '@info', 'parent variables (link to 1st var in list)': '@info', 'parent questionnaire': '@info', 'status': '@info'
+    },
+    generic: {
+      'variable name': '@link', 'variable': '@link', 'field name': '@link', 'variable_name': '@link', 'name': '@link',
+      'label': '@label', 'question': '@label', 'field label': '@label', 'vraag': '@label', 'question text': '@label',
+      'choices': '@values', 'answers': '@values', 'answer options': '@values', 'value labels': '@values', 'options': '@values',
+      'field type': '@type', 'type': '@type', 'branching logic': '@dep', 'routing': '@dep', 'show if': '@dep',
+      'form': '@group', 'form name': '@group', 'instrument': '@group', 'section': '@group', 'calculation': 'calculation'
+    }
+  };
+  const PLACEHOLDER = new Set(['', 'nvt', 'n.v.t', 'n.v.t.', 'n/a', 'na', '-', '–', 'none', 'null', 'nan']);
+  const s = x => x == null ? '' : String(x);
+  const trim = x => s(x).replace(/ /g, ' ').trim();
+  const isEmpty = x => PLACEHOLDER.has(trim(x).toLowerCase());
+  const ws = x => trim(x).replace(/\s+/g, ' ');
+  const low = x => ws(x).toLowerCase();
+  const loose = x => trim(x).toLowerCase().replace(/[.\-\s]+/g, '_');
+  const words = x => new Set(low(x).replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(w => w.length > 1));
+  const textNorm = x => low(x).replace(/[‘’'"`]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
+  const jacc = (a, b) => { if (!a.size || !b.size) return 0; let i = 0; a.forEach(w => { if (b.has(w)) i++; }); return i / (a.size + b.size - i); };
+  const fsKind = n => { const m = s(n).toLowerCase().match(/[_\-.](freq|frequency|sev|severity)$/); return m ? m[1][0] : ''; };
+  const tokens = x => s(x).split(/\s+and\s+|[;,\n]/i).map(t => trim(t)).filter(t => !isEmpty(t));
+
+  function targetOf(srcName, header, map) {
+    if (map && Object.prototype.hasOwnProperty.call(map, header)) return map[header];
+    const h = low(header);
+    const d = DICT[srcName] || {};
+    if (d[h]) return d[h];
+    const g = DICT.generic[h];
+    if (!g) return null;
+    const S = SOURCES[srcName];
+    const role = { '@link': S.link, '@label': S.own.find(f => /^Var_label_/.test(f)), '@values': S.own.find(f => /^Val_/.test(f)),
+                   '@type': S.own.find(f => /^field_type_/.test(f)), '@dep': S.own.find(f => /^Dep_/.test(f)) }[g];
+    return role || g;
+  }
+
+  // ---------- reading the source file ----------
+  // sheets: [{ name, rows: [[cell, ...], ...] }]  (rows as read, row 0 = Excel row 1)
+  function readSheets(srcName, sheets, map) {
+    const out = [];
+    sheets.forEach(sh => {
+      let best = -1, bestScore = 0;
+      for (let r = 0; r < Math.min(10, sh.rows.length); r++) {
+        const score = (sh.rows[r] || []).filter(c => { const t = targetOf(srcName, trim(c), map); return t && t !== '@info'; }).length;
+        if (score > bestScore) { bestScore = score; best = r; }
+      }
+      const headers = best >= 0 ? (sh.rows[best] || []).map(c => trim(c)) : [];
+      const S = SOURCES[srcName];
+      const keyCols = headers.map((h, i) => ({ h, i })).filter(x => x.h && targetOf(srcName, x.h, map) === S.link);
+      out.push({ name: sh.name, headerRow: best + 1, headers, usable: bestScore >= 2 && keyCols.length > 0,
+                 rowCount: Math.max(0, sh.rows.length - best - 1), keyCols, rows: sh.rows });
+    });
+    return out;
+  }
+  function headerSamples(info) {
+    const m = new Map();   // header -> Set of sample values
+    info.filter(x => x.use).forEach(sh => {
+      for (let r = sh.headerRow; r < sh.rows.length; r++) {
+        const row = sh.rows[r] || [];
+        sh.headers.forEach((h, i) => { if (!h) return; const v = trim(row[i]); if (!v) return; if (!m.has(h)) m.set(h, new Set()); const set = m.get(h); if (set.size < 400) set.add(v); });
+      }
+    });
+    return m;
+  }
+  // Suggest a target for each header: known names first, otherwise by content
+  // (share of the header's values that also occur in a central field).
+  function suggestMap(srcName, info, central, fields, get) {
+    const samples = headerSamples(info), res = {};
+    const centralVals = new Map();
+    const valsOf = f => { if (!centralVals.has(f)) { const set = new Set(); central.forEach(v => { tokens(get(v, f)).forEach(t => set.add(low(t))); const w = low(get(v, f)); if (w && w.length < 400) set.add(w); }); centralVals.set(f, set); } return centralVals.get(f); };
+    samples.forEach((vals, h) => {
+      const known = targetOf(srcName, h, null);
+      if (known) { res[h] = { target: known, how: 'known name', score: 1 }; return; }
+      let bestF = '', bestS = 0;
+      const arr = [...vals].map(low);
+      fields.forEach(f => { const set = valsOf(f); if (!set.size) return; let hit = 0; arr.forEach(x => { if (set.has(x)) hit++; }); const sc = hit / arr.length; if (sc > bestS) { bestS = sc; bestF = f; } });
+      res[h] = (bestS >= 0.5 && arr.length >= 5) ? { target: bestF, how: 'content', score: bestS } : { target: '', how: arr.length < 5 ? 'too few different values to tell' : 'no match', score: bestS };
+    });
+    return { suggestions: res, samples };
+  }
+
+  // ---------- source items ----------
+  function buildItems(srcName, info, map) {
+    const S = SOURCES[srcName], items = new Map(), order = [];
+    info.filter(x => x.use).forEach(sh => {
+      const tgt = sh.headers.map(h => h ? targetOf(srcName, h, map) : null);
+      for (let r = sh.headerRow; r < sh.rows.length; r++) {
+        const row = sh.rows[r] || [];
+        let key = '';
+        sh.headers.forEach((h, i) => { if (!key && tgt[i] === S.link && !isEmpty(row[i])) key = trim(row[i]); });
+        if (!key) continue;
+        const cells = {}, fields = {}, extra = {};
+        sh.headers.forEach((h, i) => {
+          const v = trim(row[i]); if (!h) return; cells[h] = v;
+          const t = tgt[i]; if (!t || !v) return;
+          if (t === '@export') extra.exportName = extra.exportName || v;
+          else if (t === '@group') extra.group = extra.group || v;
+          else if (t === '@info') { (extra.info = extra.info || {})[h] = v; }
+          else if (fields[t] == null || fields[t] === '') fields[t] = v;
+        });
+        const occ = { sheet: sh.name, row: r + 1, fields, extra, cells };
+        if (!items.has(key)) { items.set(key, { key, occ: [] }); order.push(key); }
+        items.get(key).occ.push(occ);
+      }
+    });
+    return order.map(k => {
+      const it = items.get(k), first = it.occ[0];
+      it.fields = {}; it.variants = {};
+      it.occ.forEach(o => Object.entries(o.fields).forEach(([f, v]) => {
+        if (it.fields[f] == null) it.fields[f] = v;
+        else if (low(it.fields[f]) !== low(v)) { (it.variants[f] = it.variants[f] || []).push({ sheet: o.sheet, row: o.row, value: v }); }
+      }));
+      it.exportName = (it.occ.find(o => o.extra.exportName) || first).extra.exportName || '';
+      it.group = (it.occ.find(o => o.extra.group) || first).extra.group || '';
+      it.info = Object.assign({}, ...it.occ.map(o => o.extra.info || {}));
+      return it;
+    });
+  }
+
+  // ---------- answer options ----------
+  function parsePairs(x) {
+    const t = s(x); if (!t.trim()) return null;
+    const re = /\[\s*(-?\d+(?:[.,]\d+)?)\s*\]\s*([^\[\n]*)/g; const out = new Map(); let m;
+    while ((m = re.exec(t))) out.set(String(parseFloat(m[1].replace(',', '.'))), low(m[2]).replace(/\s*[,;]\s*$/, ''));
+    if (out.size) return out;
+    const lines = t.split(/\n/).map(trim).filter(Boolean); let ok = 0;
+    lines.forEach(l => { const mm = l.match(/^(-?\d+)\s*(?:[=:.)\-]|\s)\s*(.*)$/) || l.match(/^(-?\d+)$/); if (mm) { out.set(String(parseInt(mm[1], 10)), low(mm[2] || '')); ok++; } });
+    return ok && ok === lines.length ? out : null;
+  }
+  function parseCodes(x) {
+    const parts = s(x).split(/[\n;,]+/).map(trim).filter(Boolean);
+    if (!parts.length || !parts.every(p => /^-?\d+(?:[.,]\d+)?$/.test(p))) return null;
+    return new Set(parts.map(p => String(parseFloat(p.replace(',', '.')))));
+  }
+  const PAIR_FIELDS = /^(Val_|value_labels_|value_coding|value_label)/i;
+
+  // equality of one field: 'same' | 'cosmetic' | 'differs' (+ detail)
+  function compareValue(field, a, b) {
+    if (trim(a) === trim(b)) return { st: 'same' };
+    if (low(a) === low(b)) return { st: 'cosmetic', detail: 'only spacing or capitals differ' };
+    if (PAIR_FIELDS.test(field)) {
+      const pa = parsePairs(a), pb = parsePairs(b);
+      if (pa && pb) {
+        const onlyA = [...pa.keys()].filter(k => !pb.has(k)), onlyB = [...pb.keys()].filter(k => !pa.has(k));
+        const lab = [...pa.keys()].filter(k => pb.has(k) && textNorm(pa.get(k)) !== textNorm(pb.get(k)));
+        if (!onlyA.length && !onlyB.length && !lab.length) return { st: 'cosmetic', detail: 'same codes and labels, other layout' };
+        const d = [];
+        if (onlyA.length) d.push('codes only in source: ' + onlyA.join(', '));
+        if (onlyB.length) d.push('codes only in central: ' + onlyB.join(', '));
+        if (lab.length) d.push('label differs for code ' + lab.join(', '));
+        return { st: 'differs', detail: d.join(' · ') };
+      }
+    }
+    const ca = parseCodes(a), cb = parseCodes(b);
+    if (ca && cb) {
+      const onlyA = [...ca].filter(k => !cb.has(k)), onlyB = [...cb].filter(k => !ca.has(k));
+      if (!onlyA.length && !onlyB.length) return { st: 'cosmetic', detail: 'same codes, other order or layout' };
+      return { st: 'differs', detail: [onlyA.length ? 'codes only in source: ' + onlyA.join(', ') : '', onlyB.length ? 'codes only in central: ' + onlyB.join(', ') : ''].filter(Boolean).join(' · ') };
+    }
+    if (textNorm(a) === textNorm(b)) return { st: 'cosmetic', detail: 'only punctuation, spacing or capitals differ' };
+    return { st: 'differs' };
+  }
+  function itemCodes(it, S) {
+    const valF = S.own.find(f => /^Val_/.test(f));
+    const p = valF && parsePairs(it.fields[valF]); if (p) return new Set(p.keys());
+    return parseCodes(it.fields.values) || null;
+  }
+
+  // ---------- the comparison ----------
+  // opts: { srcName, items, central, get(v, field), name(v), inst(v), fieldsMapped: [central fields],
+  //         decisions: [{item_key, field_name, decision, source_value}] }
+  function compare(opts) {
+    const S = SOURCES[opts.srcName], get = opts.get, name = opts.name;
+    const central = opts.central;
+    const labelF = S.own.find(f => /^Var_label_/.test(f));
+    const dec = opts.decisions || [];
+    const confirmed = new Map(), rejected = new Set();
+    dec.forEach(d => {
+      if (d.field_name !== '__match') return;
+      const k = String(d.item_key).replace(/^src:/, '');
+      if (d.decision === 'match_confirmed') confirmed.set(k, d.source_value);
+      if (d.decision === 'match_rejected') rejected.add(k + '→' + d.source_value);
+    });
+    const byId = new Map(central.map(v => [v.id || v._uid, v]));
+    const idOf = v => v.id || v._uid;
+    const idx = (field, fn) => { const m = new Map(); if (!field) return m; central.forEach(v => tokens(get(v, field)).forEach(t => { const k = fn(t); if (!m.has(k)) m.set(k, []); if (!m.get(k).includes(v)) m.get(k).push(v); })); return m; };
+    const exact1 = idx(S.link, trim), loose1 = idx(S.link, loose), exact2 = idx(S.link2, trim), loose2 = idx(S.link2, loose);
+
+    const pairs = [], matchedItem = new Map(), matchedVar = new Map();
+    const addPair = (it, vs, tier, why) => {
+      vs = vs.filter(v => !rejected.has(it.key + '→' + idOf(v)));
+      if (!vs.length) return false;
+      const p = { item: it, vars: vs, tier, why, conflict: vs.length > 1 };
+      pairs.push(p); matchedItem.set(it.key, p);
+      vs.forEach(v => { if (!matchedVar.has(idOf(v))) matchedVar.set(idOf(v), []); matchedVar.get(idOf(v)).push(p); });
+      return true;
+    };
+    // confirmed matches first
+    opts.items.forEach(it => { const id = confirmed.get(it.key); if (id && byId.has(id)) addPair(it, [byId.get(id)], 'confirmed', 'match confirmed by you'); });
+    // A / B: by name
+    opts.items.forEach(it => {
+      if (matchedItem.has(it.key)) return;
+      const k2 = it.fields[S.link2] || '';
+      let vs = exact1.get(it.key) || (k2 && exact2.get(k2));
+      if (vs && addPair(it, vs, 'A', 'same ' + (exact1.get(it.key) ? S.link : S.link2))) return;
+      vs = loose1.get(loose(it.key)) || (k2 && loose2.get(loose(k2)));
+      if (vs && addPair(it, vs, 'B', 'same name after writing . - and _ the same')) return;
+    });
+    // B2: the source's FAIR/export name is the central variable name (only for central variables without a link to this source)
+    const byName = new Map(); central.forEach(v => { const k = loose(name(v)); if (k && !tokens(get(v, S.link)).length) { if (!byName.has(k)) byName.set(k, []); byName.get(k).push(v); } });
+    opts.items.forEach(it => {
+      if (matchedItem.has(it.key)) return;
+      const cand = [it.fields[S.link2], it.exportName].filter(Boolean).map(loose).map(k => byName.get(k)).find(Boolean);
+      if (cand) addPair(it, cand.filter(v => !matchedVar.has(idOf(v))), 'B', 'source name ' + (it.fields[S.link2] || it.exportName) + ' = central variable_name_CBS');
+    });
+    // instrument per name prefix, learned from the name matches
+    const prefix = k => (s(k).split(/[.\-_\s]/)[0] || '').toUpperCase();
+    const learned = new Map();
+    pairs.forEach(p => { const pr = prefix(p.item.key); p.vars.forEach(v => { const i = opts.inst(v) || ''; if (!learned.has(pr)) learned.set(pr, new Map()); const m = learned.get(pr); m.set(i, (m.get(i) || 0) + 1); }); });
+    const instFor = it => { const m = learned.get(prefix(it.key)); if (!m) return ''; return [...m.entries()].sort((a, b) => b[1] - a[1])[0][0]; };
+
+    // C / D: by question text, among what is still unmatched
+    const freeVars = () => central.filter(v => !matchedVar.has(idOf(v)));
+    const textOf = v => [get(v, labelF), get(v, 'variable_label_NL')].filter(x => !isEmpty(x));
+    const valF = S.own.find(f => /^Val_/.test(f));
+    const codesOfVar = v => parseCodes(get(v, 'values')) || (valF && parsePairs(get(v, valF)) ? new Set(parsePairs(get(v, valF)).keys()) : null);
+    const STOP = new Set(['the', 'of', 'and', 'van', 'de', 'het', 'en', 'questionnaire', 'vragenlijst', 'short', 'form', 'no', 'instrument']);
+    const itok = x => new Set(low(x).split(/[^a-z0-9]+/).filter(t => t.length >= 2 && !STOP.has(t)));
+    const atomsOf = v => (opts.inst(v) || '').split(/\s*\+\s*/).filter(Boolean);
+    const allInst = [...new Set(central.flatMap(atomsOf))];
+    const instCands = it => {
+      const out = new Set(), lv = instFor(it);
+      if (lv) lv.split(/\s*\+\s*/).forEach(a => out.add(a));
+      const gt = itok(it.group || ''); if (gt.size) {
+        let best = 0, list = [];
+        allInst.forEach(n => { const t = itok(n); let o = 0; t.forEach(x => { if (gt.has(x)) o++; }); if (o > best) { best = o; list = [n]; } else if (o && o === best) list.push(n); });
+        list.forEach(n => out.add(n));
+      }
+      return out;
+    };
+    const contain = (a, b) => { if (!a.size) return 0; let i = 0; a.forEach(w => { if (b.has(w)) i++; }); return i / a.size; };
+    const suggestions = [], noSuggest = [];
+    opts.items.forEach(it => {
+      if (matchedItem.has(it.key)) return;
+      const q = it.fields[labelF]; if (isEmpty(q)) { noSuggest.push(it); return; }
+      const qn = textNorm(q);
+      const codes = itemCodes(it, S);
+      const guard = v => { const a = fsKind(it.key) || fsKind(it.exportName), b = fsKind(name(v)); return !(a && b && a !== b); };
+      const codesOk = v => { if (!codes) return true; const c = codesOfVar(v); return !c || (c.size === codes.size && [...c].every(x => codes.has(x))); };
+      const pool = freeVars().filter(guard).filter(v => !rejected.has(it.key + '→' + idOf(v)));
+      const exact = qn.split(' ').length >= 2 ? pool.filter(v => textOf(v).some(t => textNorm(t) === qn) && codesOk(v)) : [];
+      if (exact.length === 1) { addPair(it, exact, 'C', 'same question text' + (codes ? ' and same answer codes' : '')); return; }
+      const insts = instCands(it);
+      const inInst = v => atomsOf(v).some(a => insts.has(a));
+      const qw = words(q);
+      const scored = (exact.length > 1 ? exact : pool).map(v => {
+        const sc = Math.max(0, ...textOf(v).map(t => textNorm(t) === qn ? 1 : 0.6 * contain(qw, words(t)) + 0.4 * jacc(qw, words(t))));
+        return { v, score: sc, codes: codesOk(v), inst: inInst(v) };
+      }).sort((x, y) => (y.inst - x.inst) || (y.score - x.score) || (y.codes - x.codes));
+      const inI = scored.filter(c => c.inst), top = inI[0], second = inI[1];
+      let cands = [];
+      if (top && top.score >= 0.35 && (!second || top.score - second.score >= 0.1)) cands = inI.slice(0, 3).filter(c => c.score >= 0.25);
+      else { const out = scored.filter(c => c.score >= 0.7).sort((x, y) => y.score - x.score); if (out.length) cands = out.slice(0, 3); }
+      if (cands.length) suggestions.push({ item: it, cands, why: exact.length > 1 ? 'same question text on ' + exact.length + ' central variables'
+        : cands[0].inst ? 'similar question text in the same instrument' : 'very similar question text (other instrument)' });
+      else noSuggest.push(it);
+    });
+    // last resort: same position in the same instrument, when both sides have
+    // the same number of unmatched items there (texts too different to tell)
+    const sugKeys = new Set(suggestions.map(x => x.item.key));
+    const byInst = new Map();
+    noSuggest.forEach(it => { const c = [...instCands(it)]; if (c.length !== 1) return; if (!byInst.has(c[0])) byInst.set(c[0], []); byInst.get(c[0]).push(it); });
+    byInst.forEach((its, inst) => {
+      const vs = freeVars().filter(v => atomsOf(v).includes(inst) && isEmpty(get(v, 'calculation')))
+        .sort((a, b) => (parseFloat(get(a, 'display_order')) || 0) - (parseFloat(get(b, 'display_order')) || 0));
+      if (its.length < 2 || its.length !== vs.length) return;
+      its.forEach((it, i) => { if (!sugKeys.has(it.key)) suggestions.push({ item: it, cands: [{ v: vs[i], score: 0, codes: true, inst: true }], why: 'same position in ' + inst + ' (' + its.length + ' unmatched on both sides; texts differ too much to match)' }); });
+    });
+
+    // findings per pair and field
+    const fields = opts.fieldsMapped;
+    const findings = [];
+    pairs.forEach(p => p.vars.forEach(v => {
+      fields.forEach(f => {
+        const sv = p.item.fields[f], cv = get(v, f);
+        const se = isEmpty(sv), ce = isEmpty(cv);
+        if (se && ce) return;
+        let st, detail = '';
+        if (!se && ce) st = 'only_source';
+        else if (se && !ce) st = 'only_central';
+        else { const r = compareValue(f, sv, cv); st = r.st; detail = r.detail || ''; }
+        if (st === 'same') return;
+        findings.push({ pair: p, item: p.item, v, field: f, st, sv: sv || '', cv: cv || '', detail, own: S.own.includes(f) ? 'source' : 'ours' });
+      });
+      // flag of the source on the central side
+      const flag = S.own.find(f => /^Source_/.test(f));
+      const srcs = s(get(v, 'sources')).toLowerCase().split(/\s*\+\s*|[,;]\s*/).filter(Boolean);
+      if (!srcs.includes(S.token)) findings.push({ pair: p, item: p.item, v, field: 'sources', st: 'only_source', sv: S.token, cv: get(v, 'sources') || '', detail: 'the variable is in the ' + S.label + ' codebook, but sources does not list ' + S.token, own: 'ours', synthetic: true });
+      if (flag && fields.indexOf(flag) < 0 && !/^y/i.test(trim(get(v, flag))) && get(v, flag) !== undefined && opts.hasField && opts.hasField(flag))
+        findings.push({ pair: p, item: p.item, v, field: flag, st: 'only_source', sv: 'y', cv: get(v, flag) || '', detail: S.label + ' flag is not set', own: 'source', synthetic: true });
+    }));
+    // differences between sheets of the source itself
+    const variants = [];
+    opts.items.forEach(it => Object.entries(it.variants).forEach(([f, list]) => variants.push({ item: it, field: f, first: { sheet: it.occ[0].sheet, row: it.occ[0].row, value: it.fields[f] }, others: list })));
+
+    // lists
+    const sourceOnly = opts.items.filter(it => !matchedItem.has(it.key));
+    const claims = v => tokens(get(v, S.link)).length || s(get(v, 'sources')).toLowerCase().split(/\s*\+\s*|[,;]\s*/).includes(S.token);
+    const instWithPairs = new Set(); pairs.forEach(p => p.vars.forEach(v => (opts.inst(v) || '').split(/\s*\+\s*/).forEach(a => instWithPairs.add(a))));
+    const centralOnly = [];
+    central.forEach(v => {
+      if (matchedVar.has(idOf(v))) return;
+      const derived = !isEmpty(get(v, 'calculation'));
+      if (claims(v)) centralOnly.push({ v, why: derived ? 'derived (has a calculation), but linked to ' + S.label : 'linked to ' + S.label + ' (name or sources), but not found in the file' + (tokens(get(v, S.link)).length ? ': ' + tokens(get(v, S.link)).join(', ') : ''), kind: 'claims' });
+      else if (derived && (opts.inst(v) || '').split(/\s*\+\s*/).some(a => instWithPairs.has(a))) centralOnly.push({ v, why: 'derived score (has a calculation) — central only by design', kind: 'derived' });
+    });
+    const tierCount = {}; pairs.forEach(p => { tierCount[p.tier] = (tierCount[p.tier] || 0) + 1; });
+    return { pairs, suggestions, sourceOnly, centralOnly, findings, variants, instFor,
+             stats: { items: opts.items.length, central: central.length, tiers: tierCount, conflicts: pairs.filter(p => p.conflict).length,
+                      suggestions: suggestions.length, sourceOnly: sourceOnly.length, centralOnly: centralOnly.length } };
+  }
+
+  // ---------- data export (e.g. the portal's patient export) ----------
+  function parseCSV(text) {
+    const first = text.split(/\r?\n/, 1)[0] || '';
+    const sep = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : (first.indexOf('\t') >= 0 && first.indexOf(',') < 0 ? '\t' : ',');
+    const rows = []; let row = [], cur = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === sep) { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += c;
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows.filter(r => r.some(x => x !== ''));
+  }
+  function dataCheck(srcName, items, csvRows) {
+    if (!csvRows || csvRows.length < 1) return null;
+    const head = csvRows[0].map(trim).map(h => h.replace(/^﻿/, ''));
+    const col = new Map(head.map((h, i) => [h, i]));
+    const stat = new Map();
+    head.forEach((h, i) => { let n = 0; const vals = new Set(); for (let r = 1; r < csvRows.length; r++) { const v = trim(csvRows[r][i]); if (v) { n++; if (vals.size < 60) vals.add(v); } } stat.set(h, { filled: n, vals }); });
+    const S = SOURCES[srcName];
+    const res = { rows: csvRows.length - 1, columns: head.length, notInData: [], codesNotListed: [], dataOnly: [] };
+    const known = new Set();
+    items.forEach(it => {
+      const names = [it.exportName, it.key, it.fields[S.link2]].filter(Boolean);
+      const h = names.map(n => col.has(n) ? n : head.find(x => loose(x) === loose(n))).find(Boolean);
+      if (!h) {
+        // matrix/multiple choice items are often exported as several columns (NAME_1, NAME_2 ...)
+        const pre = (it.exportName || it.key);
+        const multi = head.filter(x => x.indexOf(pre + '_') === 0);
+        if (multi.length) { multi.forEach(m => known.add(m)); return; }
+        res.notInData.push({ item: it, tried: names.join(' / ') }); return;
+      }
+      known.add(h);
+      const st = stat.get(h), codes = itemCodes(it, S);
+      const typeF = S.own.find(f => /^field_type_/.test(f));
+      const isChoice = /choice|matrix|radio|dropdown|checkbox|select|yes.?no/i.test(typeF ? it.fields[typeF] || '' : '');
+      if (codes && isChoice && st.vals.size) {
+        const extra = [...st.vals].filter(x => /^-?\d+(?:[.,]\d+)?$/.test(x)).map(x => String(parseFloat(x.replace(',', '.')))).filter(x => !codes.has(x));
+        if (extra.length) res.codesNotListed.push({ item: it, column: h, codes: [...new Set(extra)].slice(0, 12), listed: [...codes] });
+      }
+    });
+    res.dataOnly = head.filter(h => !known.has(h)).map(h => ({ column: h, filled: stat.get(h).filled }));
+    return res;
+  }
+
+  return { SOURCES, DICT, targetOf, readSheets, suggestMap, buildItems, compare, compareValue, parsePairs, parseCodes, parseCSV, dataCheck,
+           util: { trim, isEmpty, low, loose, textNorm, tokens, fsKind } };
+})();
+// ====== END v6.43 compare engine ======
+
+// ====== v6.43: Compare with source codebook — screen ======
+const CMPUI = { src: 'portal', fileName: '', sheets: null, info: null, map: {}, sug: null, items: null,
+  csv: null, csvName: '', result: null, decisions: [], decReady: false, profReady: false, log: new Map(),
+  view: 'overview', inst: '', field: '', showCosmetic: false, hideDecided: false, q: '' };
+
+(function patchSwitchTabCompare() {
+  function tryPatch() {
+    if (typeof window.switchTab !== 'function') { setTimeout(tryPatch, 200); return; }
+    if (window.switchTab.__cmpPatched) return;
+    const orig = window.switchTab;
+    window.switchTab = function (name) {
+      orig.apply(this, arguments);
+      if (name === 'compare') { const b = document.getElementById('admin-tab-btn'); if (b) b.classList.add('active'); cmpRender(); }
+    };
+    window.switchTab.__cmpPatched = true;
+  }
+  window.addEventListener('cloud-authenticated', tryPatch);
+})();
+
+const cmpGet = (v, f) => qv(v, f);
+const cmpName = v => getId(v) || qv(v, 'variable_name_CBS') || v.id || '?';
+const cmpInst = v => histInstOf(v);
+const cmpInstKey = v => splitInstrumentName(cmpInst(v)).slice().sort((a, b) => a.localeCompare(b)).join(' + ') || '(no instrument)';
+const cmpE = s => escapeHtml(s == null ? '' : String(s));
+const cmpSrc = () => CMP.SOURCES[CMPUI.src];
+function cmpFieldLabel(f) {
+  if (!f) return '';
+  if (f[0] === '@') return { '@export': 'export name (used to find the column in a data file)', '@group': 'chapter / group (helps to find the instrument)', '@info': 'show as information only' }[f] || f;
+  return f;
+}
+function cmpOwnerTag(f) { return cmpSrc().own.includes(f) ? cmpSrc().label + ' field' : 'our field'; }
+
+// ---------- loading profiles and decisions ----------
+async function cmpLoadProfile() {
+  CMPUI.profReady = false;
+  try {
+    const { data, error } = await window.cloudAuth.client.from('compare_profiles').select('name, settings').eq('name', CMPUI.src);
+    if (error) throw error;
+    CMPUI.profReady = true;
+    const st = data && data[0] && data[0].settings;
+    CMPUI.map = (st && st.map) || {};
+    CMPUI.sheetsOff = (st && st.sheetsOff) || null;
+  } catch (e) { console.warn('compare_profiles unavailable (migration 35 not applied?)', e.message || e); CMPUI.map = {}; CMPUI.sheetsOff = null; }
+}
+async function cmpLoadDecisions() {
+  CMPUI.decReady = false; CMPUI.decisions = [];
+  try {
+    const { data, error } = await window.cloudAuth.client.from('compare_decisions').select('*').eq('source_name', CMPUI.src);
+    if (error) throw error;
+    CMPUI.decisions = data || []; CMPUI.decReady = true;
+  } catch (e) { console.warn('compare_decisions unavailable (migration 35 not applied?)', e.message || e); }
+}
+function cmpDecisionFor(itemKey, field) { return CMPUI.decisions.find(d => d.item_key === itemKey && d.field_name === field); }
+
+// ---------- step 1: files ----------
+async function cmpReadFiles() {
+  const f = document.getElementById('cmp-file').files[0];
+  if (!f) { cloudShowToast('error', 'Choose the source codebook file first.'); return; }
+  CMPUI.src = document.getElementById('cmp-src').value;
+  try {
+    let sheets;
+    if (/\.csv$/i.test(f.name)) sheets = [{ name: f.name, rows: CMP.parseCSV(await f.text()) }];
+    else {
+      if (typeof XLSX === 'undefined') throw new Error('The Excel library is not loaded.');
+      const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+      sheets = wb.SheetNames.map(n => ({ name: n, rows: XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, defval: '', raw: false, blankrows: true }) }));
+    }
+    CMPUI.fileName = f.name; CMPUI.sheets = sheets;
+    const d = document.getElementById('cmp-data').files[0];
+    CMPUI.csv = null; CMPUI.csvName = '';
+    if (d) { CMPUI.csv = CMP.parseCSV(await d.text()); CMPUI.csvName = d.name; }
+    await cmpLoadProfile();
+    cmpPrepareSheets();
+    CMPUI.result = null;
+    cmpRender();
+  } catch (e) { console.error(e); cloudShowToast('error', 'Could not read the file: ' + (e.message || e)); }
+}
+function cmpPrepareSheets() {
+  CMPUI.info = CMP.readSheets(CMPUI.src, CMPUI.sheets, CMPUI.map);
+  CMPUI.info.forEach(x => {
+    x.use = x.usable && (CMPUI.sheetsOff ? !CMPUI.sheetsOff.includes(x.name) : !/delete|readme|version|flag|syntax/i.test(x.name));
+  });
+  CMPUI.sug = CMP.suggestMap(CMPUI.src, CMPUI.info, qRows(), state.allFields || [], cmpGet);
+}
+function cmpToggleSheet(name, on) { const x = CMPUI.info.find(i => i.name === name); if (x) x.use = on; CMPUI.sug = CMP.suggestMap(CMPUI.src, CMPUI.info, qRows(), state.allFields || [], cmpGet); cmpRender(); }
+function cmpSetMap(header, target) { CMPUI.map[header] = target; CMPUI.result = null; cmpPrepareSheetsKeepUse(); cmpRender(); }
+function cmpPrepareSheetsKeepUse() {
+  const use = new Map((CMPUI.info || []).map(x => [x.name, x.use]));
+  CMPUI.info = CMP.readSheets(CMPUI.src, CMPUI.sheets, CMPUI.map);
+  CMPUI.info.forEach(x => { x.use = x.usable && (use.has(x.name) ? use.get(x.name) : true); });
+}
+function cmpEffectiveMap() {
+  const m = {};
+  Object.entries((CMPUI.sug && CMPUI.sug.suggestions) || {}).forEach(([h, s]) => { m[h] = Object.prototype.hasOwnProperty.call(CMPUI.map, h) ? CMPUI.map[h] : s.target; });
+  return m;
+}
+async function cmpSaveProfile() {
+  const settings = { map: cmpEffectiveMap(), sheetsOff: CMPUI.info.filter(x => x.usable && !x.use).map(x => x.name), savedFrom: CMPUI.fileName };
+  try {
+    const { error } = await window.cloudAuth.client.from('compare_profiles').upsert({ name: CMPUI.src, settings, updated_at: new Date().toISOString(), updated_by: window.cloudAuth.user.id }, { onConflict: 'name' });
+    if (error) throw error;
+    CMPUI.map = settings.map; CMPUI.sheetsOff = settings.sheetsOff;
+    cloudShowToast('success', 'Column settings saved for ' + cmpSrc().label);
+  } catch (e) { cloudShowToast('error', 'Could not save (is migration 35 applied?): ' + (e.message || e)); }
+}
+
+// ---------- run ----------
+async function cmpRun() {
+  const map = cmpEffectiveMap();
+  CMPUI.map = Object.assign({}, map);
+  cmpPrepareSheetsKeepUse();
+  const S = cmpSrc();
+  if (!Object.values(map).includes(S.link)) { cloudShowToast('error', 'Choose which column holds the variable name (' + S.link + ').'); return; }
+  await cmpLoadDecisions();
+  if (typeof ensureUids === 'function') ensureUids();
+  CMPUI.items = CMP.buildItems(CMPUI.src, CMPUI.info, map);
+  const fieldsMapped = [...new Set(Object.values(map).filter(t => t && t[0] !== '@'))];
+  const has = new Set((state.allFields || []).map(x => x.toLowerCase()));
+  CMPUI.result = CMP.compare({ srcName: CMPUI.src, items: CMPUI.items, central: qRows(), get: cmpGet, name: cmpName, inst: cmpInst,
+    fieldsMapped, decisions: CMPUI.decisions, hasField: f => has.has(f.toLowerCase()) });
+  CMPUI.result.data = CMPUI.csv ? CMP.dataCheck(CMPUI.src, CMPUI.items, CMPUI.csv) : null;
+  CMPUI.view = 'overview';
+  cmpRender();
+  cmpLoadLog();
+}
+async function cmpLoadLog() {
+  // When was each differing central value last changed, and by whom (Log, migration 32)
+  CMPUI.log = new Map();
+  const r = CMPUI.result; if (!r) return;
+  const ids = [...new Set(r.findings.filter(f => f.st === 'differs' || f.st === 'only_central').map(f => f.v.id).filter(Boolean))];
+  const client = window.cloudAuth.client;
+  try {
+    for (let i = 0; i < ids.length; i += 80) {
+      const { data, error } = await client.from('audit_log').select('variable_id, field_name, performed_by, performed_at, action')
+        .in('variable_id', ids.slice(i, i + 80)).eq('action', 'update_field').order('performed_at', { ascending: false }).limit(2000);
+      if (error) throw error;
+      await histResolveNames(data || []);
+      (data || []).forEach(x => { const k = x.variable_id + '|' + String(x.field_name || '').toLowerCase(); if (!CMPUI.log.has(k)) CMPUI.log.set(k, x); });
+    }
+    if (CMPUI.view === 'diff') cmpRender();
+  } catch (e) { console.warn('log lookup failed', e); }
+}
+function cmpLogText(f) {
+  const x = CMPUI.log.get(f.v.id + '|' + String(f.field).toLowerCase()); if (!x) return '';
+  return 'changed in central ' + new Date(x.performed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' by ' + histWho(x);
+}
+
+// ---------- decisions ----------
+const CMP_DEC = { take_source: 'Take source value', keep_central: 'Keep central', intended: 'Intended difference', report_source: 'Report to source team',
+                  match_confirmed: 'Match confirmed', match_rejected: 'Match rejected' };
+async function cmpDecide(itemKey, field, decision, sv, cv) {
+  if (!CMPUI.decReady) { cloudShowToast('error', 'Decisions cannot be saved yet: run migration 35 first.'); return; }
+  const noteEl = document.querySelector(`[data-note="${CSS.escape(itemKey + '|' + field)}"]`);
+  const row = { source_name: CMPUI.src, item_key: itemKey, field_name: field, decision, source_value: sv == null ? null : String(sv),
+                central_value: cv == null ? null : String(cv), note: noteEl && noteEl.value.trim() ? noteEl.value.trim() : null, created_by: window.cloudAuth.user.id, created_at: new Date().toISOString() };
+  try {
+    const { data, error } = await window.cloudAuth.client.from('compare_decisions').upsert(row, { onConflict: 'source_name,item_key,field_name' }).select('*');
+    if (error) throw error;
+    CMPUI.decisions = CMPUI.decisions.filter(d => !(d.item_key === itemKey && d.field_name === field)).concat(data || [row]);
+    if (field === '__match') await cmpRun(); else cmpRender();
+  } catch (e) { cloudShowToast('error', 'Could not save the decision: ' + (e.message || e)); }
+}
+async function cmpDecideAll(field, decision) {
+  if (!CMPUI.decReady) { cloudShowToast('error', 'Decisions cannot be saved yet: run migration 35 first.'); return; }
+  const list = cmpFilteredFindings().filter(f => f.field === field && !cmpDecisionFor(f.v.id || f.v._uid, f.field));
+  if (!list.length) return;
+  if (!confirmInline('Record “' + CMP_DEC[decision] + '” for ' + list.length + ' variables in ' + field + '?')) return;
+  const now = new Date().toISOString();
+  const rows = list.map(f => ({ source_name: CMPUI.src, item_key: f.v.id || f.v._uid, field_name: f.field, decision, source_value: String(f.sv || ''), central_value: String(f.cv || ''),
+    note: null, created_by: window.cloudAuth.user.id, created_at: now }));
+  try {
+    for (let i = 0; i < rows.length; i += 200) {
+      const { data, error } = await window.cloudAuth.client.from('compare_decisions').upsert(rows.slice(i, i + 200), { onConflict: 'source_name,item_key,field_name' }).select('*');
+      if (error) throw error;
+      const keys = new Set(rows.slice(i, i + 200).map(r => r.item_key + '|' + r.field_name));
+      CMPUI.decisions = CMPUI.decisions.filter(d => !keys.has(d.item_key + '|' + d.field_name)).concat(data || rows.slice(i, i + 200));
+    }
+    cloudShowToast('success', 'Recorded for ' + rows.length + ' variables');
+    cmpRender();
+  } catch (e) { cloudShowToast('error', 'Could not save the decisions: ' + (e.message || e)); }
+}
+// a second click confirms (no browser dialogs)
+function confirmInline(msg) {
+  const now = Date.now();
+  if (window._cmpConfirm && window._cmpConfirm.msg === msg && now - window._cmpConfirm.t < 6000) { window._cmpConfirm = null; return true; }
+  window._cmpConfirm = { msg, t: now };
+  cloudShowToast('info', msg + ' Click again to confirm.');
+  return false;
+}
+async function cmpUndecide(itemKey, field) {
+  const d = cmpDecisionFor(itemKey, field); if (!d) return;
+  try {
+    const { error } = await window.cloudAuth.client.from('compare_decisions').delete().eq('id', d.id);
+    if (error) throw error;
+    CMPUI.decisions = CMPUI.decisions.filter(x => x !== d);
+    if (field === '__match') await cmpRun(); else cmpRender();
+  } catch (e) { cloudShowToast('error', 'Could not undo: ' + (e.message || e)); }
+}
+function cmpDecisionHtml(itemKey, field, sv, cv, opts) {
+  const d = cmpDecisionFor(itemKey, field);
+  const k = cmpE(itemKey), fl = cmpE(field);
+  const a = x => escapeAttr(JSON.stringify(x == null ? '' : String(x)));
+  if (d) {
+    const changed = (d.source_value || '') !== (sv || '') || (d.central_value || '') !== (cv || '');
+    return `<span class="cmp-dec">✔ ${cmpE(CMP_DEC[d.decision] || d.decision)}${d.note ? ': ' + cmpE(d.note) : ''}</span>`
+      + (changed ? ' <span class="cmp-warn" title="A value changed after this decision">changed since</span>' : '')
+      + ` <button class="q-ib" onclick='cmpUndecide(${a(itemKey)}, ${a(field)})'>undo</button>`;
+  }
+  const choices = (opts && opts.choices) || ['take_source', 'keep_central', 'intended', 'report_source'];
+  return `<input class="cmp-note" data-note="${k}|${fl}" placeholder="note (optional)">`
+    + choices.map(c => `<button class="q-ib" onclick='cmpDecide(${a(itemKey)}, ${a(field)}, "${c}", ${a(sv)}, ${a(cv)})'>${cmpE(CMP_DEC[c])}</button>`).join('');
+}
+
+// ---------- rendering ----------
+function cmpVarLink(v) {
+  if (!v) return '';
+  const u = escapeAttr(v._uid || '');
+  return `<span class="hl-var" onclick="openViewDialog('${u}')">${cmpE(cmpName(v))}</span> <span class="hl-inst">${cmpE(cmpInst(v) || '—')}</span>`
+    + ` <button class="q-ib" onclick="openViewDialog('${u}')">👁 View</button>` + (qCanEdit() ? `<button class="q-ib q-ib-edit" onclick="openEditDialog('${u}')">✎ Edit</button>` : '');
+}
+function cmpWhere(it) { return it.occ.slice(0, 4).map(o => o.sheet + ' r' + o.row).join(', ') + (it.occ.length > 4 ? ' …' : ''); }
+function cmpSrcCell(it) {
+  const S = cmpSrc(), lab = S.own.find(f => /^Var_label_/.test(f));
+  const act = it.info && (it.info.Active_from_version || it.info['Active_from_version']);
+  return `<code>${cmpE(it.key)}</code> <span class="q-muted">${cmpE(cmpWhere(it))}${act ? ' · active from ' + cmpE(act) : ''}</span>`
+    + (it.fields[lab] ? `<div class="cmp-q">${cmpE(truncate(it.fields[lab], 160))}</div>` : '');
+}
+function cmpFilteredFindings() {
+  const r = CMPUI.result; if (!r) return [];
+  const q = CMPUI.q.trim().toLowerCase();
+  return r.findings.filter(f => (CMPUI.showCosmetic || f.st !== 'cosmetic')
+    && (!CMPUI.inst || cmpInstKey(f.v) === CMPUI.inst)
+    && (!CMPUI.field || f.field === CMPUI.field)
+    && (!CMPUI.hideDecided || !cmpDecisionFor(f.v.id || f.v._uid, f.field))
+    && (!q || [f.item.key, cmpName(f.v), f.sv, f.cv].some(x => String(x || '').toLowerCase().includes(q))));
+}
+function cmpRender() {
+  const el = document.getElementById('cmp-content'); if (!el) return;
+  const S = cmpSrc();
+  let h = `<div class="cmp-card"><div class="cmp-h">1 · Files</div>
+    <div class="cmp-row"><label>Source <select id="cmp-src" onchange="CMPUI.src=this.value; CMPUI.result=null; CMPUI.sheets=null; cmpRender()">
+      ${Object.entries(CMP.SOURCES).map(([k, x]) => `<option value="${k}"${k === CMPUI.src ? ' selected' : ''}>${cmpE(x.label)}</option>`).join('')}</select></label>
+    <label>Source codebook <input type="file" id="cmp-file" accept=".xlsx,.xls,.csv"></label>
+    <label title="Optional: an export of real answers (CSV). Shows which variables really occur and which codes are used.">Data file (optional) <input type="file" id="cmp-data" accept=".csv,.txt"></label>
+    <button class="btn-primary btn-mini" onclick="cmpReadFiles()">Read files</button></div>
+    ${CMPUI.fileName ? `<div class="q-muted">Read: <strong>${cmpE(CMPUI.fileName)}</strong>${CMPUI.csvName ? ' · data file <strong>' + cmpE(CMPUI.csvName) + '</strong> (' + (CMPUI.csv.length - 1) + ' rows)' : ''}</div>` : ''}
+    </div>`;
+  if (CMPUI.info) {
+    const sug = CMPUI.sug.suggestions, eff = cmpEffectiveMap();
+    const fields = (state.allFields || []).filter(f => f && !f.startsWith('_') && f !== 'id').slice().sort((a, b) => a.localeCompare(b));
+    const roles = ['@export', '@group', '@info'];
+    h += `<div class="cmp-card"><div class="cmp-h">2 · Sheets and columns</div>
+      <div class="q-muted" style="margin-bottom:6px;">Sheets used (a sheet needs a column with the variable name):</div>
+      <div class="cmp-sheets">${CMPUI.info.map(x => `<label class="${x.usable ? '' : 'q-muted'}"><input type="checkbox" ${x.use ? 'checked' : ''} ${x.usable ? '' : 'disabled'} onchange="cmpToggleSheet('${escapeAttr(x.name)}', this.checked)"> ${cmpE(x.name)} <span class="q-muted">(${x.usable ? x.rowCount + ' rows' : 'no variable-name column'})</span></label>`).join('')}</div>
+      <table class="cmp-t"><thead><tr><th>Column in the source</th><th>Examples</th><th>Central field</th><th>Why suggested</th></tr></thead><tbody>
+      ${Object.keys(sug).map(hd => { const s = sug[hd], cur = eff[hd] || ''; const ex = [...(CMPUI.sug.samples.get(hd) || [])].slice(0, 3).map(x => truncate(x, 40)).join(' · ');
+        return `<tr class="${cur ? '' : 'cmp-unmapped'}"><td><strong>${cmpE(hd)}</strong></td><td class="q-muted">${cmpE(ex)}</td><td><select onchange="cmpSetMap('${escapeAttr(hd)}', this.value)">
+          <option value="">— not used —</option>${roles.map(r => `<option value="${r}"${cur === r ? ' selected' : ''}>${cmpE(cmpFieldLabel(r))}</option>`).join('')}
+          <optgroup label="Central fields">${fields.map(f => `<option value="${escapeAttr(f)}"${cur === f ? ' selected' : ''}>${cmpE(f)}${f === S.link ? ' (variable name — key)' : ''}</option>`).join('')}</optgroup></select></td>
+          <td class="q-muted">${Object.prototype.hasOwnProperty.call(CMPUI.map, hd) && CMPUI.map[hd] !== s.target ? 'set by you' : cmpE(s.how) + (s.how === 'content' ? ' (' + Math.round(s.score * 100) + '% of values found)' : '')}</td></tr>`; }).join('')}
+      </tbody></table>
+      <div class="cmp-row"><button class="btn-secondary btn-mini" onclick="cmpSaveProfile()" ${CMPUI.profReady ? '' : 'disabled title="Run migration 35 to save"'}>Save column settings</button>
+        <button class="btn-primary btn-mini" onclick="cmpRun()">Compare</button>
+        <span class="q-muted">Columns that are “not used” are left out of the comparison; nothing is lost from the file.</span></div></div>`;
+  }
+  if (CMPUI.result) h += cmpResultsHtml();
+  el.innerHTML = h;
+}
+function cmpResultsHtml() {
+  const r = CMPUI.result, S = cmpSrc(), st = r.stats;
+  const F = r.findings;
+  const n = { sug: r.suggestions.length, diff: F.filter(f => f.st !== 'cosmetic').length, src: r.sourceOnly.length, cen: r.centralOnly.length, var: r.variants.length,
+              data: r.data ? r.data.notInData.length + r.data.codesNotListed.length + r.data.dataOnly.length : 0 };
+  const nav = [['overview', '📋', 'Overview', ''], ['sug', '🔗', 'Suggested matches', n.sug], ['diff', '≠', 'Differences', n.diff], ['src', '⬅', 'Only in ' + S.label, n.src],
+               ['cen', '➡', 'Only in central', n.cen], ['var', '↔', 'Within ' + S.label, n.var]].concat(r.data ? [['data', '📊', 'Data file', n.data]] : []);
+  let h = `<div class="cmp-card"><div class="cmp-h" style="display:flex;justify-content:space-between;align-items:center;">3 · Results
+      <span><button class="btn-mini" onclick="cmpReport()" id="cmp-report-btn">📄 Report (Word)</button></span></div>
+    <div class="cmp-stats">${st.items} variables in the ${cmpE(S.label)} file · matched: <strong>${(st.tiers.confirmed || 0) + (st.tiers.A || 0) + (st.tiers.B || 0) + (st.tiers.C || 0)}</strong>
+      (${st.tiers.confirmed ? st.tiers.confirmed + ' confirmed by you, ' : ''}${st.tiers.A || 0} same name, ${st.tiers.B || 0} same name after small changes, ${st.tiers.C || 0} same question text)
+      · ${st.suggestions} suggested · ${st.sourceOnly} only in ${cmpE(S.label)} · ${st.centralOnly} only in central${st.conflicts ? ` · <span class="cmp-warn">${st.conflicts} conflict${st.conflicts > 1 ? 's' : ''}</span>` : ''}
+      ${CMPUI.decReady ? '' : '<br><span class="cmp-warn">Decisions cannot be saved until migration 35 is applied.</span>'}</div>
+    <div class="q-nav">${nav.map(([k, ic, t, c]) => `<button class="q-navbtn ${CMPUI.view === k ? 'active' : ''}" onclick="CMPUI.view='${k}'; cmpRender()"><span class="q-navic">${ic}</span><span class="q-navtx"><strong>${cmpE(t)}</strong><span class="q-muted">${c === '' ? 'by instrument' : c}</span></span></button>`).join('')}</div>`;
+  h += cmpViewHtml();
+  return h + '</div>';
+}
+function cmpViewHtml() {
+  const r = CMPUI.result, S = cmpSrc(), v = CMPUI.view;
+  if (v === 'overview') {
+    const rows = new Map();
+    const R = k => { if (!rows.has(k)) rows.set(k, { pairs: 0, diff: 0, src: 0, cen: 0, sug: 0, dec: 0 }); return rows.get(k); };
+    r.pairs.forEach(p => R(cmpInstKey(p.vars[0])).pairs++);
+    r.findings.filter(f => f.st !== 'cosmetic').forEach(f => { const x = R(cmpInstKey(f.v)); x.diff++; if (cmpDecisionFor(f.v.id || f.v._uid, f.field)) x.dec++; });
+    r.centralOnly.forEach(c => R(cmpInstKey(c.v)).cen++);
+    r.sourceOnly.forEach(it => R(r.instFor(it) ? splitInstrumentName(r.instFor(it)).sort().join(' + ') : '(not linked) ' + (it.group || it.occ[0].sheet)).src++);
+    r.suggestions.forEach(s => R(cmpInstKey(s.cands[0].v)).sug++);
+    const keys = [...rows.keys()].sort((a, b) => a.localeCompare(b));
+    return `<table class="cmp-t"><thead><tr><th>Instrument</th><th>Matched</th><th>Differences</th><th>Decided</th><th>Suggested</th><th>Only in ${cmpE(S.label)}</th><th>Only in central</th></tr></thead><tbody>
+      ${keys.map(k => { const x = rows.get(k); return `<tr><td>${k.startsWith('(not linked)') ? '<em>' + cmpE(k) + '</em>' : `<a href="javascript:void(0)" onclick="CMPUI.inst='${escapeAttr(k)}'; CMPUI.view='diff'; cmpRender()">${cmpE(k)}</a>`}</td><td>${x.pairs || ''}</td><td>${x.diff || ''}</td><td>${x.dec || ''}</td><td>${x.sug || ''}</td><td>${x.src || ''}</td><td>${x.cen || ''}</td></tr>`; }).join('')}
+      </tbody></table>`;
+  }
+  if (v === 'sug') {
+    if (!r.suggestions.length) return '<div class="empty-state"><p>No suggested matches.</p></div>';
+    return `<p class="q-muted">These ${cmpE(S.label)} variables have no name link to central, but a likely partner was found by question text or position. Confirm the right one, or reject.</p>`
+      + r.suggestions.map(sg => `<div class="q-find"><div class="q-find-h"><span>${cmpSrcCell(sg.item)}</span></div><div class="q-muted" style="margin:2px 0 6px;">${cmpE(sg.why)}</div>
+        <table class="q-ftable"><tbody>${sg.cands.map(c => `<tr><td>${cmpVarLink(c.v)}</td><td class="q-muted">${cmpE(truncate(qv(c.v, S.own.find(f => /^Var_label_/.test(f))) || qv(c.v, 'variable_label_NL'), 140))}</td>
+          <td>${c.score ? Math.round(c.score * 100) + '% similar' : 'by position'}${c.codes ? '' : ' · <span class="cmp-warn">answer codes differ</span>'}</td>
+          <td><button class="q-ib" onclick='cmpDecide(${escapeAttr(JSON.stringify("src:" + sg.item.key))}, "__match", "match_confirmed", ${escapeAttr(JSON.stringify(c.v.id || c.v._uid))}, "")'>✔ Confirm</button>
+              <button class="q-ib" onclick='cmpDecide(${escapeAttr(JSON.stringify("src:" + sg.item.key))}, "__match", "match_rejected", ${escapeAttr(JSON.stringify(c.v.id || c.v._uid))}, "")'>✕ Not this one</button></td></tr>`).join('')}</tbody></table></div>`).join('');
+  }
+  if (v === 'diff') {
+    const F = cmpFilteredFindings();
+    const insts = [...new Set(r.findings.map(f => cmpInstKey(f.v)))].sort();
+    const fields = [...new Set(r.findings.map(f => f.field))].sort();
+    let h = `<div class="cmp-row cmp-filters"><input type="search" placeholder="Search variable or value…" value="${escapeAttr(CMPUI.q)}" oninput="CMPUI.q=this.value; clearTimeout(window._cmpT); window._cmpT=setTimeout(cmpRender, 350)">
+      <select onchange="CMPUI.inst=this.value; cmpRender()"><option value="">All instruments</option>${insts.map(i => `<option${i === CMPUI.inst ? ' selected' : ''}>${cmpE(i)}</option>`).join('')}</select>
+      <select onchange="CMPUI.field=this.value; cmpRender()"><option value="">All fields</option>${fields.map(i => `<option${i === CMPUI.field ? ' selected' : ''}>${cmpE(i)}</option>`).join('')}</select>
+      <label><input type="checkbox" ${CMPUI.showCosmetic ? 'checked' : ''} onchange="CMPUI.showCosmetic=this.checked; cmpRender()"> show layout-only differences</label>
+      <label><input type="checkbox" ${CMPUI.hideDecided ? 'checked' : ''} onchange="CMPUI.hideDecided=this.checked; cmpRender()"> hide decided</label>
+      <span class="q-muted">${F.length} shown</span></div>`;
+    const byField = new Map(); F.forEach(f => { if (!byField.has(f.field)) byField.set(f.field, []); byField.get(f.field).push(f); });
+    const ST = { only_source: 'filled in ' + S.label + ', empty in central', only_central: 'empty in ' + S.label + ', filled in central', differs: 'different', cosmetic: 'layout only' };
+    byField.forEach((list, field) => {
+      const und = list.filter(f => !cmpDecisionFor(f.v.id || f.v._uid, f.field)).length;
+      const fa = escapeAttr(JSON.stringify(field));
+      h += `<div class="q-card"><div class="q-card-h"><strong>${cmpE(field)}</strong> <span class="hl-tag">${cmpE(cmpOwnerTag(field))}</span><span class="q-muted">${list.length}</span>
+        ${und > 1 ? `<span class="cmp-bulk">same decision for the ${und} undecided shown:${['take_source', 'keep_central', 'intended', 'report_source'].map(c => `<button class="q-ib" onclick='cmpDecideAll(${fa}, "${c}")'>${cmpE(CMP_DEC[c])}</button>`).join('')}</span>` : ''}</div>
+        <table class="cmp-t"><thead><tr><th>Central variable</th><th>${cmpE(S.label)} variable</th><th>${cmpE(S.label)} value</th><th>Central value</th><th>What</th><th>Decision</th></tr></thead><tbody>
+        ${list.slice(0, 400).map(f => `<tr><td>${cmpVarLink(f.v)}</td><td><code>${cmpE(f.item.key)}</code><div class="q-muted">${cmpE(cmpWhere(f.item))}</div></td>
+          <td class="cmp-val">${cmpE(truncate(f.sv, 400)) || '<span class="q-muted">(empty)</span>'}</td><td class="cmp-val">${cmpE(truncate(f.cv, 400)) || '<span class="q-muted">(empty)</span>'}</td>
+          <td>${cmpE(ST[f.st])}${f.detail ? '<div class="q-muted">' + cmpE(f.detail) + '</div>' : ''}${cmpLogText(f) ? '<div class="cmp-log">' + cmpE(cmpLogText(f)) + '</div>' : ''}${f.pair.conflict ? '<div class="cmp-warn">' + cmpE(f.item.key) + ' is linked to ' + f.pair.vars.length + ' central variables</div>' : ''}</td>
+          <td class="cmp-decide">${cmpDecisionHtml(f.v.id || f.v._uid, f.field, f.sv, f.cv)}</td></tr>`).join('')}
+        </tbody></table>${list.length > 400 ? '<div class="q-muted">… ' + (list.length - 400) + ' more — use the filters.</div>' : ''}</div>`;
+    });
+    return h || '<div class="empty-state"><p>No differences with these filters.</p></div>';
+  }
+  if (v === 'src') {
+    const groups = new Map();
+    r.sourceOnly.forEach(it => { const k = r.instFor(it) || it.group || it.occ[0].sheet; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(it); });
+    return [...groups.entries()].map(([k, list]) => `<div class="q-card"><div class="q-card-h"><strong>${cmpE(k)}</strong><span class="q-muted">${list.length}</span></div>
+      <table class="cmp-t"><tbody>${list.map(it => `<tr><td>${cmpSrcCell(it)}</td><td class="cmp-decide">${cmpDecisionHtml('src:' + it.key, '__item', it.key, '', { choices: ['take_source', 'intended', 'report_source'] }).replace('Take source value', 'Add to central')}</td></tr>`).join('')}</tbody></table></div>`).join('')
+      || '<div class="empty-state"><p>Every variable of the file was found in central.</p></div>';
+  }
+  if (v === 'cen') {
+    return r.centralOnly.length ? `<table class="cmp-t"><thead><tr><th>Central variable</th><th>Label</th><th>Why it is listed</th><th>Decision</th></tr></thead><tbody>
+      ${r.centralOnly.map(c => `<tr><td>${cmpVarLink(c.v)}</td><td class="q-muted">${cmpE(truncate(qv(c.v, 'variable_label_NL') || qv(c.v, 'variable_label_EN'), 140))}</td><td>${cmpE(c.why)}</td>
+        <td class="cmp-decide">${cmpDecisionHtml(c.v.id || c.v._uid, '__central_only', '', cmpName(c.v), { choices: ['intended', 'keep_central', 'report_source'] })}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty-state"><p>Nothing in central is missing from the file.</p></div>';
+  }
+  if (v === 'var') {
+    return r.variants.length ? `<p class="q-muted">The same ${cmpE(S.label)} variable appears on several sheets with a different value.</p><table class="cmp-t"><thead><tr><th>Variable</th><th>Field</th><th>Values per sheet</th></tr></thead><tbody>
+      ${r.variants.map(x => `<tr><td><code>${cmpE(x.item.key)}</code></td><td>${cmpE(x.field)}</td><td>${[x.first].concat(x.others).map(o => `<div><span class="q-muted">${cmpE(o.sheet)} r${o.row}:</span> ${cmpE(truncate(o.value, 200))}</div>`).join('')}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty-state"><p>No differences between sheets.</p></div>';
+  }
+  if (v === 'data') {
+    const d = r.data;
+    return `<p class="q-muted">Data file: ${d.rows} rows, ${d.columns} columns. Shown side by side; nothing is assumed about which one is right.</p>
+      <div class="q-card"><div class="q-card-h"><strong>In the ${cmpE(S.label)} codebook, but no column in the data file</strong><span class="q-muted">${d.notInData.length}</span></div>
+        <table class="cmp-t"><tbody>${d.notInData.map(x => `<tr><td>${cmpSrcCell(x.item)}</td><td class="q-muted">looked for: ${cmpE(x.tried)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="q-card"><div class="q-card-h"><strong>Codes used in the data that the codebook does not list</strong><span class="q-muted">${d.codesNotListed.length}</span></div>
+        <table class="cmp-t"><tbody>${d.codesNotListed.map(x => `<tr><td><code>${cmpE(x.column)}</code></td><td>in data: <strong>${cmpE(x.codes.join(', '))}</strong></td><td class="q-muted">codebook lists: ${cmpE(x.listed.join(', '))}</td></tr>`).join('')}</tbody></table></div>
+      <div class="q-card"><div class="q-card-h"><strong>Columns in the data file that are not in the codebook</strong><span class="q-muted">${d.dataOnly.length}</span></div>
+        <div class="cmp-chips">${d.dataOnly.map(x => `<span class="hl-chip">${cmpE(x.column)}${x.filled ? ' · ' + x.filled : ''}</span>`).join('')}</div></div>`;
+  }
+  return '';
+}
+
+// ---------- Word report (structure of the CBRQ portal-vs-central review) ----------
+async function cmpReport() {
+  const btn = document.getElementById('cmp-report-btn'); const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Making report…'; }
+  try {
+    const D = await histLoadDocx();
+    const blob = await cmpBuildReport(D);
+    const name = 'Compare_' + cmpSrc().label.replace(/\s+/g, '_') + '_vs_central_' + new Date().toISOString().slice(0, 10) + '.docx';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    cloudShowToast('success', 'Report ready: ' + name);
+  } catch (e) { console.error(e); cloudShowToast('error', 'Could not make the report: ' + (e.message || e)); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
+}
+async function cmpBuildReport(D) {
+  const r = CMPUI.result, S = cmpSrc();
+  const P = (t, o) => new D.Paragraph(Object.assign({ children: [new D.TextRun({ text: String(t == null ? '' : t), ...(o && o.run || {}) })], spacing: { after: 80 } }, o && o.para || {}));
+  const B = t => new D.Paragraph({ text: String(t), bullet: { level: 0 } });
+  const H = (t, l) => new D.Paragraph({ text: t, heading: l, spacing: { before: 200, after: 80 } });
+  const cell = (t, hd) => new D.TableCell({ children: String(t == null ? '' : t).split('\n').map(x => new D.Paragraph({ children: [new D.TextRun({ text: x, bold: !!hd, size: 18 })] })),
+    shading: hd ? { fill: 'E7ECEF', type: D.ShadingType.CLEAR, color: 'auto' } : undefined });
+  const table = (head, rows) => new D.Table({ width: { size: 100, type: D.WidthType.PERCENTAGE },
+    rows: [new D.TableRow({ tableHeader: true, children: head.map(x => cell(x, true)) })].concat(rows.map(rr => new D.TableRow({ children: rr.map(c => cell(c)) }))) });
+  const cut = (x, n) => { x = x == null ? '' : String(x); return x.length > (n || 300) ? x.slice(0, n || 300) + '…' : x; };
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const TIER = { confirmed: 'confirmed by us', A: 'same name', B: 'same name (small changes)', C: 'same question text' };
+  const ST = { only_source: 'empty in central', only_central: 'empty in ' + S.label, differs: 'different' };
+  const decText = (k, f) => { const d = cmpDecisionFor(k, f); return d ? (CMP_DEC[d.decision] || d.decision) + (d.note ? ': ' + d.note : '') : ''; };
+  const labF = S.own.find(f => /^Var_label_/.test(f));
+
+  const sections = new Map();
+  const G = k => { if (!sections.has(k)) sections.set(k, { pairs: [], findings: [], src: [], cen: [], sug: [] }); return sections.get(k); };
+  r.pairs.forEach(p => G(cmpInstKey(p.vars[0])).pairs.push(p));
+  r.findings.filter(f => f.st !== 'cosmetic').forEach(f => G(cmpInstKey(f.v)).findings.push(f));
+  r.centralOnly.forEach(c => G(cmpInstKey(c.v)).cen.push(c));
+  r.suggestions.forEach(sg => G(cmpInstKey(sg.cands[0].v)).sug.push(sg));
+  r.sourceOnly.forEach(it => G(r.instFor(it) ? splitInstrumentName(r.instFor(it)).sort().join(' + ') : '(not linked to a central instrument)').src.push(it));
+  const cosmetic = r.findings.filter(f => f.st === 'cosmetic').length;
+
+  const ch = [];
+  ch.push(H(S.label + ' vs central codebook', D.HeadingLevel.TITLE));
+  ch.push(P(today + ' · ' + ((window.cloudAuth.profile && (window.cloudAuth.profile.display_name || window.cloudAuth.profile.email)) || '')));
+  ch.push(H('Summary', D.HeadingLevel.HEADING_1));
+  const st = r.stats, matched = r.pairs.length;
+  ch.push(P(`The ${S.label} codebook has ${st.items} variables; ${matched} were matched to the central codebook, ${st.suggestions} have a suggested match to confirm, and ${st.sourceOnly} were not found in central. ${st.centralOnly} central variables are linked to ${S.label} but were not found in the file, or are derived scores (central only by design). ${r.findings.length - cosmetic} field values differ or are filled on one side only${cosmetic ? ' (' + cosmetic + ' more differ in layout only and are left out)' : ''}.`));
+  ch.push(P('Sources compared: ' + CMPUI.fileName + (CMPUI.info ? ' (sheets ' + CMPUI.info.filter(x => x.use).map(x => x.name).join(', ') + ')' : '') + '; the central codebook as it is in the Editor on ' + today + (CMPUI.csvName ? '; data file ' + CMPUI.csvName : '') + '.'));
+  ch.push(P('Nothing in this report assumes which side is right. For each point the values of both sides are given, with what is known about it (a later edit in central, a decision already taken).'));
+  ch.push(table(['How variables were matched', 'Number'], Object.entries(st.tiers).map(([k, x]) => [TIER[k] || k, x]).concat([['suggested (to confirm)', st.suggestions], ['not found in central', st.sourceOnly]])));
+  if (st.conflicts) {
+    ch.push(H('Conflicts', D.HeadingLevel.HEADING_2));
+    r.pairs.filter(p => p.conflict).forEach(p => ch.push(B(p.item.key + ' is linked to ' + p.vars.length + ' central variables: ' + p.vars.map(cmpName).join(', ') + '.')));
+  }
+
+  let formulaF = []; try { formulaF = runQualityChecks(qRows()).filter(x => x.check === 'formula_ref'); } catch (_) {}
+  [...sections.keys()].sort((a, b) => a.startsWith('(') ? 1 : b.startsWith('(') ? -1 : a.localeCompare(b)).forEach(k => {
+    const g = sections.get(k);
+    ch.push(H(k, D.HeadingLevel.HEADING_1));
+    ch.push(P([g.pairs.length ? g.pairs.length + ' in both' : '', g.src.length ? g.src.length + ' only in ' + S.label : '', g.cen.length ? g.cen.length + ' only in central' : '', g.sug.length ? g.sug.length + ' suggested' : ''].filter(Boolean).join(' · ') + '.'));
+    if (g.pairs.length) {
+      ch.push(H('Variables in both (' + g.pairs.length + ')', D.HeadingLevel.HEADING_2));
+      ch.push(table(['Central variable', S.label + ' variable', 'Matched by'], g.pairs.map(p => [p.vars.map(cmpName).join(' + '), p.item.key, TIER[p.tier] || p.tier])));
+    }
+    if (g.findings.length) {
+      ch.push(H('Fields to fill in or check', D.HeadingLevel.HEADING_2));
+      const byF = new Map(); g.findings.forEach(f => { if (!byF.has(f.field)) byF.set(f.field, []); byF.get(f.field).push(f); });
+      byF.forEach((list, field) => {
+        ch.push(P(field + ' (' + cmpOwnerTag(field) + ') — ' + list.length, { run: { bold: true }, para: { spacing: { before: 140, after: 60 } } }));
+        const allSame = list.every(f => f.st === 'only_source') && new Set(list.map(f => f.sv)).size === 1;
+        if (allSame && list.length > 3) { ch.push(P('Empty in central for ' + list.length + ' variables; ' + S.label + ' value for all: “' + cut(list[0].sv, 200) + '”. Variables: ' + list.map(f => cmpName(f.v)).join(', ') + '.')); return; }
+        const hasDec = list.some(f => cmpDecisionFor(f.v.id || f.v._uid, f.field));
+        ch.push(table(['Variable', S.label, 'Central', 'Note'].concat(hasDec ? ['Decision'] : []), list.map(f => [cmpName(f.v), cut(f.sv) || '(empty)', cut(f.cv) || '(empty)',
+          [ST[f.st], f.detail, cmpLogText(f)].filter(Boolean).join('; ')].concat(hasDec ? [decText(f.v.id || f.v._uid, f.field)] : []))));
+      });
+    }
+    if (g.sug.length) {
+      ch.push(H('Suggested matches to confirm (' + g.sug.length + ')', D.HeadingLevel.HEADING_2));
+      ch.push(table([S.label + ' variable', 'Likely central variable', 'Why'], g.sug.map(sg => [sg.item.key, sg.cands.map(c => cmpName(c.v) + (c.score ? ' (' + Math.round(c.score * 100) + '%)' : '')).join(' / '), sg.why])));
+    }
+    if (g.src.length) {
+      ch.push(H(S.label + ' variables not in central (' + g.src.length + ')', D.HeadingLevel.HEADING_2));
+      const hasDec = g.src.some(it => cmpDecisionFor('src:' + it.key, '__item'));
+      ch.push(table([S.label + ' variable', 'Question', 'Where'].concat(hasDec ? ['Decision'] : []), g.src.map(it => [it.key, cut(it.fields[labF], 200) || '–', cmpWhere(it)].concat(hasDec ? [decText('src:' + it.key, '__item').replace('Take source value', 'Add to central')] : []))));
+    }
+    if (g.cen.length) {
+      ch.push(H('Central variables not in ' + S.label + ' (' + g.cen.length + ')', D.HeadingLevel.HEADING_2));
+      ch.push(table(['Central variable', 'Label', 'Why listed'], g.cen.map(c => [cmpName(c.v), cut(qv(c.v, 'variable_label_NL') || qv(c.v, 'variable_label_EN'), 160), c.why])));
+    }
+    const ids = new Set(g.pairs.flatMap(p => p.vars.map(v => v.id || v._uid)).concat(g.cen.map(c => c.v.id || c.v._uid)));
+    const fp = formulaF.filter(x => x.vars.some(v => ids.has(v.id || v._uid)));
+    if (fp.length) { ch.push(H('Problems', D.HeadingLevel.HEADING_2)); fp.forEach(x => ch.push(B('Formula of ' + x.vars.map(cmpName).join(', ') + ' refers to a variable that does not exist — ' + x.detail + '.'))); }
+  });
+  if (r.variants.length) {
+    ch.push(H('Differences inside the ' + S.label + ' codebook', D.HeadingLevel.HEADING_1));
+    ch.push(P('The same variable appears on several sheets with a different value.'));
+    ch.push(table(['Variable', 'Field', 'Values per sheet'], r.variants.map(x => [x.item.key, x.field, [x.first].concat(x.others).map(o => o.sheet + ' r' + o.row + ': ' + cut(o.value, 150)).join('\n')])));
+  }
+  if (r.data) {
+    const d = r.data;
+    ch.push(H('Data file', D.HeadingLevel.HEADING_1));
+    ch.push(P(CMPUI.csvName + ': ' + d.rows + ' rows, ' + d.columns + ' columns.'));
+    if (d.codesNotListed.length) { ch.push(H('Codes used in the data that the codebook does not list', D.HeadingLevel.HEADING_2)); ch.push(table(['Column', 'Codes in data', 'Codes in the codebook'], d.codesNotListed.map(x => [x.column, x.codes.join(', '), x.listed.join(', ')]))); }
+    if (d.notInData.length) { ch.push(H('In the codebook, no column in the data file (' + d.notInData.length + ')', D.HeadingLevel.HEADING_2)); ch.push(P(d.notInData.map(x => x.item.key).join(', ') + '.')); }
+    if (d.dataOnly.length) { ch.push(H('Columns in the data file not in the codebook (' + d.dataOnly.length + ')', D.HeadingLevel.HEADING_2)); ch.push(P(d.dataOnly.map(x => x.column).join(', ') + '.')); }
+  }
+  const undecided = r.findings.filter(f => f.st !== 'cosmetic' && !cmpDecisionFor(f.v.id || f.v._uid, f.field)).length;
+  ch.push(H('Open decisions', D.HeadingLevel.HEADING_1));
+  ch.push(P(undecided + ' of ' + (r.findings.length - cosmetic) + ' field differences have no decision yet; ' + r.suggestions.length + ' suggested matches are waiting for confirmation; '
+    + r.sourceOnly.filter(it => !cmpDecisionFor('src:' + it.key, '__item')).length + ' ' + S.label + ' variables not in central have no decision yet.'));
+  const doc = new D.Document({ styles: { default: { document: { run: { font: 'Calibri', size: 21 } } } },
+    sections: [{ properties: { page: { margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: ch }] });
+  return D.Packer.toBlob(doc);
+}
+// ====== END v6.43 compare screen ======
+
+
 // ====== v6.7: Field Manager ======
 let FM_STATE = { fields: [], dirty: false };
 
@@ -7769,7 +8682,7 @@ function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   var _adminBtn = document.getElementById("admin-tab-btn");
-  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports"].indexOf(name) !== -1);
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports","compare"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   // v6.42: the instrument selector and its info box only on the tabs that use them
   document.body.classList.toggle("no-inst-bar", !(name === "variables" || name === "bulk"));
