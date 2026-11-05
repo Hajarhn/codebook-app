@@ -111,6 +111,7 @@
   .infobar-item code { font-family: var(--mono); font-size: 12px; padding: 1px 5px; background: var(--surface-2); border-radius: 3px; }
 
   /* ============ INSTRUMENT BAR ============ */
+  body.no-inst-bar .instrument-bar, body.no-inst-bar #instrument-info-bar { display: none !important; }
   .instrument-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
   .instrument-bar label { font-size: 13px; font-weight: 500; color: var(--text); }
   .instrument-bar select { flex: 1; min-width: 220px; max-width: 460px; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); color: var(--text); font-family: inherit; }
@@ -1510,7 +1511,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.42.0
+      Codebook Editor — Cloud edition · v6.42.1
     </div>
   </div>
 </div>
@@ -1783,7 +1784,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.42.0 cloud</span>
+      <span class="version">v6.42.1 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -5469,16 +5470,30 @@ async function histFetchAllForReport() {
 // v6.42: report in the style of the CBRQ report — per instrument: what changed,
 // in plain tables, then what is still to do. Full detail only on request.
 function hNorm(s) { return s == null ? '' : String(s).replace(/\s+/g, ' ').trim(); }
+async function histLogStart() {
+  // The first log row ever. Variables created before it (the first bulk load
+  // into the system) are not reported as "new".
+  if (HISTORY_STATE.logStart !== undefined) return HISTORY_STATE.logStart;
+  try {
+    const { data } = await window.cloudAuth.client.from('audit_log').select('performed_at')
+      .order('performed_at', { ascending: true }).limit(1);
+    HISTORY_STATE.logStart = data && data[0] ? data[0].performed_at : null;
+  } catch (_) { HISTORY_STATE.logStart = null; }
+  return HISTORY_STATE.logStart;
+}
 async function histFetchCreatedForReport() {
   // New variables, found by creation date (also catches Excel imports, which
-  // did not log 'create' before migration 32).
+  // did not log 'create' before migration 32) — only after the log started.
   const f = HISTORY_STATE.f;
   if (f.action && f.action !== 'create') return [];
   if (f.field || f.q) return [];
+  const start = await histLogStart();
+  const fromIso = f.from ? new Date(f.from + 'T00:00:00').toISOString() : null;
+  const lower = [fromIso, start].filter(Boolean).sort().pop();
   const client = window.cloudAuth.client;
   let q = client.from('variables').select('id, variable_name_cbs, "Instrument", created_at, created_by, is_deleted')
     .order('created_at', { ascending: true }).limit(5000);
-  if (f.from) q = q.gte('created_at', new Date(f.from + 'T00:00:00').toISOString());
+  if (lower) q = q.gte('created_at', lower);
   if (f.to) q = q.lt('created_at', new Date(new Date(f.to + 'T00:00:00').getTime() + 86400000).toISOString());
   if (f.person === '__none') q = q.is('created_by', null); else if (f.person) q = q.eq('created_by', f.person);
   const ids = histVariableIdFilter();
@@ -5527,111 +5542,140 @@ async function histBuildReport(D, items, created, withDetail) {
     rows: [new D.TableRow({ tableHeader: true, children: head.map(h => cell(h, true)) })]
       .concat(rows.map(r => new D.TableRow({ children: r.map(c => cell(c)) })))
   });
-  const gap = () => new D.Paragraph({ text: '' });
   const cut = (s, n) => { s = s == null ? '' : String(s); return s.length > (n || 300) ? s.slice(0, n || 300) + '…' : s; };
   const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const info = id => histVarInfo(id, local);
   const lv = (id, k) => { const v = local.get(id); return v ? qv(v, k) : ''; };
-  const question = id => lv(id, 'Var_label_portal') || lv(id, 'variable_label_NL') || lv(id, 'variable_label_EN');
-  const portalVar = id => lv(id, 'Var_portal_FAIR_colnames') || lv(id, 'Var_portal_variable_raw_name');
   const listNames = (names, max) => { max = max || 30; return names.length > max ? names.slice(0, max).join(', ') + ' and ' + (names.length - max) + ' more' : names.join(', '); };
   const lf = s => String(s || '').toLowerCase();
-  const SPECIAL = new Set(['variable_name_cbs', 'instrument', 'display_order', 'is_deleted']);
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 
-  // ---------- gather per variable ----------
-  const createdSet = new Map();
-  (created || []).forEach(v => createdSet.set(v.id, v));
-  items.filter(i => i.action === 'create' && i.variable_id).forEach(i => { if (!createdSet.has(i.variable_id)) createdSet.set(i.variable_id, { id: i.variable_id, created_at: i.performed_at }); });
-  const instOf = id => { const v = local.get(id); if (v) return histInstOf(v) || '(no instrument)'; const d = HISTORY_STATE.varMap[id]; return (d && d.Instrument) || '(no instrument)'; };
-
-  const groups = new Map();   // instrument -> data
-  const G = inst => {
-    if (!groups.has(inst)) groups.set(inst, { vars: new Set(), changes: 0, people: {}, renames: new Map(), instMoves: new Map(),
-      created: [], delres: new Map(), fields: new Map(), moved: new Set(), approved: 0, rejected: 0, detail: [] });
-    return groups.get(inst);
+  // Columns are chosen from what is filled in: a column only appears when at
+  // least one row has a value for it.
+  const SOURCE_COLS = [
+    ['Portal variable', id => lv(id, 'Var_portal_FAIR_colnames') || lv(id, 'Var_portal_variable_raw_name')],
+    ['Biobank variable', id => lv(id, 'Var_biobank')],
+    ['Platform trials variable', id => lv(id, 'Var_platform_trials')],
+    ['Expertise clinics variable', id => lv(id, 'Var_expertise_clinics')]
+  ];
+  const QUESTION_COLS = [
+    ['Question (portal)', id => lv(id, 'Var_label_portal')],
+    ['Question (NL)', id => lv(id, 'variable_label_NL')],
+    ['Question (EN)', id => lv(id, 'variable_label_EN')]
+  ];
+  const smartTable = (ids, fixed, extra) => {
+    // fixed: [[header, id => value]] always shown; extra: shown only when some row has a value
+    const cols = fixed.concat(extra.filter(([, fn]) => ids.some(id => fn(id))));
+    return table(cols.map(c => c[0]), ids.map(id => cols.map(([, fn]) => fn(id) || '–')));
   };
-  createdSet.forEach((v, id) => { const g = G(instOf(id)); g.vars.add(id); g.created.push(v); });
-  const who = i => histWho(i);
+  const firstQuestion = ids => { const c = QUESTION_COLS.find(([, fn]) => ids.some(id => fn(id))); return c ? [c] : []; };
+
+  // ---------- which instrument sections a variable belongs to ----------
+  const instString = id => { const v = local.get(id); if (v) return histInstOf(v); const d = HISTORY_STATE.varMap[id]; return (d && d.Instrument) || ''; };
+  const sectionsOf = id => {
+    if (f.inst) return [f.inst];                       // filtered: one section
+    const a = splitInstrumentName(instString(id));
+    return a.length ? a : ['(no instrument)'];        // shared variables appear under each instrument
+  };
+  const belongs = (v, sec) => sec === '(no instrument)' ? !histInstOf(v) : variableBelongsTo(v, sec);
+
+  const groups = new Map();
+  const G = sec => {
+    if (!groups.has(sec)) groups.set(sec, { vars: new Set(), people: {}, renames: new Map(), instMoves: new Map(),
+      created: new Map(), delres: new Map(), fields: new Map(), moved: new Set(), approved: 0, rejected: 0, detail: [] });
+    return groups.get(sec);
+  };
+  const createdAll = new Map();
+  (created || []).forEach(v => createdAll.set(v.id, v));
+  items.filter(i => i.action === 'create' && i.variable_id).forEach(i => { if (!createdAll.has(i.variable_id)) createdAll.set(i.variable_id, { id: i.variable_id, created_at: i.performed_at }); });
+  createdAll.forEach((v, id) => sectionsOf(id).forEach(sec => { const g = G(sec); g.vars.add(id); g.created.set(id, v); }));
+
   items.forEach(i => {
-    if (!i.variable_id) return;
-    const g = G(instOf(i.variable_id));
-    const fl = lf(i.field_name);
+    if (!i.variable_id || i.action === 'create') return;
     if (i.action === 'update_field' && hNorm(i.old_value) === hNorm(i.new_value)) return;   // spacing only
-    if (i.action === 'create') return;
-    g.vars.add(i.variable_id); g.changes++;
-    g.people[who(i)] = (g.people[who(i)] || 0) + 1;
-    if (i.action === 'approve_change') { g.approved++; return; }
-    if (i.action === 'reject_change') { g.rejected++; return; }
-    if (i.action === 'reorder' || fl === 'display_order') { g.moved.add(i.variable_id); return; }
-    if (i.action === 'delete' || i.action === 'restore') {
-      const e = g.delres.get(i.variable_id) || []; e.push(i.action); g.delres.set(i.variable_id, e); return;
-    }
-    if (i.action !== 'update_field') return;
-    if (fl === 'variable_name_cbs') {
-      const e = g.renames.get(i.variable_id) || { old: i.old_value, neu: i.new_value }; e.neu = i.new_value; g.renames.set(i.variable_id, e); return;
-    }
-    if (fl === 'instrument') {
-      const e = g.instMoves.get(i.variable_id) || { old: i.old_value, neu: i.new_value }; e.neu = i.new_value; g.instMoves.set(i.variable_id, e); return;
-    }
-    const key = histFieldLabel(i.field_name);
-    if (!g.fields.has(key)) g.fields.set(key, new Map());
-    const m = g.fields.get(key);
-    const e = m.get(i.variable_id) || { old: i.old_value, neu: i.new_value, n: 0, last: i };
-    e.neu = i.new_value; e.n++; e.last = i; m.set(i.variable_id, e);
+    const fl = lf(i.field_name);
+    sectionsOf(i.variable_id).forEach(sec => {
+      const g = G(sec);
+      g.vars.add(i.variable_id);
+      const w = histWho(i); g.people[w] = (g.people[w] || 0) + 1;
+      if (i.action === 'approve_change') { g.approved++; return; }
+      if (i.action === 'reject_change') { g.rejected++; return; }
+      if (i.action === 'reorder' || fl === 'display_order') { g.moved.add(i.variable_id); return; }
+      if (i.action === 'delete' || i.action === 'restore') { const e = g.delres.get(i.variable_id) || []; e.push(i.action); g.delres.set(i.variable_id, e); return; }
+      if (i.action !== 'update_field') return;
+      const net = (m, key) => { const e = m.get(key) || { old: i.old_value, neu: i.new_value, n: 0, last: i }; e.neu = i.new_value; e.n++; e.last = i; m.set(key, e); };
+      if (fl === 'variable_name_cbs') return net(g.renames, i.variable_id);
+      if (fl === 'instrument') return net(g.instMoves, i.variable_id);
+      const key = histFieldLabel(i.field_name);
+      if (!g.fields.has(key)) g.fields.set(key, new Map());
+      net(g.fields.get(key), i.variable_id);
+    });
   });
 
   // ---------- document ----------
-  const period = (f.from ? day(f.from + 'T00:00:00') : day((items[0] || {}).performed_at || (created[0] || {}).created_at || new Date().toISOString()))
-    + ' – ' + (f.to ? day(f.to + 'T00:00:00') : day(new Date().toISOString()));
+  const firstIso = (items[0] || {}).performed_at || ([...createdAll.values()][0] || {}).created_at || new Date().toISOString();
+  const period = (f.from ? day(f.from + 'T00:00:00') : day(firstIso)) + ' – ' + (f.to ? day(f.to + 'T00:00:00') : day(new Date().toISOString()));
   const me = (window.cloudAuth.profile && (window.cloudAuth.profile.display_name || window.cloudAuth.profile.email)) || '';
   const filt = histActiveFilterText();
-  const insts = [...groups.keys()].sort((a, b) => a === '(no instrument)' ? 1 : b === '(no instrument)' ? -1 : a.localeCompare(b));
+  const secs = [...groups.keys()].sort((a, b) => a === '(no instrument)' ? 1 : b === '(no instrument)' ? -1 : a.localeCompare(b));
   const ch = [];
-  ch.push(H('Changes in the central codebook' + (insts.length === 1 && insts[0] !== '(no instrument)' ? ': ' + insts[0] : ''), D.HeadingLevel.TITLE));
+  ch.push(H('Changes in the central codebook' + (f.inst ? ': ' + f.inst : ''), D.HeadingLevel.TITLE));
   ch.push(P('Central PCNN codebook. Changes made ' + period + (filt ? ' (' + filt + ')' : '') + '. Made from the Editor log on ' + day(new Date().toISOString()) + (me ? ' by ' + me : '') + '.'));
-
-  if (insts.length > 1) {
+  if (secs.length > 1) {
     ch.push(H('Overview', D.HeadingLevel.HEADING_1));
+    ch.push(P('Variables that belong to more than one instrument are listed under each of them.'));
     ch.push(table(['Instrument', 'Variables changed', 'New', 'Renamed', 'Deleted', 'Fields changed'],
-      insts.map(k => { const g = groups.get(k); return [k, g.vars.size, g.created.length, g.renames.size,
+      secs.map(k => { const g = groups.get(k); return [k, g.vars.size, g.created.size, g.renames.size,
         [...g.delres.values()].filter(a => a[a.length - 1] === 'delete').length, g.fields.size]; })));
   }
 
   const notes = window.cloudInstrumentNotes || {};
-  let qF = null;
-  try { qF = runQualityChecks(qRows()); } catch (_) { qF = []; }
+  let qF; try { qF = runQualityChecks(qRows()); } catch (_) { qF = []; }
   const exc = (window._q && window._q.exc) || new Map();
   const missingFields = (window._q && window._q.missingFields && window._q.missingFields.length ? window._q.missingFields : Q_DEFAULT_MISSING)
     .filter(x => (state.allFields || []).some(y => y.toLowerCase() === x.toLowerCase()));
   const VALUE_FIELDS = new Set(['value_labels_en', 'value_labels_nl', 'value_coding_fair', 'value_coding', 'value_fair_status', 'value_labels_fair']);
 
-  insts.forEach(inst => {
-    const g = groups.get(inst);
-    const atoms = inst === '(no instrument)' ? [] : splitInstrumentName(inst);
-    ch.push(H(inst, D.HeadingLevel.HEADING_1));
+  secs.forEach(sec => {
+    const g = groups.get(sec);
+    const cur = qRows().filter(v => belongs(v, sec));
+    const instCount = cur.length;
+    ch.push(H(sec, D.HeadingLevel.HEADING_1));
     const people = Object.entries(g.people).sort((a, b) => b[1] - a[1]).map(([n, c]) => n + (Object.keys(g.people).length > 1 ? ' (' + c + ')' : ''));
-    ch.push(P(g.vars.size + ' variable' + (g.vars.size === 1 ? '' : 's') + ' changed' + (g.created.length ? ', of which ' + g.created.length + ' new' : '')
-      + (people.length ? '. Changes by ' + people.join(', ') : '') + '.'));
+    ch.push(P(plural(g.vars.size, 'variable') + ' changed' + (g.created.size ? ', of which ' + g.created.size + ' new' : '')
+      + (instCount ? ' (the instrument has ' + instCount + ' variables now)' : '') + (people.length ? '. Changes by ' + people.join(', ') : '') + '.'));
     let n = 0;
 
     if (g.instMoves.size) {
       const pairs = new Map();
-      g.instMoves.forEach((e, id) => { const k = (e.old || '(none)') + '→' + (e.neu || '(none)'); if (!pairs.has(k)) pairs.set(k, { e, ids: [] }); pairs.get(k).ids.push(id); });
-      ch.push(H((++n) + '. Instrument', D.HeadingLevel.HEADING_2));
-      pairs.forEach(({ e, ids }) => ch.push(P('The instrument was changed from ' + (e.old || '(empty)') + ' to ' + (e.neu || '(empty)') + ' for ' + ids.length + ' variable' + (ids.length === 1 ? '' : 's')
-        + (ids.length <= 10 ? ': ' + ids.map(id => info(id).name).join(', ') : '') + '.')));
-    }
-    if (g.renames.size) {
-      const rows = [...g.renames.entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
-      if (rows.length) {
-        ch.push(H((++n) + '. Renamed variables', D.HeadingLevel.HEADING_2));
-        ch.push(table(['Old (variable_name_CBS)', 'Changed to', 'Portal variable'], rows.map(([id, e]) => [e.old || '(empty)', e.neu || '(empty)', portalVar(id) || '–'])));
+      g.instMoves.forEach((e, id) => { if (hNorm(e.old) === hNorm(e.neu)) return; const k = (e.old || '') + '→' + (e.neu || ''); if (!pairs.has(k)) pairs.set(k, { e, ids: [] }); pairs.get(k).ids.push(id); });
+      if (pairs.size) {
+        ch.push(H((++n) + '. Instrument', D.HeadingLevel.HEADING_2));
+        const orderOnly = [];
+        pairs.forEach(({ e, ids }) => {
+          const sameSet = splitInstrumentName(e.old).slice().sort().join('|') === splitInstrumentName(e.neu).slice().sort().join('|');
+          if (sameSet) { orderOnly.push(...ids); return; }
+          ch.push(P('The instrument was changed from “' + (e.old || '(empty)') + '” to “' + (e.neu || '(empty)') + '” for ' + plural(ids.length, 'variable')
+            + (ids.length <= 10 ? ': ' + ids.map(id => info(id).name).join(', ') : '') + '.'));
+        });
+        if (orderOnly.length) ch.push(P('Only the order of the instrument names was changed (same instruments, e.g. “DSQ-SF + DSQ-2” → “DSQ-2 + DSQ-SF”) for ' + plural(orderOnly.length, 'variable')
+          + (orderOnly.length <= 15 ? ': ' + orderOnly.map(id => info(id).name).join(', ') : '') + '.'));
       }
     }
-    if (g.created.length) {
+    const renamed = [...g.renames.entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
+    if (renamed.length) {
+      ch.push(H((++n) + '. Renamed variables', D.HeadingLevel.HEADING_2));
+      const ids = renamed.map(([id]) => id), m = new Map(renamed);
+      ch.push(smartTable(ids, [['Old (variable_name_CBS)', id => m.get(id).old || '(empty)'], ['Changed to', id => m.get(id).neu || '(empty)']], SOURCE_COLS));
+    }
+    if (g.created.size) {
+      const ids = [...g.created.keys()];
+      const dates = new Set(ids.map(id => g.created.get(id).created_at ? day(g.created.get(id).created_at) : ''));
       ch.push(H((++n) + '. New variables added', D.HeadingLevel.HEADING_2));
-      ch.push(table(['variable_name_CBS', 'Question', 'Portal variable', 'Added'],
-        g.created.map(v => [info(v.id).name, cut(question(v.id), 200) || '–', portalVar(v.id) || '–', v.created_at ? day(v.created_at) : ''])));
+      if (dates.size === 1 && [...dates][0]) ch.push(P('Added on ' + [...dates][0] + '.'));
+      const fixed = [['variable_name_CBS', id => info(id).name]].concat(firstQuestion(ids).map(([h, fn]) => [h, id => cut(fn(id), 200)]));
+      if (dates.size > 1) fixed.push(['Added', id => g.created.get(id).created_at ? day(g.created.get(id).created_at) : '']);
+      ch.push(smartTable(ids, fixed, SOURCE_COLS));
     }
     if (g.delres.size) {
       ch.push(H((++n) + '. Deleted and restored', D.HeadingLevel.HEADING_2));
@@ -5640,85 +5684,82 @@ async function histBuildReport(D, items, created, withDetail) {
         return [info(id).name, acts.length > 1 ? (last === 'delete' ? 'Deleted (after being restored)' : 'Deleted and restored again — no net change') : (last === 'delete' ? 'Deleted' : 'Restored')];
       })));
     }
-    // fields
-    const instCount = qRows().filter(v => histInstOf(v) === inst).length;
-    const fieldRows = [];
+    // fields: simple ones in one summary table, the others each with their own table
+    const summary = [], own = [];
     [...g.fields.keys()].sort((a, b) => a.localeCompare(b)).forEach(field => {
-      const m = g.fields.get(field);
-      const net = [...m.entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
+      const net = [...g.fields.get(field).entries()].filter(([, e]) => hNorm(e.old) !== hNorm(e.neu));
       if (!net.length) return;
-      const filled = net.filter(([, e]) => !hNorm(e.old)), cleared = net.filter(([, e]) => hNorm(e.old) && !hNorm(e.neu)),
-            changed = net.filter(([, e]) => hNorm(e.old) && hNorm(e.neu));
-      const parts = [];
-      if (filled.length) parts.push('filled in for ' + filled.length);
-      if (changed.length) parts.push('changed for ' + changed.length);
-      if (cleared.length) parts.push('emptied for ' + cleared.length);
-      const newVals = new Set(net.map(([, e]) => hNorm(e.neu)));
-      let what = parts.join(', ');
-      const same = newVals.size === 1 && hNorm(net[0][1].neu) && hNorm(net[0][1].neu).length <= 60 && net.length > 1;
-      if (same) what += ' — set to “' + hNorm(net[0][1].neu) + '”';
-      let vars;
-      if (!same && net.length <= 3) vars = net.map(([id, e]) => info(id).name + ': ' + (cut(hNorm(e.old), 140) || '(empty)') + ' → ' + (cut(hNorm(e.neu), 140) || '(empty)')).join('\n');
-      else if (instCount && net.length === instCount && net.length > 5) vars = 'all ' + instCount + ' variables of ' + inst;
-      else vars = listNames(net.map(([id]) => info(id).name));
-      fieldRows.push([field, what, vars]);
       net.forEach(([id, e]) => g.detail.push([info(id).name, field + (e.n > 1 ? ' (' + e.n + ' edits)' : ''), cut(e.old) || '(empty)', cut(e.neu) || '(empty)', day(e.last.performed_at), histWho(e.last)]));
+      const filled = net.filter(([, e]) => !hNorm(e.old)).length, cleared = net.filter(([, e]) => hNorm(e.old) && !hNorm(e.neu)).length, changed = net.length - filled - cleared;
+      const parts = [];
+      if (filled) parts.push('filled in for ' + filled);
+      if (changed) parts.push('changed for ' + changed);
+      if (cleared) parts.push('emptied for ' + cleared);
+      const newVals = new Set(net.map(([, e]) => hNorm(e.neu)));
+      const oneVal = newVals.size === 1 ? hNorm(net[0][1].neu) : null;
+      const varsText = () => (instCount && net.length === instCount && net.length > 5) ? 'all ' + instCount + ' variables' : listNames(net.map(([id]) => info(id).name));
+      if (net.length > 1 && oneVal !== null && !changed && oneVal.length <= 80)
+        summary.push([field, parts.join(', ') + (oneVal ? ' — set to “' + oneVal + '”' : ''), varsText()]);
+      else if (net.length > 12 && !changed)
+        summary.push([field, parts.join(', '), varsText()]);
+      else own.push({ field, net, what: parts.join(', ') });
     });
-    if (fieldRows.length) {
+    if (summary.length || own.length) {
       ch.push(H((++n) + '. Fields filled in or changed', D.HeadingLevel.HEADING_2));
-      ch.push(table(['Field', 'What changed', 'Variables'], fieldRows));
+      if (summary.length) ch.push(table(['Field', 'What changed', 'Variables'], summary));
+      own.forEach(({ field, net, what }) => {
+        ch.push(P(field + ' — ' + what, { run: { bold: true }, para: { spacing: { before: 160, after: 60 } } }));
+        const hasOld = net.some(([, e]) => hNorm(e.old)), hasNew = net.some(([, e]) => hNorm(e.neu));
+        const head = ['Variable'].concat(hasOld ? ['Before'] : [], hasNew ? ['After'] : []);
+        ch.push(table(head, net.map(([id, e]) => [info(id).name].concat(hasOld ? [cut(hNorm(e.old)) || '(empty)'] : [], hasNew ? [cut(hNorm(e.neu)) || '(empty)'] : []))));
+      });
     }
     if (g.moved.size) {
       ch.push(H((++n) + '. Order of the questions', D.HeadingLevel.HEADING_2));
-      ch.push(P('The order was changed (' + g.moved.size + ' variable' + (g.moved.size === 1 ? '' : 's') + ' moved).'));
+      ch.push(P('The order was changed (' + plural(g.moved.size, 'variable') + ' moved).'));
     }
     if (g.approved || g.rejected) {
       ch.push(H((++n) + '. Suggested changes reviewed', D.HeadingLevel.HEADING_2));
       ch.push(P(g.approved + ' approved, ' + g.rejected + ' rejected.'));
     }
-    // notes
-    const noteTexts = atoms.map(a => ({ a, t: ((notes[a] || {}).note || '').trim() })).filter(x => x.t);
-    if (noteTexts.length) {
+    const noteText = ((notes[sec] || {}).note || '').trim();
+    if (noteText) {
       ch.push(H((++n) + '. Notes', D.HeadingLevel.HEADING_2));
-      noteTexts.forEach(({ a, t }) => {
-        if (noteTexts.length > 1) ch.push(P(a, { run: { bold: true } }));
-        t.split(/\n/).map(s => s.trim()).filter(Boolean).forEach(line => {
-          const b = line.match(/^[-•*]\s*(.*)$/);
-          ch.push(b ? B(b[1]) : P(line));
-        });
-      });
+      noteText.split(/\n/).map(s => s.trim()).filter(Boolean).forEach(line => { const b = line.match(/^[-•*]\s*(.*)$/); ch.push(b ? B(b[1]) : P(line)); });
     }
-    // still to do: as the codebook is now
-    const cur = qRows().filter(v => histInstOf(v) === inst);
+    // still to do — as the codebook is now
     const todo = [];
-    if (cur.length) {
-      missingFields.forEach(fld => {
-        const isVal = VALUE_FIELDS.has(fld.toLowerCase());
-        const base = isVal ? cur.filter(v => qv(v, 'values') || qv(v, 'value_labels_NL')) : cur;
-        if (!base.length) return;
-        const empty = base.filter(v => !qv(v, fld));
-        if (!empty.length) return;
-        todo.push(fld + ': ' + (empty.length === base.length ? 'empty for all ' + base.length + (isVal ? ' variables with answer options' : '')
-          : 'empty for ' + empty.length + ' of ' + base.length + ' (' + listNames(empty.map(v => qName(v)), 15) + ')'));
-      });
-    }
+    missingFields.forEach(fld => {
+      const isVal = VALUE_FIELDS.has(fld.toLowerCase());
+      const base = isVal ? cur.filter(v => qv(v, 'values') || qv(v, 'value_labels_NL')) : cur;
+      if (!base.length) return;
+      const empty = base.filter(v => !qv(v, fld));
+      if (!empty.length) return;
+      todo.push(fld + ': ' + (empty.length === base.length ? 'empty for all ' + base.length + (isVal ? ' variables with answer options' : '')
+        : 'empty for ' + empty.length + ' of ' + base.length + (empty.length <= 15 ? ' (' + empty.map(v => qName(v)).join(', ') + ')' : '')));
+    });
     const curIds = new Set(cur.map(v => v.id || v._uid));
-    const noteAll = lf(noteTexts.map(x => x.t).join(' '));
+    const noteAll = lf(noteText);
     const seen = new Set();
     const checks = (qF || []).filter(x => x.vars.some(v => curIds.has(v.id || v._uid)))
       .filter(x => !exc.has(x.check + '#' + x.key))
       .filter(x => { const k = x.check + '#' + x.key; if (seen.has(k)) return false; seen.add(k); return true; })
-      .filter(x => { const ids = (x.detail.match(/[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+/g) || []); return !ids.some(t => noteAll.includes(t.toLowerCase())); });
+      .filter(x => !(x.detail.match(/[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+/g) || []).some(t => noteAll.includes(t.toLowerCase())));
     if (todo.length || checks.length) {
       ch.push(H((++n) + '. Still to do', D.HeadingLevel.HEADING_2));
       if (todo.length) {
-        ch.push(P('For the ' + cur.length + ' variables of ' + inst + ', as the codebook is now, these fields are not filled in:'));
+        ch.push(P('For the ' + cur.length + ' variables of ' + sec + ', as the codebook is now, these fields are not filled in:'));
         todo.forEach(t => ch.push(B(t)));
       }
       if (checks.length) {
-        ch.push(P(noteTexts.length ? 'Also to check (from the Quality tab; points already in the notes are left out):' : 'Also to check (from the Quality tab):'));
-        checks.slice(0, 60).forEach(x => ch.push(B((Q_CHECKS[x.check] ? Q_CHECKS[x.check].title : x.check) + ' — ' + x.detail + ' (' + x.vars.map(qName).join(', ') + ')')));
-        if (checks.length > 60) ch.push(P('… and ' + (checks.length - 60) + ' more in the Quality tab.'));
+        ch.push(P(noteText ? 'Also to check (from the Quality tab; points already in the notes are left out):' : 'Also to check (from the Quality tab):'));
+        const byCheck = new Map();
+        checks.forEach(x => { if (!byCheck.has(x.check)) byCheck.set(x.check, []); byCheck.get(x.check).push(x); });
+        byCheck.forEach((xs, k) => {
+          ch.push(P((Q_CHECKS[k] ? Q_CHECKS[k].title : k) + ' (' + xs.length + ')', { run: { bold: true } }));
+          xs.slice(0, 25).forEach(x => ch.push(B(x.vars.map(qName).join(', ') + ' — ' + x.detail)));
+          if (xs.length > 25) ch.push(P('… and ' + (xs.length - 25) + ' more in the Quality tab.'));
+        });
       }
     }
   });
@@ -5726,14 +5767,13 @@ async function histBuildReport(D, items, created, withDetail) {
   if (withDetail) {
     ch.push(H('Full detail', D.HeadingLevel.HEADING_1));
     ch.push(P('Every field change in the period, one row per variable and field: the value at the start and at the end. Changes in spacing only are left out.'));
-    insts.forEach(inst => {
-      const g = groups.get(inst);
+    secs.forEach(sec => {
+      const g = groups.get(sec);
       if (!g.detail.length) return;
-      ch.push(H(inst, D.HeadingLevel.HEADING_2));
-      ch.push(table(['Variable', 'Field', 'Old', 'New', 'Date', 'By'], g.detail));
+      ch.push(H(sec, D.HeadingLevel.HEADING_2));
+      ch.push(table(['Variable', 'Field', 'Before', 'After', 'Date', 'By'], g.detail));
     });
   }
-
   const doc = new D.Document({
     styles: { default: { document: { run: { font: 'Calibri', size: 21 } } } },
     sections: [{ properties: { page: { margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: ch }]
@@ -7731,6 +7771,8 @@ function switchTab(name) {
   var _adminBtn = document.getElementById("admin-tab-btn");
   if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
+  // v6.42: the instrument selector and its info box only on the tabs that use them
+  document.body.classList.toggle("no-inst-bar", !(name === "variables" || name === "bulk"));
   if (name === "variables") refreshVariablesTab();
   else if (name === "bulk") refreshBulkTab();
   else if (name === "search") refreshSearchTab();
@@ -7788,6 +7830,11 @@ function qLev(a, b) {
 function qCodes(text) { const out = []; String(text || '').replace(/\[\s*([^\]\s]+)\s*\]/g, (_, c) => { out.push(c); return ''; }); return out; }
 function qLabelsOnly(text) { return String(text || '').split(/\[\s*[^\]]+\]/).map(qNorm).filter(Boolean); }
 function qName(v) { return getId(v) || v.id || '?'; }
+function qFreqSevPair(a, b) {
+  const k = x => String(x).toLowerCase().replace(/[_\-.](freq|frequency|sev|severity)$/, '');
+  const t = x => (String(x).toLowerCase().match(/[_\-.](freq|frequency|sev|severity)$/) || [])[1] || '';
+  return t(a) && t(b) && t(a)[0] !== t(b)[0] && k(a) === k(b);
+}
 function qRows() { return (state.codebook || []).filter(v => !v._deleted); }
 function qInScope(v) { return !window._q.inst || variableBelongsTo(v, window._q.inst); }
 function qCanEdit() { const r = window.cloudAuth && window.cloudAuth.role; return r === 'admin' || r === 'editor' || r === 'ontology_engineer'; }
@@ -7890,6 +7937,7 @@ function runQualityChecks(rows) {
   const ws = lab.map(x => ({ v: x.v, t: x.nl, w: qWords(x.nl) })).filter(x => x.w.size >= 4);
   for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) {
     if (ws[i].t === ws[j].t) continue;
+    if (qFreqSevPair(qName(ws[i].v), qName(ws[j].v))) continue;   // v6.42: DSQ frequency/severity pairs are meant to be alike
     const r = qJacc(ws[i].w, ws[j].w); if (r >= 0.85) add('similar_question', [ws[i].v, ws[j].v], `${Math.round(r * 100)}% the same words`);
   }
 
