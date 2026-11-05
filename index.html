@@ -191,6 +191,21 @@
   /* ============ QUALITY (v6.39) ============ */
   .q-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
   .q-sub { display:flex; gap:3px; background:var(--surface-2); padding:3px; border-radius:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .q-nav { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-bottom:14px; }
+  .q-navbtn { display:flex; gap:10px; align-items:flex-start; text-align:left; padding:11px 12px; border:1px solid var(--border-strong); border-radius:10px; background:var(--surface); cursor:pointer; box-shadow:var(--shadow-sm); transition:border-color .12s, background .12s; }
+  .q-navbtn:hover { border-color:var(--accent); background:var(--accent-bg); }
+  .q-navbtn.active { border:2px solid var(--accent); background:var(--accent-bg); padding:10px 11px; }
+  .q-navic { font-size:20px; line-height:1; width:26px; height:26px; display:grid; place-items:center; border-radius:7px; background:var(--surface-2); color:var(--accent-text); flex-shrink:0; }
+  .q-navbtn.active .q-navic { background:var(--accent); color:#fff; }
+  .q-navtx { display:flex; flex-direction:column; min-width:0; }
+  .q-navtitle { font-size:14px; font-weight:600; color:var(--text); }
+  .q-navcount { font-size:12.5px; font-weight:600; color:var(--accent-text); margin-top:1px; }
+  .q-navdesc { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .q-vars { display:flex; flex-wrap:wrap; gap:6px; }
+  .q-varbox { display:inline-flex; align-items:center; gap:3px; border:1px solid var(--border); border-radius:6px; padding:2px 3px 2px 7px; background:var(--surface-2); }
+  .q-ib { font-size:11px; padding:2px 7px; border:1px solid var(--border-strong); background:var(--surface); border-radius:5px; cursor:pointer; color:var(--text); line-height:1.3; }
+  .q-ib:hover { border-color:var(--accent); color:var(--accent-text); }
+  .q-ib-edit { color:var(--accent-text); }
   .q-sub button { border:none; background:transparent; padding:6px 12px; border-radius:4px; font-size:12px; color:var(--text-muted); cursor:pointer; }
   .q-sub button.active { background:var(--surface); color:var(--text); box-shadow:0 1px 2px rgba(0,0,0,.05); font-weight:500; }
   .q-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
@@ -202,7 +217,7 @@
   .q-row:last-child { border-bottom:none; }
   .q-sev { width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-top:5px; }
   .q-sev.error { background:#b42318; } .q-sev.warn { background:#d97706; } .q-sev.info { background:#3b82f6; }
-  .q-var { font-family:var(--mono); font-size:11.5px; color:var(--accent-text); cursor:pointer; text-decoration:underline dotted; }
+  .q-var { font-family:var(--mono); font-size:11.5px; color:var(--accent-text); cursor:pointer; text-decoration:underline; margin-right:3px; }
   .q-muted { color:var(--text-muted); font-size:11.5px; }
   .q-table { width:100%; border-collapse:collapse; font-size:12.5px; }
   .q-table th { text-align:left; font-size:11px; color:var(--text-muted); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--border-strong); background:var(--surface-2); position:sticky; top:0; }
@@ -1450,7 +1465,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.39.0
+      Codebook Editor — Cloud edition · v6.40.0
     </div>
   </div>
 </div>
@@ -1723,7 +1738,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.39.0 cloud</span>
+      <span class="version">v6.40.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -7019,7 +7034,7 @@ const Q_KNOWN_PREFIX = ['sct', 'lnc', 'ncit', 'pcnn'];
 const Q_PREFIX_TYPO = { nci: 'ncit', snct: 'sct', svg: 'sct', sctid: 'sct', loinc: 'lnc', snomed: 'sct' };
 const Q_MAPPING_OK = ['exact match', 'close match', 'broad match', 'narrow match', 'related match'];
 const Q_CHECKS = {
-  name_dup:        { sev: 'error', title: 'Same variable name' },
+  name_dup:        { sev: 'error', title: 'Same variable name' },   // shown under Duplicates
   formula_ref:     { sev: 'error', title: 'Formula refers to a variable that does not exist' },
   name_near:       { sev: 'info',  title: 'Very similar variable names' },
   same_question:   { sev: 'warn',  title: 'Same question text on different variables' },
@@ -7055,7 +7070,14 @@ function qLabelsOnly(text) { return String(text || '').split(/\[\s*[^\]]+\]/).ma
 function qName(v) { return getId(v) || v.id || '?'; }
 function qRows() { return (state.codebook || []).filter(v => !v._deleted); }
 function qInScope(v) { return !window._q.inst || variableBelongsTo(v, window._q.inst); }
-function qVarLink(v) { return `<span class="q-var" title="${escapeAttr(qv(v, 'variable_label_EN') || qv(v, 'variable_label_NL'))}" onclick="openEditDialog('${escapeAttr(v._uid)}')">${escapeHtml(qName(v))}</span>`; }
+function qCanEdit() { const r = window.cloudAuth && window.cloudAuth.role; return r === 'admin' || r === 'editor' || r === 'ontology_engineer'; }
+function qVarLink(v) {
+  const u = escapeAttr(v._uid), lab = escapeAttr(qv(v, 'variable_label_EN') || qv(v, 'variable_label_NL'));
+  return `<span class="q-varbox"><span class="q-var" title="Open — ${lab}" onclick="openViewDialog('${u}')">${escapeHtml(qName(v))}</span>`
+    + `<button class="q-ib" title="View all fields" onclick="openViewDialog('${u}')">👁 View</button>`
+    + (qCanEdit() ? `<button class="q-ib q-ib-edit" title="Edit this variable" onclick="openEditDialog('${u}')">✎ Edit</button>` : '')
+    + `</span>`;
+}
 function qKey(vs) { return vs.map(v => v.id || v._uid).sort().join('|'); }
 
 async function loadQualityExceptions() {
@@ -7259,14 +7281,30 @@ async function renderQuality(reload) {
   const q = window._q;
   if (reload) await loadQualityExceptions();
   const insts = getAllAtomicInstruments();
-  const subs = [['checks', 'Checks'], ['dups', 'Duplicates'], ['missing', 'Missing values'], ['scales', 'Answer scales'], ['fair', 'FAIR status']];
+  // compute once per render; the section buttons show live counts
+  const allRows = qRows();
+  q.F = runQualityChecks(allRows).filter(f => f.vars.some(qInScope));
+  const openF = q.F.filter(f => !q.exc.has(f.check + '#' + f.key));
+  const DUPS = ['name_dup', 'name_near', 'same_question', 'similar_question', 'same_q_diff_fair', 'portal_dup', 'item_dup'];
+  const scope = allRows.filter(qInScope);
+  const nScales = new Set(scope.map(v => qNorm(qv(v, 'value_labels_EN'))).filter(Boolean)).size;
+  const nMissing = scope.filter(v => !qv(v, 'sources') || !qv(v, 'variable_label_EN') || !(qv(v, 'variable_name_FAIR') || qv(v, 'variable_name_FAIR_merged'))).length;
+  const nFair = scope.filter(v => { const [sg] = qSuggestStatus(v, 'variable'); return sg && qv(v, 'fair_status') !== sg; }).length;
+  const subs = [
+    ['checks',  '⚠', 'Checks',         `${openF.filter(f => !DUPS.includes(f.check)).length} findings`, 'All automatic checks'],
+    ['dups',    '⧉', 'Duplicates',     `${openF.filter(f => DUPS.includes(f.check)).length} findings`, 'Names, questions, portal names'],
+    ['missing', '◌', 'Missing values', `${nMissing} variables`, 'No source, EN label or FAIR code'],
+    ['scales',  '≡', 'Answer scales',  `${nScales} scales`, 'Shared and similar answers'],
+    ['fair',    '✓', 'FAIR status',    `${nFair} to set or check`, 'Confirmed / review / proposed'],
+  ];
   host.innerHTML = `<div class="q-bar">
       <label class="field-inline" style="display:flex;gap:6px;align-items:center;font-size:12.5px;">Instrument
         <select id="q-inst" style="width:auto; min-width:200px;"><option value="">All instruments</option>${insts.map(i => `<option value="${escapeAttr(i)}" ${q.inst === i ? 'selected' : ''}>${escapeHtml(i)}</option>`).join('')}</select></label>
       ${(q.sub === 'checks' || q.sub === 'dups') ? `<label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;"><input type="checkbox" id="q-showok" ${q.showOk ? 'checked' : ''}> Show findings marked OK</label>` : ''}
       ${!q.excReady && (q.sub === 'checks' || q.sub === 'dups') ? `<span class="q-muted">“Mark OK” needs migration 31.</span>` : ''}
     </div>
-    <div class="q-sub">${subs.map(([id, l]) => `<button class="${q.sub === id ? 'active' : ''}" onclick="window._q.sub='${id}'; renderQuality();">${l}</button>`).join('')}</div>
+    <div class="q-nav">${subs.map(([id, ic, l, n, d]) => `<button class="q-navbtn ${q.sub === id ? 'active' : ''}" onclick="window._q.sub='${id}'; renderQuality();">
+        <span class="q-navic">${ic}</span><span class="q-navtx"><span class="q-navtitle">${l}</span><span class="q-navcount">${n}</span><span class="q-navdesc">${d}</span></span></button>`).join('')}</div>
     <div id="q-content"></div>`;
   host.querySelector('#q-inst').addEventListener('change', e => { q.inst = e.target.value; q.fairSel = new Set(); renderQuality(); });
   const so = host.querySelector('#q-showok'); if (so) so.addEventListener('change', e => { q.showOk = e.target.checked; renderQuality(); });
@@ -7280,8 +7318,9 @@ async function renderQuality(reload) {
 
 function qRenderChecks(el, only) {
   const q = window._q, admin = isAdminRole();
-  let F = runQualityChecks(qRows()).filter(f => f.vars.some(qInScope));
-  if (only) F = F.filter(f => only.includes(f.check));
+  let F = (q.F || runQualityChecks(qRows()).filter(f => f.vars.some(qInScope))).slice();
+  const DUPS = ['name_dup', 'name_near', 'same_question', 'similar_question', 'same_q_diff_fair', 'portal_dup', 'item_dup'];
+  F = only ? F.filter(f => only.includes(f.check)) : F.filter(f => !DUPS.includes(f.check));
   const okCount = F.filter(f => q.exc.has(f.check + '#' + f.key)).length;
   if (!q.showOk) F = F.filter(f => !q.exc.has(f.check + '#' + f.key));
   const by = {}; F.forEach(f => (by[f.check] = by[f.check] || []).push(f));
@@ -7298,7 +7337,7 @@ function qRenderChecks(el, only) {
     ${F.length ? '' : '<div class="empty-state"><p>Nothing found. 🎉</p></div>'}
     ${order.filter(k => !q.checkFilter || k === q.checkFilter).map(k => `<div class="q-card"><div class="q-card-h"><span class="q-sev ${Q_CHECKS[k].sev}" style="margin:0;"></span><strong style="font-size:13px;">${escapeHtml(Q_CHECKS[k].title)}</strong><span class="q-muted">${by[k].length}</span></div>
       ${by[k].slice(0, 300).map(f => { const ok = q.exc.get(f.check + '#' + f.key);
-        return `<div class="q-row" style="${ok ? 'opacity:.55;' : ''}"><div style="flex:1;">${f.vars.map(qVarLink).join(' · ')}<div class="q-muted" style="margin-top:2px;">${escapeHtml(f.detail)}</div>${ok ? `<div class="q-muted">✔ marked OK${ok.note ? ': ' + escapeHtml(ok.note) : ''}</div>` : ''}</div>
+        return `<div class="q-row" style="${ok ? 'opacity:.55;' : ''}"><div style="flex:1;"><div class="q-vars">${f.vars.map(qVarLink).join('')}</div><div class="q-muted" style="margin-top:2px;">${escapeHtml(f.detail)}</div>${ok ? `<div class="q-muted">✔ marked OK${ok.note ? ': ' + escapeHtml(ok.note) : ''}</div>` : ''}</div>
           ${admin && q.excReady ? (ok ? `<button class="btn-mini" onclick="qUnmark('${f.check}','${escapeAttr(f.key)}')">Undo OK</button>` : `<button class="btn-mini" onclick="qMarkOk('${f.check}','${escapeAttr(f.key)}')" title="Hide this finding for everyone">Mark OK</button>`) : ''}</div>`; }).join('')}
       ${by[k].length > 300 ? `<div class="q-row q-muted">… ${by[k].length - 300} more — use “Download list”.</div>` : ''}</div>`).join('')}`;
   el.querySelectorAll('.q-chip').forEach(c => c.addEventListener('click', () => { q.checkFilter = c.dataset.c; renderQuality(); }));
@@ -8393,9 +8432,10 @@ const SEARCH_PRESET_COMMON = [
 function refreshSearchTab() {
   if (!state.codebook) return;
   if (!SEARCH_STATE.initialized) {
-    // Start empty — user decides. No defaults selected.
+    // Start with the last choice of this browser (v6.40), otherwise empty.
     SEARCH_STATE.searchInFields = new Set();
     SEARCH_STATE.displayFields = new Set();
+    searchLoadChoice();
     SEARCH_STATE.initialized = true;
   }
   renderSearchFieldsGrid("search");
@@ -8403,37 +8443,124 @@ function refreshSearchTab() {
   runSearch();
 }
 
-function renderSearchFieldsGrid(which) {
+// v6.40: field pickers with a filter box, A–Z or grouped order, selected
+// fields as chips (drag to reorder the result columns), and remembered choice.
+const SEARCH_UI = { filter: { search: '', display: '' }, order: 'groups' };
+function searchSaveChoice() {
+  try { localStorage.setItem('cb_search_fields_v1', JSON.stringify({ search: [...SEARCH_STATE.searchInFields], display: [...SEARCH_STATE.displayFields], order: SEARCH_UI.order })); } catch (e) { /* storage unavailable */ }
+}
+function searchLoadChoice() {
+  try {
+    const raw = localStorage.getItem('cb_search_fields_v1'); if (!raw) return false;
+    const o = JSON.parse(raw), ok = f => state.allFields.includes(f);
+    SEARCH_STATE.searchInFields = new Set((o.search || []).filter(ok));
+    SEARCH_STATE.displayFields = new Set((o.display || []).filter(ok));
+    if (o.order === 'az' || o.order === 'groups') SEARCH_UI.order = o.order;
+    return true;
+  } catch (e) { return false; }
+}
+function searchEnsureTools(which, grid) {
+  const id = grid.id + '-tools';
+  let t = document.getElementById(id);
+  if (t) return t;
+  grid.style.maxHeight = '320px';
+  t = document.createElement('div'); t.id = id;
+  t.innerHTML = `<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+      <input type="search" data-sf="filter" placeholder="Find a field… (e.g. fair, label, portal)" style="flex:1; min-width:220px; padding:5px 9px; font-size:12.5px;">
+      <label style="display:flex; gap:6px; align-items:center; margin:0; font-weight:400; font-size:12px;">Order
+        <select data-sf="order" style="width:auto; padding:3px 6px; font-size:12px;"><option value="groups">By group (A–Z inside)</option><option value="az">A–Z</option></select></label>
+      <span style="font-size:11.5px; color:var(--text-muted);">Quick sets:</span>
+      <button class="btn-mini" data-sp="labels">Labels</button><button class="btn-mini" data-sp="fair">FAIR</button><button class="btn-mini" data-sp="sources">Sources / portal</button>
+    </div>
+    <div data-sf="chips" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px;"></div>`;
+  grid.parentNode.insertBefore(t, grid);
+  const f = t.querySelector('[data-sf="filter"]');
+  f.addEventListener('input', () => { SEARCH_UI.filter[which] = f.value; renderSearchFieldsGrid(which, true); });
+  const o = t.querySelector('[data-sf="order"]');
+  o.addEventListener('change', () => { SEARCH_UI.order = o.value; searchSaveChoice(); renderSearchFieldsGrid('search', true); renderSearchFieldsGrid('display', true); });
+  t.querySelectorAll('[data-sp]').forEach(b => b.addEventListener('click', () => searchQuickSet(which, b.dataset.sp)));
+  return t;
+}
+function searchQuickSet(which, kind) {
+  const all = state.allFields.filter(f => !f.startsWith('_'));
+  const pick = all.filter(f => kind === 'labels' ? /label/i.test(f)
+    : kind === 'fair' ? /fair/i.test(f)
+    : (f === 'sources' || /^(Var_|Val_|Dep_|Source_|field_type)/.test(f) || /portal|biobank|platform|expertise/i.test(f)));
+  const target = which === 'search' ? SEARCH_STATE.searchInFields : SEARCH_STATE.displayFields;
+  if (which === 'display') [state.identifierField, state.instrumentField].forEach(f => { if (f && !target.has(f)) target.add(f); });
+  pick.forEach(f => target.add(f));
+  searchSaveChoice(); renderSearchFieldsGrid(which); runSearch();
+}
+function renderSearchFieldsGrid(which, keepFocus) {
   const gridId = which === "search" ? "search-fields-grid" : "search-display-grid";
   const grid = document.getElementById(gridId);
   const selectedSet = which === "search" ? SEARCH_STATE.searchInFields : SEARCH_STATE.displayFields;
   const dataAttr = which === "search" ? "data-search-field" : "data-display-field";
-  const groups = groupFields(state.allFields);
-  const labels = { identifiers: "ID", labels: "Labels", values: "Values", tracking: "Tracking", other: "Other" };
+  const tools = searchEnsureTools(which, grid);
+  tools.querySelector('[data-sf="order"]').value = SEARCH_UI.order;
+  const fbox = tools.querySelector('[data-sf="filter"]'); if (fbox.value !== SEARCH_UI.filter[which]) fbox.value = SEARCH_UI.filter[which];
+  const q = (SEARCH_UI.filter[which] || '').trim().toLowerCase();
+  const match = f => !q || f.toLowerCase().includes(q) || (window.cloudFieldMeta && window.cloudFieldMeta[f] && String(window.cloudFieldMeta[f].display_label || '').toLowerCase().includes(q));
+  const az = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' });
+
+  // chips of the selected fields (for "show in results": this is the column order; drag to change)
+  const chips = tools.querySelector('[data-sf="chips"]');
+  const sel = [...selectedSet];
+  chips.innerHTML = sel.length
+    ? `<span style="font-size:11.5px; color:var(--text-muted); align-self:center;">${which === 'display' ? 'Columns, in this order (drag to move):' : 'Selected:'}</span>` + sel.map(f =>
+        `<span class="sf-chip" ${which === 'display' ? 'draggable="true"' : ''} data-chip="${escapeAttr(f)}" style="display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:11px; padding:2px 4px 2px 8px; border-radius:12px; background:var(--accent-bg); color:var(--accent-text); border:1px solid #c5e2dd; ${which === 'display' ? 'cursor:grab;' : ''}">${escapeHtml(f)}<button data-unchip="${escapeAttr(f)}" title="Remove" style="border:none; background:none; cursor:pointer; color:inherit; font-size:13px; line-height:1; padding:0 3px;">×</button></span>`).join('')
+    : `<span style="font-size:11.5px; color:var(--text-faint);">Nothing selected yet.</span>`;
+  chips.querySelectorAll('[data-unchip]').forEach(b => b.addEventListener('click', () => { selectedSet.delete(b.dataset.unchip); searchSaveChoice(); renderSearchFieldsGrid(which); runSearch(); }));
+  if (which === 'display') {
+    let drag = null;
+    chips.querySelectorAll('[data-chip]').forEach(c => {
+      c.addEventListener('dragstart', e => { drag = c.dataset.chip; c.style.opacity = '.4'; try { e.dataTransfer.setData('text/plain', drag); } catch (_) {} });
+      c.addEventListener('dragend', () => { c.style.opacity = ''; });
+      c.addEventListener('dragover', e => e.preventDefault());
+      c.addEventListener('drop', e => {
+        e.preventDefault(); const target = c.dataset.chip; if (!drag || drag === target) return;
+        const order = [...SEARCH_STATE.displayFields].filter(x => x !== drag);
+        const r = c.getBoundingClientRect(); let i = order.indexOf(target); if (e.clientX - r.left > r.width / 2) i++;
+        order.splice(i, 0, drag);
+        SEARCH_STATE.displayFields = new Set(order); searchSaveChoice(); renderSearchFieldsGrid('display'); runSearch();
+      });
+    });
+  }
+
+  const box = f => `<label style="display: flex; align-items: center; padding: 2px 0; font-weight: 400; color: var(--text); margin: 0; cursor: pointer; font-size: 12px;">
+          <input type="checkbox" ${dataAttr}="${escapeAttr(f)}" ${selectedSet.has(f) ? "checked" : ""} style="margin-right: 5px;">
+          <code style="font-family: var(--mono); font-size: 11px;">${escapeHtml(f)}</code></label>`;
   grid.innerHTML = "";
-  for (const gKey of Object.keys(labels)) {
-    const fields = groups[gKey];
-    if (!fields.length) continue;
-    const section = document.createElement("div");
-    section.style.cssText = "border-left: 2px solid var(--border); padding-left: 8px;";
-    section.innerHTML = `<div style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--accent-text); margin-bottom: 3px;">${labels[gKey]}</div>` +
-      fields.map(f => {
-        const checked = selectedSet.has(f) ? "checked" : "";
-        return `<label style="display: flex; align-items: center; padding: 2px 0; font-weight: 400; color: var(--text); margin: 0; cursor: pointer; font-size: 12px;">
-          <input type="checkbox" ${dataAttr}="${escapeAttr(f)}" ${checked} style="margin-right: 5px;">
-          <code style="font-family: var(--mono); font-size: 11px;">${escapeHtml(f)}</code>
-        </label>`;
-      }).join("");
-    grid.appendChild(section);
+  if (SEARCH_UI.order === 'az') {
+    const fields = state.allFields.filter(f => !f.startsWith('_') && f !== 'id' && match(f)).sort(az);
+    grid.style.display = 'block'; grid.style.columns = '220px';
+    grid.innerHTML = fields.map(box).join('') || `<div style="font-size:12px; color:var(--text-faint);">No field matches “${escapeHtml(q)}”.</div>`;
+  } else {
+    grid.style.display = 'grid'; grid.style.columns = '';
+    const groups = groupFields(state.allFields);
+    const labels = { identifiers: "ID", labels: "Labels", values: "Values", tracking: "Tracking", other: "Other" };
+    let any = false;
+    for (const gKey of Object.keys(labels)) {
+      const fields = groups[gKey].filter(match).sort(az);
+      if (!fields.length) continue;
+      any = true;
+      const section = document.createElement("div");
+      section.style.cssText = "border-left: 2px solid var(--border); padding-left: 8px;";
+      section.innerHTML = `<div style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--accent-text); margin-bottom: 3px;">${labels[gKey]}</div>` + fields.map(box).join("");
+      grid.appendChild(section);
+    }
+    if (!any) grid.innerHTML = `<div style="font-size:12px; color:var(--text-faint);">No field matches “${escapeHtml(q)}”.</div>`;
   }
   grid.querySelectorAll(`input[${dataAttr}]`).forEach(cb => {
     cb.addEventListener("change", () => {
       const f = cb.getAttribute(dataAttr);
       if (cb.checked) selectedSet.add(f); else selectedSet.delete(f);
+      searchSaveChoice(); renderSearchFieldsGrid(which, true);
       updateSearchFieldsSummary();
       debouncedSearch();
     });
   });
+  if (keepFocus && document.activeElement !== fbox && SEARCH_UI.filter[which]) { /* leave focus where the user is */ }
   updateSearchFieldsSummary();
 }
 
@@ -8462,6 +8589,7 @@ function searchSelectPreset(which, preset) {
     if (which === "search") SEARCH_STATE.searchInFields = new Set(common);
     else SEARCH_STATE.displayFields = new Set(common);
   }
+  searchSaveChoice();
   renderSearchFieldsGrid(which);
   runSearch();
 }
@@ -8484,7 +8612,7 @@ function runSearch() {
   const caseSensitive = document.getElementById("search-case-sensitive").checked;
   const includeDeleted = document.getElementById("search-include-deleted").checked;
   const searchFields = [...SEARCH_STATE.searchInFields];
-  const displayFields = [...SEARCH_STATE.displayFields].sort((a, b) => state.allFields.indexOf(a) - state.allFields.indexOf(b));
+  const displayFields = [...SEARCH_STATE.displayFields];   // v6.40: in the order of the chips
   const resultsEl = document.getElementById("search-results-table");
   const headerEl = document.getElementById("search-results-header");
   const emptyEl = document.getElementById("search-empty");
