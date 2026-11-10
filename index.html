@@ -529,6 +529,60 @@
   .admin-menu-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint, #b6bac2); padding: 7px 12px 3px; }
   .admin-menu-label:not(:first-child) { border-top: 1px solid var(--border, #e3e5e8); margin-top: 4px; }
   .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  /* v6.47 discussions + since */
+  .disc-badge { display: inline-block; font-size: 10.5px; padding: 0 6px; margin-left: 4px; border-radius: 9px; background: #e7f0fb; color: #1e4f8a; border: 1px solid #c7dbf3; cursor: pointer; vertical-align: 1px; }
+  .disc-thread { border: 1px solid var(--border, #e3e5e8); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; background: #fff; }
+  .disc-thread.resolved { background: var(--surface-2, #f1f3f7); opacity: .85; }
+  .disc-msg { padding: 4px 0; }
+  .disc-msg + .disc-msg { border-top: 1px dashed var(--border, #e3e5e8); margin-left: 14px; }
+  .disc-meta { font-size: 11.5px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .disc-acts { margin-left: auto; display: inline-flex; gap: 8px; }
+  .disc-acts .btn-link { font-size: 11.5px; background: none; border: none; padding: 0; color: var(--accent, #0f766e); cursor: pointer; }
+  .disc-body { font-size: 13px; line-height: 1.5; white-space: normal; word-break: break-word; margin-top: 2px; }
+  .disc-at { color: #1e4f8a; background: #e7f0fb; border-radius: 4px; padding: 0 3px; }
+  .disc-st { font-size: 10.5px; padding: 0 7px; border-radius: 9px; border: 1px solid; }
+  .disc-st.open { color: #92500c; background: #FAEEDA; border-color: #f0d4a3; }
+  .disc-st.resolved { color: #0F6E56; background: #E1F5EE; border-color: #b8e0d0; }
+  .disc-reply textarea { min-height: 34px; }
+  .disc-new textarea { min-height: 52px; }
+  .disc-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--border-strong, #c6ccd8); border-radius: 6px; margin-top: 4px; }
+  .disc-row { display: flex; justify-content: flex-end; gap: 6px; align-items: center; margin-top: 4px; }
+  .disc-row select { font-size: 12px; padding: 3px 6px; }
+  .disc-new { margin-top: 6px; }
+  .disc-filters { display: flex; gap: 6px; margin: 4px 0 8px; }
+  .since h3 { margin: 0 0 4px; }
+  .since-list { margin: 6px 0; padding-left: 18px; font-size: 0.88rem; line-height: 1.6; }
+  /* v6.46 backup + releases */
+  #bk-banner .bk-msg { margin: 0 0 8px; }
+  .bk-msg { padding: 9px 12px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; margin: 8px 0; border: 1px solid; }
+  .bk-msg.bad { background: #fdeceb; border-color: #f3c7c2; color: #8a1c13; }
+  .bk-msg.warn { background: #FAEEDA; border-color: #f0d4a3; color: #6b3d06; }
+  .bk-msg.ok { background: #E1F5EE; border-color: #b8e0d0; color: #0b4f3e; }
+  .bk-msg .btn-mini { margin-left: 4px; }
+  .bk-note { color: var(--text-muted); font-size: 0.8rem; }
+  .bk-box { border: 1px solid var(--border, #e3e5e8); border-radius: 10px; padding: 12px 16px; background: var(--surface, #fff); margin: 12px 0; }
+  .bk-box h3 { margin: 0 0 6px; font-size: 0.98rem; }
+  .bk-box p { margin: 4px 0 8px; font-size: 0.86rem; }
+  .bk-box textarea, .bk-box input[type=text], .rel-add input, .rel-add textarea, .rel-form input, .wp-add input { width: 100%; box-sizing: border-box; font: inherit; font-size: 0.85rem; padding: 6px 8px; border: 1px solid var(--border-strong, #c6ccd8); border-radius: 6px; margin: 4px 0; }
+  .bk-check { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; font-size: 0.86rem; border-bottom: 1px solid var(--border, #eee); }
+  .bk-pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; }
+  .bk-overlay { position: fixed; inset: 0; background: rgba(22,26,34,.45); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .bk-dialog { background: #fff; border-radius: 12px; padding: 18px 20px; max-width: 480px; box-shadow: 0 20px 50px rgba(0,0,0,.2); }
+  .bk-dialog h3 { margin: 0 0 8px; }
+  .bk-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 12px; }
+  .rel-pill { display: inline-block; font-size: 10.5px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--border); }
+  .rel-pill.major { background: #e4f1ef; color: #0a564f; border-color: #c5e2dd; font-weight: 600; }
+  .rel-pill.baseline { background: #f1f3f7; color: #5c6472; }
+  .rel-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; font-size: 0.85rem; }
+  .rel-form label { display: flex; flex-direction: column; gap: 2px; }
+  .rel-compare { margin-top: 10px; font-size: 0.86rem; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .rel-var { margin: 10px 0; }
+  .rel-add { margin-top: 8px; font-size: 0.86rem; }
+  .wp { border: 1px solid var(--border, #e3e5e8); border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+  .wp.done { background: var(--surface-2, #f1f3f7); }
+  .wp-steps { list-style: none; margin: 6px 0; padding: 0; font-size: 0.86rem; }
+  .wp-steps li { padding: 3px 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .wp-steps li.done { color: var(--text-muted); }
   .dash-card { border: 1px solid var(--border, #e3e5e8); border-radius: 10px; padding: 12px 14px; background: var(--surface, #fff); }
   .dash-card .dc-num { font-size: 22px; font-weight: 600; line-height: 1.2; }
   .dash-card .dc-label { font-size: 11.5px; color: var(--text-muted, #6b7280); margin-top: 2px; }
@@ -1543,7 +1597,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.45.0
+      Codebook Editor — Cloud edition · v6.47.0
     </div>
   </div>
 </div>
@@ -1816,7 +1870,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.45.0 cloud</span>
+      <span class="version">v6.47.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1890,6 +1944,9 @@
         <div class="admin-menu-label">Overview</div>
         <button type="button" onclick="switchTab('compare'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><path d="M12 3v18"/></svg>Compare with source</button>
         <button type="button" onclick="switchTab('history'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
+        <div class="admin-menu-label">Safety &amp; versions</div>
+        <button type="button" onclick="switchTab('backup'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Backup</button>
+        <button type="button" onclick="switchTab('releases'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/></svg>Releases</button>
         <div class="admin-menu-label">Content</div>
         <button type="button" onclick="switchTab('imports'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Imports</button>
         <button type="button" onclick="switchTab('trash'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Trash</button>
@@ -2084,6 +2141,24 @@
     </div>
     <div id="history-list"><div class="empty-state"><p>Loading…</p></div></div>
     <div id="hl-more" style="text-align:center; padding: 12px 0;"></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-backup" role="tabpanel">
+    <div style="margin-bottom: 0.8rem; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+      <div><h2 style="margin: 0; font-size: 1.1rem;">Backup</h2>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Full backups, the nightly backup status and the monthly check. A backup only reads; nothing in the codebook changes.</p></div>
+      <button class="btn-mini" onclick="bkRender()">↻ Refresh</button>
+    </div>
+    <div id="bk-content"></div>
+  </div>
+
+  <div class="tab-panel admin-only" id="panel-releases" role="tabpanel">
+    <div style="margin-bottom: 0.8rem; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+      <div><h2 style="margin: 0; font-size: 1.1rem;">Releases</h2>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Numbered versions of the central codebook (1.0, 1.1, 2.0 …). Each version is a frozen copy with release notes made automatically from what changed.</p></div>
+      <button class="btn-mini" onclick="relRender()">↻ Refresh</button>
+    </div>
+    <div id="rel-content"></div>
   </div>
 
   <div class="tab-panel admin-only" id="panel-compare" role="tabpanel">
@@ -5551,6 +5626,7 @@ async function histMakeReport() {
   try {
     histReadFilters();
     if (typeof loadInstrumentNotes === 'function' && !window.cloudInstrumentNotesReady) await loadInstrumentNotes();
+    if (typeof discLoadAll === 'function') { try { await discLoadAll(true); } catch (_) {} }
     const [D, items, created] = await Promise.all([histLoadDocx(), histFetchAllForReport(), histFetchCreatedForReport()]);
     if (!items.length && !created.length) { cloudShowToast('error', 'No changes match these filters — nothing to report.'); return; }
     const detail = !!(document.getElementById('hl-detail') || {}).checked;
@@ -5802,6 +5878,16 @@ async function histBuildReport(D, items, created, withDetail) {
           if (xs.length > 25) ch.push(P('… and ' + (xs.length - 25) + ' more in the Quality tab.'));
         });
       }
+    }
+    // v6.47: open discussions on the variables of this instrument
+    const openDisc = ((typeof DISC !== 'undefined' && DISC.all) || []).filter(c => !c.parent_id && c.status === 'open' && curIds.has(c.variable_id));
+    if (openDisc.length) {
+      ch.push(H((++n) + '. Open discussions', D.HeadingLevel.HEADING_2));
+      openDisc.forEach(c => {
+        const nm = (cur.find(v => (v.id || v._uid) === c.variable_id) || {});
+        const nRep = DISC.all.filter(x => x.parent_id === c.id).length;
+        ch.push(B((qName(nm) || '?') + ' — ' + bkWho(c.created_by) + ', ' + day(c.created_at) + ': ' + cut(c.body, 400) + (nRep ? ' (' + nRep + ' repl' + (nRep === 1 ? 'y' : 'ies') + ')' : '')));
+      });
     }
   });
 
@@ -7034,6 +7120,1021 @@ function fairLinkifyNode(root) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
 // ====== END v6.45 FAIR links ======
+
+// ====== v6.46: Backup, Releases and work packages (migration 36) ======
+// Backup: one JSON file with every table + the database structure; "Check a
+// backup" compares a file with now and can put single variables back, always
+// with a preview. Releases: numbered, frozen versions of the codebook with
+// automatic release notes (overview + details). Work packages: finishing a step
+// suggests a minor release, finishing the package a major one. Nothing is ever
+// created or changed without an explicit click.
+
+const BK = { status: null, staff: null, checked: null };
+const BK_TABLES = [
+  // [table, order column, admin only?]
+  ['variables', 'id'], ['instruments', 'name'], ['instrument_notes', 'instrument_name'],
+  ['field_metadata', 'field_name'], ['custom_field_defs', 'field_name'], ['role_field_access', 'role'],
+  ['profiles', 'id'], ['audit_log', 'id'], ['pending_changes', 'id'], ['quality_exceptions', 'id'],
+  ['compare_profiles', 'name'], ['compare_decisions', 'id'], ['work_packages', 'id'],
+  ['codebook_releases', 'id'], ['variable_comments', 'id'], ['backup_log', 'id']
+];
+const BK_REMIND_CHANGES = 50, BK_REMIND_DAYS = 7, BK_MONTHLY_DAYS = 30, BK_NIGHTLY_LATE_H = 48, BK_MAX_SNOOZE = 3;
+
+function bkClient() { return window.cloudAuth && window.cloudAuth.client; }
+function bkDay(iso) { return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '–'; }
+function bkDayTime(iso) { return iso ? new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–'; }
+function bkAgo(iso) {
+  if (!iso) return 'never';
+  const h = (Date.now() - new Date(iso).getTime()) / 36e5;
+  if (h < 1) return 'less than an hour ago';
+  if (h < 24) return Math.round(h) + ' hours ago';
+  const d = Math.round(h / 24); return d + ' day' + (d === 1 ? '' : 's') + ' ago';
+}
+function bkSave(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function bkStamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()); }
+async function bkFetchAll(table, order) {
+  const c = bkClient(), out = [];
+  for (let from = 0; from < 2000000; from += 1000) {
+    let q = c.from(table).select('*').range(from, from + 999);
+    if (order) q = q.order(order, { ascending: true });
+    const { data, error } = await q;
+    if (error) throw error;
+    out.push(...(data || []));
+    if (!data || data.length < 1000) break;
+  }
+  return out;
+}
+async function bkStaffNames() {
+  if (BK.staff) return BK.staff;
+  BK.staff = {};
+  try { const { data } = await bkClient().rpc('staff_names'); (data || []).forEach(r => { BK.staff[r.id] = r.name; }); } catch (_) {}
+  return BK.staff;
+}
+function bkWho(id) { return (BK.staff && BK.staff[id]) || (id ? 'someone' : 'database'); }
+
+// ---------- status (used by the banner and the Backup page) ----------
+async function bkLoadStatus() {
+  const c = bkClient(); if (!c || !isAdminRole()) return null;
+  const st = { ready: true, last: {}, changesSince: 0, lastAny: null };
+  try {
+    const { data, error } = await c.from('backup_log').select('*').order('created_at', { ascending: false }).limit(200);
+    if (error) throw error;
+    (data || []).forEach(r => {
+      if (!st.last[r.kind]) st.last[r.kind] = r;
+      if (r.ok && r.kind !== 'monthly_check' && (!st.lastAny || r.created_at > st.lastAny)) st.lastAny = r.created_at;
+      if (r.ok && r.kind === 'nightly' && !st.lastNightlyOk) st.lastNightlyOk = r;
+    });
+    st.rows = data || [];
+  } catch (e) { st.ready = false; st.error = e.message || String(e); return (BK.status = st); }
+  try {
+    let q = c.from('audit_log').select('id', { count: 'exact', head: true });
+    if (st.lastAny) q = q.gt('performed_at', st.lastAny);
+    const { count } = await q; st.changesSince = count || 0;
+  } catch (_) {}
+  return (BK.status = st);
+}
+function bkNightlyState(st) {
+  if (!st || !st.ready) return 'unknown';
+  if (!st.last.nightly) return 'not_set_up';
+  if (!st.lastNightlyOk) return 'failing';
+  const h = (Date.now() - new Date(st.lastNightlyOk.created_at).getTime()) / 36e5;
+  return h > BK_NIGHTLY_LATE_H ? 'late' : 'ok';
+}
+function bkMonthlyDue(st) {
+  const m = st && st.last.monthly_check;
+  return !m || (Date.now() - new Date(m.created_at).getTime()) / 864e5 > BK_MONTHLY_DAYS;
+}
+function bkManualDue(st) {
+  if (!st) return false;
+  const days = st.lastAny ? (Date.now() - new Date(st.lastAny).getTime()) / 864e5 : 999;
+  return st.changesSince >= BK_REMIND_CHANGES || days >= BK_REMIND_DAYS;
+}
+// "Remind me tomorrow" — at most BK_MAX_SNOOZE times per due period
+function bkSnoozeKey(st) { const m = st && st.last.monthly_check; return 'pcnn_bk_snooze_' + (m ? m.id : 'none'); }
+function bkSnoozeInfo(st) { try { return JSON.parse(localStorage.getItem(bkSnoozeKey(st)) || '{"n":0,"until":0}'); } catch (_) { return { n: 0, until: 0 }; } }
+function bkSnooze() {
+  const st = BK.status, s = bkSnoozeInfo(st);
+  if (s.n >= BK_MAX_SNOOZE) return;
+  s.n++; s.until = Date.now() + 864e5;
+  try { localStorage.setItem(bkSnoozeKey(st), JSON.stringify(s)); } catch (_) {}
+  bkRenderBanner();
+}
+
+function bkRenderBanner() {
+  let el = document.getElementById('bk-banner');
+  if (!el) {
+    const tabs = document.getElementById('tabs-bar'); if (!tabs) return;
+    el = document.createElement('div'); el.id = 'bk-banner'; tabs.parentNode.insertBefore(el, tabs);
+  }
+  const st = BK.status;
+  if (!st || !isAdminRole() || !st.ready) { el.innerHTML = ''; return; }
+  const msgs = [];
+  const ns = bkNightlyState(st);
+  if (ns === 'failing' || ns === 'late') {
+    msgs.push(`<div class="bk-msg bad">⚠ <b>Nightly backup has not run since ${bkDayTime(st.lastNightlyOk && st.lastNightlyOk.created_at)}.</b> Check the GitHub job (Actions tab of the backups repository), and download a backup now. <button class="btn-mini" onclick="bkDownload()">⬇ Backup now</button> <button class="btn-mini" onclick="switchTab('backup')">Open Backup</button></div>`);
+  } else if (ns === 'not_set_up') {
+    msgs.push(`<div class="bk-msg warn">🛟 <b>Nightly backup is not set up yet.</b> Until it is, download a backup regularly. <button class="btn-mini" onclick="switchTab('backup')">How to set it up</button></div>`);
+  }
+  if (ns !== 'ok' && bkManualDue(st)) {
+    msgs.push(`<div class="bk-msg warn">💾 <b>${st.changesSince} change${st.changesSince === 1 ? '' : 's'} since the last backup</b> (${bkAgo(st.lastAny)}). <button class="btn-mini" onclick="bkDownload()">⬇ Download backup</button></div>`);
+  }
+  if (bkMonthlyDue(st)) {
+    const s = bkSnoozeInfo(st);
+    if (Date.now() >= s.until) {
+      const left = BK_MAX_SNOOZE - s.n;
+      msgs.push(`<div class="bk-msg warn">🗓 <b>Monthly backup check is due</b> (last: ${st.last.monthly_check ? bkDay(st.last.monthly_check.created_at) : 'never'}). Five short checks, about 5 minutes. <button class="btn-mini" onclick="switchTab('backup'); setTimeout(()=>{const x=document.getElementById('bk-monthly'); if(x) x.scrollIntoView({behavior:'smooth'});},200)">Do the check</button>` +
+        (left > 0 ? ` <button class="btn-mini" onclick="bkSnooze()">Remind me tomorrow (${left} left)</button>` : ` <span class="bk-note">can no longer be postponed</span>`) + `</div>`);
+    }
+  }
+  el.innerHTML = msgs.join('');
+}
+
+// ---------- full backup ----------
+async function bkDownload(opts) {
+  opts = opts || {};
+  const c = bkClient(); if (!c || !isAdminRole()) { cloudShowToast('error', 'Admins only'); return false; }
+  cloudShowToast('info', 'Making the backup… this can take a minute.', 60000);
+  try {
+    const tables = {}, counts = {}, problems = [];
+    for (const [t, ord] of BK_TABLES) {
+      try { tables[t] = await bkFetchAll(t, ord); counts[t] = tables[t].length; }
+      catch (e) { problems.push(t + ': ' + (e.message || e)); }
+    }
+    let schema = null;
+    try { const { data, error } = await c.rpc('admin_schema_snapshot'); if (error) throw error; schema = data; }
+    catch (e) { problems.push('database structure: ' + (e.message || e)); }
+    const meta = {
+      format: 'pcnn-codebook-backup', format_version: 1,
+      taken_at: new Date().toISOString(), editor_version: (document.querySelector('.version') || {}).textContent || '',
+      supabase_project: (window.cloudAuth.client && window.cloudAuth.client.supabaseUrl) || '',
+      taken_by: (window.cloudAuth.profile && (window.cloudAuth.profile.display_name || window.cloudAuth.profile.email)) || '',
+      counts, problems,
+      note: 'Full backup of the PCNN central codebook: every table (tables) and the database structure (schema). ' +
+            'Open it in the Editor under Admin → Backup → Check a backup. See the system documentation, Appendix A, for restoring into a new project.'
+    };
+    const name = 'PCNN_codebook_backup_' + bkStamp() + '.json';
+    bkSave(new Blob([JSON.stringify({ _meta: meta, schema, tables })], { type: 'application/json' }), name);
+    try {
+      await c.from('backup_log').insert({ kind: 'manual', ok: problems.length === 0,
+        details: { file: name, counts, problems, schema: !!schema }, created_by: window.cloudAuth.user.id });
+    } catch (_) {}
+    cloudShowToast(problems.length ? 'error' : 'success',
+      problems.length ? 'Backup saved, but some parts could not be read: ' + problems.join('; ') : 'Backup saved: ' + name, 8000);
+    await bkLoadStatus(); bkRenderBanner();
+    if (state.currentTab === 'backup') bkRender();
+    return true;
+  } catch (e) {
+    cloudShowToast('error', 'Backup failed: ' + (e.message || e)); return false;
+  }
+}
+
+// ---------- ask for a backup before big operations ----------
+function bkGuard(what) {
+  if (!isAdminRole() || !BK.status || !BK.status.ready) return Promise.resolve(true);
+  const last = BK.status.lastAny;
+  if (last && (Date.now() - new Date(last).getTime()) / 36e5 < 24) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'bk-overlay';
+    ov.innerHTML = `<div class="bk-dialog"><h3>Backup first?</h3>
+      <p>You are about to ${escapeHtml(what)}. The last backup was <b>${bkAgo(last)}</b>.</p>
+      <p class="bk-note">Every change is in the Log and can be undone, but a backup makes going back much easier.</p>
+      <div class="bk-actions"><button class="btn-secondary" data-a="cancel">Cancel</button>
+      <button class="btn-secondary" data-a="skip">Continue without backup</button>
+      <button class="btn-primary" data-a="backup">⬇ Backup, then continue</button></div></div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener('click', async e => {
+      const a = e.target && e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return;
+      if (a === 'backup') { e.target.disabled = true; e.target.textContent = 'Making backup…'; const ok = await bkDownload(); ov.remove(); resolve(ok); return; }
+      ov.remove(); resolve(a === 'skip');
+    });
+  });
+}
+(function bkWrapBigOperations() {
+  const wrap = () => {
+    if (typeof window.confirmImport === 'function' && !window.confirmImport.__bk) {
+      const orig = window.confirmImport;
+      window.confirmImport = async function () { if (!(await bkGuard('import new variables'))) return; return orig.apply(this, arguments); };
+      window.confirmImport.__bk = true;
+    }
+    if (typeof window.showPreviewModal === 'function' && !window.showPreviewModal.__bk) {
+      const orig = window.showPreviewModal;
+      window.showPreviewModal = async function (changes) {
+        if (Array.isArray(changes) && changes.length > 20 && !(await bkGuard('change ' + changes.length + ' variables at once'))) return;
+        return orig.apply(this, arguments);
+      };
+      window.showPreviewModal.__bk = true;
+    }
+  };
+  window.addEventListener('cloud-authenticated', () => setTimeout(wrap, 700));
+})();
+
+// ---------- Backup page ----------
+const BK_MONTHLY_ITEMS = [
+  ['nightly', 'The nightly backup ran without errors this month', 'Filled in automatically from the backup log.'],
+  ['onedrive', 'The OneDrive folder has a copy from the last few days', 'Open the OneDrive folder PCNN_codebook_backups and look at the newest file date.'],
+  ['test', 'One backup file opened with "Check a backup" below', 'Proves the file is complete and readable.'],
+  ['rescue', 'Rescue package is up to date', 'Latest Editor file, all migration files, the documentation.'],
+  ['viewer', 'Viewer HTML copy is saved', 'From the Viewer repository, next to the rescue package.']
+];
+async function bkRender() {
+  const el = document.getElementById('bk-content'); if (!el) return;
+  el.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  const st = await bkLoadStatus(); await bkStaffNames();
+  if (!st || !st.ready) {
+    el.innerHTML = `<div class="bk-msg bad">The backup tables are not available (${escapeHtml((st && st.error) || 'not signed in as admin')}). Run migration 36 first.</div>`;
+    return;
+  }
+  const ns = bkNightlyState(st);
+  const nsTxt = { ok: '✅ running', late: '⚠ late', failing: '⚠ failing', not_set_up: '— not set up yet', unknown: '?' }[ns];
+  const nightly = st.lastNightlyOk;
+  const monthlyRow = st.last.monthly_check;
+  el.innerHTML = `
+    <div class="dash-cards">
+      <div class="dash-card"><div class="dc-num" style="font-size:1.1rem">${nsTxt}</div><div class="dc-label">Nightly backup (GitHub)</div><div class="dc-sub">${nightly ? 'last: ' + bkDayTime(nightly.created_at) : 'no nightly backup recorded'}</div></div>
+      <div class="dash-card"><div class="dc-num">${st.changesSince}</div><div class="dc-label">Changes since last backup</div><div class="dc-sub">last backup ${bkAgo(st.lastAny)}</div></div>
+      <div class="dash-card"><div class="dc-num" style="font-size:1.1rem">${monthlyRow ? bkDay(monthlyRow.created_at) : 'never'}</div><div class="dc-label">Last monthly check</div><div class="dc-sub">${bkMonthlyDue(st) ? 'due now' : 'next in ' + Math.max(0, Math.ceil(BK_MONTHLY_DAYS - (Date.now() - new Date(monthlyRow.created_at).getTime()) / 864e5)) + ' days'}</div></div>
+    </div>
+    <div class="bk-box">
+      <h3>Download a full backup</h3>
+      <p>One file with every table (variables, instruments, notes, log, suggestions, field settings, users' names and roles, Quality, Compare, releases, discussions) and the database structure (tables, functions, triggers, access rules). Passwords are never included.</p>
+      <button class="btn-primary" onclick="bkDownload()">⬇ Download full backup</button>
+      <span class="bk-note">Store it in the OneDrive folder PCNN_codebook_backups.</span>
+    </div>
+    <div class="bk-box">
+      <h3>Check a backup</h3>
+      <p>Open a backup file to see what it contains and what changed since. Nothing is written unless you choose to put a variable back, after a preview.</p>
+      <input type="file" id="bk-file" accept=".json,application/json" onchange="bkCheckFile(this.files[0])">
+      <div id="bk-check"></div>
+    </div>
+    <div class="bk-box" id="bk-monthly">
+      <h3>Monthly check</h3>
+      <p>Once a month: tick what is true, then save. The reminder stays until this is saved (it can be postponed ${BK_MAX_SNOOZE} times by one day).</p>
+      ${BK_MONTHLY_ITEMS.map(([k, t, h]) => {
+        const auto = k === 'nightly';
+        const on = auto ? (ns === 'ok') : false;
+        return `<label class="bk-check"><input type="checkbox" data-mk="${k}" ${on ? 'checked' : ''} ${auto ? 'disabled' : ''}> <span><b>${escapeHtml(t)}</b><br><span class="bk-note">${escapeHtml(h)}${auto ? (on ? ' ✓' : ' — not OK: see the nightly status above') : ''}</span></span></label>`;
+      }).join('')}
+      <textarea id="bk-monthly-note" rows="2" placeholder="Note (optional), e.g. what was not OK and what you did"></textarea>
+      <button class="btn-primary" onclick="bkSaveMonthly()">Save monthly check</button>
+    </div>
+    <div class="bk-box">
+      <h3>Backup history</h3>
+      ${st.rows.length ? `<table class="dash-table"><thead><tr><th>When</th><th>Kind</th><th>Result</th><th>By</th><th>Details</th></tr></thead><tbody>${st.rows.slice(0, 40).map(r => `<tr>
+        <td>${bkDayTime(r.created_at)}</td><td>${escapeHtml({ manual: 'Download (Editor)', nightly: 'Nightly (GitHub)', onedrive: 'OneDrive copy', monthly_check: 'Monthly check' }[r.kind] || r.kind)}</td>
+        <td>${r.ok ? '✅' : '⚠'}</td><td>${escapeHtml(r.created_by ? bkWho(r.created_by) : (r.kind === 'nightly' ? 'GitHub' : '–'))}</td>
+        <td class="bk-note">${escapeHtml(bkDetailText(r))}</td></tr>`).join('')}</tbody></table>` : '<p class="bk-note">No backups recorded yet.</p>'}
+    </div>
+    <div class="bk-box">
+      <h3>Nightly backup and OneDrive copy</h3>
+      <p>A GitHub job makes a full database dump every night in a private repository; a small script on your computer copies the newest one to OneDrive every day. Both are set up once — see <b>PCNN_Backup_Setup_Guide.docx</b>. When the nightly job writes to the backup log, the status above turns green and this page and the reminder follow it.</p>
+    </div>`;
+}
+function bkDetailText(r) {
+  const d = r.details || {};
+  if (r.kind === 'monthly_check') { const no = Object.keys(d.items || {}).filter(k => !d.items[k]); return (no.length ? 'not OK: ' + no.join(', ') : 'all OK') + (d.note ? ' — ' + d.note : ''); }
+  if (d.file) return d.file + (d.counts && d.counts.variables != null ? ' · ' + d.counts.variables + ' variables' : '') + (d.problems && d.problems.length ? ' · problems: ' + d.problems.join('; ') : '');
+  if (d.message) return d.message;
+  return '';
+}
+async function bkSaveMonthly() {
+  const items = {};
+  document.querySelectorAll('#bk-monthly [data-mk]').forEach(cb => { items[cb.getAttribute('data-mk')] = cb.checked; });
+  const note = (document.getElementById('bk-monthly-note') || {}).value || '';
+  const allOk = Object.values(items).every(Boolean);
+  if (!allOk && !note.trim() && !confirmInline('Not everything is ticked — add a note, or save anyway.')) return;
+  try {
+    const { error } = await bkClient().from('backup_log').insert({ kind: 'monthly_check', ok: allOk, details: { items, note }, created_by: window.cloudAuth.user.id });
+    if (error) throw error;
+    cloudShowToast('success', 'Monthly check saved. Next one in ' + BK_MONTHLY_DAYS + ' days.');
+    await bkLoadStatus(); bkRenderBanner(); bkRender();
+  } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e)); }
+}
+
+// ---------- check a backup file ----------
+async function bkCheckFile(file) {
+  const out = document.getElementById('bk-check'); if (!out || !file) return;
+  out.innerHTML = '<p class="bk-note">Reading…</p>';
+  let b;
+  try { b = JSON.parse(await file.text()); } catch (e) { out.innerHTML = '<div class="bk-msg bad">This is not a readable JSON file.</div>'; return; }
+  if (!b || !b._meta || b._meta.format !== 'pcnn-codebook-backup' || !b.tables) { out.innerHTML = '<div class="bk-msg bad">This file is not a full backup made with Admin → Backup.</div>'; return; }
+  let now;
+  try { now = await bkFetchAll('variables', 'id'); } catch (e) { out.innerHTML = '<div class="bk-msg bad">Could not read the current variables: ' + escapeHtml(e.message || e) + '</div>'; return; }
+  const old = b.tables.variables || [];
+  const d = relDiff(old.filter(v => !v.is_deleted), now.filter(v => !v.is_deleted));
+  BK.checked = { file: file.name, meta: b._meta, oldById: new Map(old.map(v => [v.id, v])), nowById: new Map(now.map(v => [v.id, v])), diff: d };
+  const counts = b._meta.counts || {};
+  const sch = b.schema || {};
+  out.innerHTML = `
+    <div class="bk-msg ok">✅ <b>${escapeHtml(file.name)}</b> — made ${bkDayTime(b._meta.taken_at)} by ${escapeHtml(b._meta.taken_by || '?')} with Editor ${escapeHtml(b._meta.editor_version || '?')}.
+      ${b._meta.problems && b._meta.problems.length ? '<br>⚠ Parts missing when it was made: ' + escapeHtml(b._meta.problems.join('; ')) : ''}</div>
+    <table class="dash-table"><thead><tr><th>Part</th><th>In the file</th></tr></thead><tbody>
+      ${Object.keys(counts).map(k => `<tr><td>${escapeHtml(k)}</td><td>${counts[k]}</td></tr>`).join('')}
+      <tr><td>database structure</td><td>${sch.columns ? `${(sch.columns || []).length} columns, ${(sch.functions || []).length} functions, ${(sch.triggers || []).length} triggers, ${(sch.policies || []).length} access rules, ${(sch.views || []).length} views` : '⚠ not included'}</td></tr>
+    </tbody></table>
+    <h4 style="margin:14px 0 6px">Since this backup</h4>
+    <p>${d.added.length} variable(s) added · ${d.removed.length} removed or in Trash · ${d.changed.length} changed.</p>
+    ${d.changed.length ? `<table class="dash-table"><thead><tr><th>Variable</th><th>Instrument</th><th>Changed fields</th><th></th></tr></thead><tbody>${d.changed.slice(0, 300).map(c => `<tr>
+      <td><code>${escapeHtml(c.name)}</code></td><td>${escapeHtml(c.instrument || '')}</td>
+      <td class="bk-note">${escapeHtml(c.fields.map(f => relFieldLabel(f.key)).join(', '))}</td>
+      <td style="text-align:right"><button class="btn-mini" onclick="bkPreviewRestore('${escapeAttr(c.id)}')">Put back…</button></td></tr>`).join('')}</tbody></table>` : ''}
+    ${d.removed.length ? `<p class="bk-note">Removed since the backup: ${d.removed.slice(0, 60).map(r => escapeHtml(r.name)).join(', ')}${d.removed.length > 60 ? '…' : ''}. Variables in the Trash can be restored from Admin → Trash.</p>` : ''}
+    <div id="bk-restore"></div>`;
+}
+function bkPreviewRestore(id) {
+  const ck = BK.checked; if (!ck) return;
+  const c = ck.diff.changed.find(x => x.id === id); if (!c) return;
+  const box = document.getElementById('bk-restore');
+  const editable = c.fields.filter(f => f.key !== 'display_order');
+  box.innerHTML = `<div class="bk-box" style="border-color:var(--accent)"><h3>Put back <code>${escapeHtml(c.name)}</code> as it was on ${bkDay(ck.meta.taken_at)}?</h3>
+    <p class="bk-note">Choose the fields to put back. Only these fields change; the change is logged like any other edit.</p>
+    <table class="dash-table"><thead><tr><th></th><th>Field</th><th>Now</th><th>In the backup</th></tr></thead><tbody>
+    ${editable.map((f, i) => `<tr><td><input type="checkbox" data-rf="${i}" checked></td><td>${escapeHtml(relFieldLabel(f.key))}</td><td class="bk-pre">${escapeHtml(f.after)}</td><td class="bk-pre">${escapeHtml(f.before)}</td></tr>`).join('')}
+    </tbody></table>
+    ${c.fields.some(f => f.key === 'display_order') ? '<p class="bk-note">The position in the list also changed; use Reorder for that.</p>' : ''}
+    <button class="btn-primary" onclick="bkDoRestore('${escapeAttr(id)}')">Put back the ticked fields</button> <button class="btn-secondary" onclick="document.getElementById('bk-restore').innerHTML=''">Cancel</button></div>`;
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+async function bkDoRestore(id) {
+  const ck = BK.checked; const c = ck && ck.diff.changed.find(x => x.id === id); if (!c) return;
+  const editable = c.fields.filter(f => f.key !== 'display_order');
+  const chosen = [];
+  document.querySelectorAll('#bk-restore [data-rf]').forEach(cb => { if (cb.checked) chosen.push(editable[+cb.getAttribute('data-rf')]); });
+  if (!chosen.length) { cloudShowToast('error', 'Nothing ticked.'); return; }
+  const old = ck.oldById.get(id), upd = {}, custom = {};
+  chosen.forEach(f => {
+    if (f.key.indexOf('custom_fields.') === 0) { const k = f.key.slice(14); custom[k] = (old.custom_fields || {})[k] == null ? null : old.custom_fields[k]; }
+    else upd[f.key] = old[f.key] == null ? null : old[f.key];
+  });
+  if (Object.keys(custom).length) upd.custom_fields = custom;
+  try {
+    const { error } = await bkClient().rpc('admin_update_variable', { p_variable_id: id, p_updates: upd });
+    if (error) throw error;
+    cloudShowToast('success', 'Put back ' + chosen.length + ' field(s) of ' + c.name + '. Reloading the codebook…');
+    document.getElementById('bk-restore').innerHTML = '';
+    if (typeof bootstrapCloudCodebook === 'function') await bootstrapCloudCodebook();
+  } catch (e) { cloudShowToast('error', 'Could not put back: ' + (e.message || e)); }
+}
+
+// ---------- differences between two sets of variable rows (raw database rows) ----------
+const REL_SKIP = new Set(['updated_at', 'updated_by', 'created_at', 'created_by', 'is_deleted', 'deleted_at', 'deleted_by', 'change_log']);
+function relFlat(v) {
+  const o = {};
+  Object.keys(v || {}).forEach(k => {
+    if (REL_SKIP.has(k) || k === 'id') return;
+    if (k === 'custom_fields') { const cf = v[k] && typeof v[k] === 'object' ? v[k] : {}; Object.keys(cf).forEach(ck => { o['custom_fields.' + ck] = cf[ck]; }); return; }
+    o[k] = v[k];
+  });
+  return o;
+}
+function relNorm(x) { return x == null ? '' : String(typeof x === 'object' ? JSON.stringify(x) : x).replace(/\r\n?/g, '\n').trim(); }
+function relName(v) { return (v && (v.variable_name_cbs || v.variable_name_CBS)) || '(no name)'; }
+function relInst(v) { return (v && (v.Instrument || v.instrument)) || ''; }
+function relFieldLabel(k) {
+  if (!k) return '';
+  if (k.indexOf('custom_fields.') === 0) return k.slice(14);
+  const m = (typeof CLOUD_FIELD_CASE_MAP !== 'undefined' && CLOUD_FIELD_CASE_MAP) || {};   // database name -> name used in the Editor
+  return m[k] || k;
+}
+const REL_BREAKING = new Set(['variable_name_cbs', 'values', 'value_coding', 'value_coding_merged']);
+function relDiff(oldRows, newRows) {
+  const O = new Map((oldRows || []).map(v => [v.id, v])), N = new Map((newRows || []).map(v => [v.id, v]));
+  const added = [], removed = [], changed = [], fieldCount = {}, byInst = {};
+  const bump = (inst, k) => { (splitInstrumentName(inst || '') .length ? splitInstrumentName(inst) : ['(no instrument)']).forEach(i => { byInst[i] = byInst[i] || { added: 0, removed: 0, changed: 0, order: 0 }; byInst[i][k]++; }); };
+  N.forEach((v, id) => { if (!O.has(id)) { added.push({ id, name: relName(v), instrument: relInst(v), label: v.variable_label_en || v.variable_label_EN || v.variable_label_nl || '' }); bump(relInst(v), 'added'); } });
+  O.forEach((v, id) => { if (!N.has(id)) { removed.push({ id, name: relName(v), instrument: relInst(v) }); bump(relInst(v), 'removed'); } });
+  let breaking = removed.length > 0;
+  N.forEach((v, id) => {
+    const o = O.get(id); if (!o) return;
+    const a = relFlat(o), b = relFlat(v), keys = new Set(Object.keys(a).concat(Object.keys(b))), fields = [];
+    keys.forEach(k => { if (relNorm(a[k]) !== relNorm(b[k])) fields.push({ key: k, before: relNorm(a[k]), after: relNorm(b[k]) }); });
+    if (!fields.length) return;
+    const onlyOrder = fields.every(f => f.key === 'display_order');
+    fields.forEach(f => { if (f.key !== 'display_order') fieldCount[f.key] = (fieldCount[f.key] || 0) + 1; if (REL_BREAKING.has(f.key)) breaking = true; });
+    changed.push({ id, name: relName(v), oldName: relName(o), instrument: relInst(v), fields, onlyOrder });
+    bump(relInst(v), onlyOrder ? 'order' : 'changed');
+  });
+  const cmp = (x, y) => (x.instrument || '').localeCompare(y.instrument || '') || x.name.localeCompare(y.name);
+  added.sort(cmp); removed.sort(cmp); changed.sort(cmp);
+  return { added, removed, changed, fieldCount, byInst, breaking,
+           contentChanged: changed.filter(c => !c.onlyOrder).length, renamed: changed.filter(c => c.fields.some(f => f.key === 'variable_name_cbs')).length };
+}
+function relSummary(d) {
+  return { added: d.added.length, removed: d.removed.length, changed: d.contentChanged,
+           order_only: d.changed.length - d.contentChanged, renamed: d.renamed, breaking: d.breaking,
+           fields: d.fieldCount, by_instrument: d.byInst };
+}
+
+// ---------- Releases page ----------
+const REL = { list: [], packages: [], current: null, firstLog: null, diffCache: {} };
+function relParse(v) { const m = /^(\d+)\.(\d+)/.exec(String(v || '')); return m ? [+m[1], +m[2]] : null; }
+function relNext(kind) {
+  const nums = REL.list.map(r => relParse(r.version)).filter(Boolean).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const top = nums.length ? nums[nums.length - 1] : [1, 0];
+  return kind === 'major' ? (top[0] + 1) + '.0' : top[0] + '.' + (top[1] + 1);
+}
+async function relLoad() {
+  const c = bkClient();
+  const [rel, wp] = await Promise.all([
+    c.from('codebook_releases').select('id, version, kind, title, notes, summary, previous_version, work_package_id, created_by, created_at').order('created_at', { ascending: false }),
+    c.from('work_packages').select('*').order('created_at', { ascending: true })
+  ]);
+  if (rel.error) throw rel.error; if (wp.error) throw wp.error;
+  REL.list = rel.data || []; REL.packages = wp.data || [];
+  if (!REL.firstLog) {
+    const { data } = await c.from('audit_log').select('performed_at').order('performed_at', { ascending: true }).limit(1);
+    REL.firstLog = data && data[0] ? data[0].performed_at : null;
+  }
+}
+async function relSnapshot(version) {
+  if (REL.diffCache['snap:' + version]) return REL.diffCache['snap:' + version];
+  const { data, error } = await bkClient().from('codebook_releases').select('snapshot').eq('version', version).single();
+  if (error) throw error;
+  return (REL.diffCache['snap:' + version] = data.snapshot);
+}
+async function relCurrentRows() { return (await bkFetchAll('variables', 'id')).filter(v => !v.is_deleted); }
+function relKindPill(k) { return `<span class="rel-pill ${k}">${{ baseline: 'baseline', minor: 'minor', major: 'major' }[k] || k}</span>`; }
+function relCounts(s) {
+  s = s || {}; const p = [];
+  if (s.added) p.push(s.added + ' new'); if (s.removed) p.push(s.removed + ' removed'); if (s.changed) p.push(s.changed + ' changed');
+  if (s.renamed) p.push(s.renamed + ' renamed'); if (s.order_only) p.push(s.order_only + ' moved');
+  return p.join(' · ') || (s.variables != null ? s.variables + ' variables' : '');
+}
+async function relRender() {
+  const el = document.getElementById('rel-content'); if (!el) return;
+  el.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try { await Promise.all([relLoad(), bkStaffNames()]); }
+  catch (e) { el.innerHTML = `<div class="bk-msg bad">Releases are not available (${escapeHtml(e.message || e)}). Run migration 36 first.</div>`; return; }
+  const admin = isAdminRole();
+  const latest = REL.list[0];
+  let pending = null;
+  if (latest) {
+    try { const d = relDiff((await relSnapshot(latest.version)).variables || [], await relCurrentRows()); pending = d; REL.pendingDiff = d; }
+    catch (e) { pending = null; }
+  }
+  const pkgHtml = REL.packages.length ? REL.packages.map(relPackageHtml).join('') : '<p class="bk-note">No work packages yet.</p>';
+  el.innerHTML = `
+    ${!REL.list.length ? `<div class="bk-box" style="border-color:var(--accent)">
+      <h3>Start: version 1.0</h3>
+      <p>Version 1.0 is the codebook as it was before the first change in the Log — the content loaded on ${bkDay(REL.firstLog)}. The Editor rebuilds it from the Log; changes made before the Log existed cannot be seen, so treat it as a close reconstruction.</p>
+      ${admin ? `<label class="bk-note">State as of <input type="datetime-local" id="rel-base-at" value="${REL.firstLog ? relLocalInput(new Date(new Date(REL.firstLog).getTime() - 1000)) : ''}"></label>
+      <button class="btn-primary" onclick="relCreateBaseline()">Create version 1.0</button>` : '<p class="bk-note">An admin can create it.</p>'}
+    </div>` : `<div class="dash-cards">
+      <div class="dash-card"><div class="dc-num">${escapeHtml(latest.version)}</div><div class="dc-label">Current version</div><div class="dc-sub">${bkDay(latest.created_at)} · ${escapeHtml(latest.title || '')}</div></div>
+      <div class="dash-card"><div class="dc-num">${pending ? pending.added.length + pending.removed.length + pending.contentChanged : '–'}</div><div class="dc-label">Variables changed since ${escapeHtml(latest.version)}</div><div class="dc-sub">${pending ? relCounts(relSummary(pending)) || 'nothing yet' : ''}</div></div>
+    </div>
+    ${admin ? `<div class="bk-box"><h3>New release</h3>
+      <p>Freezes the codebook as it is now, with release notes made from the differences to ${escapeHtml(latest.version)}.${pending && pending.breaking ? ' <b>Contains renamed or removed variables or changed answer codes — consider a major version.</b>' : ''}</p>
+      <button class="btn-primary" onclick="relOpenNew({kind:'minor'})">New minor release (${escapeHtml(relNext('minor'))})</button>
+      <button class="btn-secondary" onclick="relOpenNew({kind:'major'})">New major release (${escapeHtml(relNext('major'))})</button>
+    </div>` : ''}`}
+    <div id="rel-new"></div>
+    <div class="bk-box"><h3>Work packages</h3>
+      <p class="bk-note">A larger piece of work in steps, e.g. "Comparison with portal v2.1" with one step per instrument. Finishing a step suggests a minor release; finishing the whole package suggests a major one.</p>
+      ${pkgHtml}
+      ${admin ? `<details class="rel-add"><summary>+ New work package</summary>
+        <input id="wp-name" placeholder="Name, e.g. Comparison with portal v2.1">
+        <textarea id="wp-steps" rows="4" placeholder="Steps, one per line (e.g. one instrument per line)"></textarea>
+        <button class="btn-primary btn-mini" onclick="relAddPackage()">Add work package</button></details>` : ''}
+    </div>
+    <div class="bk-box"><h3>All versions</h3>
+      ${REL.list.length ? `<table class="dash-table"><thead><tr><th>Version</th><th></th><th>Title</th><th>Date</th><th>By</th><th>Changes</th><th></th></tr></thead><tbody>
+      ${REL.list.map(r => `<tr><td><b>${escapeHtml(r.version)}</b></td><td>${relKindPill(r.kind)}</td><td>${escapeHtml(r.title || '')}${r.notes ? `<div class="bk-note">${escapeHtml(r.notes)}</div>` : ''}</td>
+        <td>${bkDay(r.created_at)}</td><td>${escapeHtml(bkWho(r.created_by))}</td><td class="bk-note">${escapeHtml(relCounts(r.summary))}</td>
+        <td style="text-align:right;white-space:nowrap">
+          ${r.previous_version ? `<button class="btn-mini" onclick="relNotesFor('${escapeAttr(r.version)}')" title="Release notes as Word">📄 Notes</button>` : ''}
+          <button class="btn-mini" onclick="relDownload('${escapeAttr(r.version)}','xlsx')" title="This version as Excel">⬇ Excel</button>
+          <button class="btn-mini" onclick="relDownload('${escapeAttr(r.version)}','json')" title="This version as JSON">⬇ JSON</button>
+          ${admin && r === REL.list[0] ? `<button class="btn-mini" onclick="relDelete('${escapeAttr(r.version)}')" title="Delete this version (only the newest can be deleted)">🗑</button>` : ''}
+        </td></tr>`).join('')}</tbody></table>
+      <div class="rel-compare">Compare <select id="rel-a" style="width:auto">${REL.list.map((r, i) => `<option ${i === 1 ? 'selected' : ''}>${escapeHtml(r.version)}</option>`).join('')}</select>
+        with <select id="rel-b" style="width:auto"><option value="__now">the codebook now</option>${REL.list.map((r, i) => `<option ${i === 0 && REL.list.length > 1 ? 'selected' : ''}>${escapeHtml(r.version)}</option>`).join('')}</select>
+        <button class="btn-mini" onclick="relCompareShow()">Show</button> <button class="btn-mini" onclick="relCompareWord()">📄 Word</button></div>
+      <div id="rel-cmp"></div>` : '<p class="bk-note">No versions yet.</p>'}
+    </div>`;
+}
+function relLocalInput(d) { const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+function relPackageHtml(w) {
+  const admin = isAdminRole(), steps = Array.isArray(w.steps) ? w.steps : [];
+  const done = steps.filter(s => s.done_at).length;
+  return `<div class="wp ${w.status}"><div class="wp-head"><b>${escapeHtml(w.name)}</b> <span class="bk-note">${done}/${steps.length} steps${w.status === 'done' ? ' · finished ' + bkDay(w.done_at) : ''}</span>
+    ${admin ? `<span style="float:right"><button class="btn-mini" onclick="relDeletePackage('${w.id}')" title="Delete this work package (versions stay)">🗑</button></span>` : ''}</div>
+    <ul class="wp-steps">${steps.map(s => `<li class="${s.done_at ? 'done' : ''}">
+      ${admin && w.status !== 'done' ? `<input type="checkbox" ${s.done_at ? 'checked' : ''} ${s.release_version ? 'disabled title="Already in a release"' : ''} onchange="relToggleStep('${w.id}','${escapeAttr(s.id)}', this.checked)">` : (s.done_at ? '✓' : '○')}
+      ${escapeHtml(s.title)} ${s.done_at ? `<span class="bk-note">done ${bkDay(s.done_at)}${s.release_version ? ' · in version ' + escapeHtml(s.release_version) : ''}</span>` : ''}
+      ${admin && w.status !== 'done' && s.done_at && !s.release_version ? `<button class="btn-mini" onclick="relOpenNew({kind:'minor', wp:'${w.id}', step:'${escapeAttr(s.id)}'})">Release ${escapeHtml(relNext('minor'))}</button>` : ''}
+    </li>`).join('')}</ul>
+    ${admin && w.status !== 'done' ? `<div class="wp-add"><input placeholder="Add a step" onkeydown="if(event.key==='Enter'){relAddStep('${w.id}', this.value); this.value='';}"></div>` : ''}
+    ${admin && w.status !== 'done' && steps.length && done === steps.length ? `<div class="bk-msg ok">All steps are done. <button class="btn-primary btn-mini" onclick="relOpenNew({kind:'major', wp:'${w.id}', finish:true})">Finish package and release ${escapeHtml(relNext('major'))}</button> <button class="btn-mini" onclick="relFinishPackage('${w.id}')">Finish without a release</button></div>` : ''}
+  </div>`;
+}
+async function relAddPackage() {
+  const name = (document.getElementById('wp-name').value || '').trim();
+  const steps = (document.getElementById('wp-steps').value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+    .map((t, i) => ({ id: 's' + Date.now().toString(36) + i, title: t }));
+  if (!name) { cloudShowToast('error', 'Give the work package a name.'); return; }
+  const { error } = await bkClient().from('work_packages').insert({ name, steps });
+  if (error) { cloudShowToast('error', 'Could not add: ' + error.message); return; }
+  relRender();
+}
+async function relSavePackage(w) {
+  const { error } = await bkClient().from('work_packages').update({ steps: w.steps, status: w.status, done_at: w.done_at || null }).eq('id', w.id);
+  if (error) { cloudShowToast('error', 'Could not save: ' + error.message); return false; }
+  return true;
+}
+async function relAddStep(id, title) {
+  title = (title || '').trim(); if (!title) return;
+  const w = REL.packages.find(x => x.id === id); if (!w) return;
+  w.steps = (w.steps || []).concat([{ id: 's' + Date.now().toString(36), title }]);
+  if (await relSavePackage(w)) relRender();
+}
+async function relToggleStep(id, stepId, on) {
+  const w = REL.packages.find(x => x.id === id); if (!w) return;
+  w.steps = (w.steps || []).map(s => s.id === stepId ? Object.assign({}, s, on ? { done_at: new Date().toISOString(), done_by: window.cloudAuth.user.id } : { done_at: null, done_by: null }) : s);
+  if (!(await relSavePackage(w))) return;
+  await relRender();
+  if (on) {
+    const st = w.steps.find(s => s.id === stepId);
+    const allDone = w.steps.every(s => s.done_at);
+    cloudShowToast('info', allDone ? 'All steps done — you can finish the package with a major release.' : 'Step done — you can now make minor release ' + relNext('minor') + ' for "' + st.title + '".', 7000);
+  }
+}
+async function relFinishPackage(id) {
+  const w = REL.packages.find(x => x.id === id); if (!w) return;
+  w.status = 'done'; w.done_at = new Date().toISOString();
+  if (await relSavePackage(w)) relRender();
+}
+async function relDeletePackage(id) {
+  if (!confirmInline('Delete this work package? Versions made from it stay.')) return;
+  const { error } = await bkClient().from('work_packages').delete().eq('id', id);
+  if (error) { cloudShowToast('error', error.message); return; }
+  relRender();
+}
+
+// new release dialog (inline)
+async function relOpenNew(o) {
+  const box = document.getElementById('rel-new'); if (!box) return;
+  const latest = REL.list[0]; if (!latest) return;
+  box.innerHTML = '<div class="bk-box"><p class="bk-note">Comparing with ' + escapeHtml(latest.version) + '…</p></div>';
+  let d = REL.pendingDiff;
+  try { d = relDiff((await relSnapshot(latest.version)).variables || [], await relCurrentRows()); REL.pendingDiff = d; }
+  catch (e) { box.innerHTML = `<div class="bk-msg bad">${escapeHtml(e.message || e)}</div>`; return; }
+  const w = o.wp ? REL.packages.find(x => x.id === o.wp) : null;
+  const step = w && o.step ? (w.steps || []).find(s => s.id === o.step) : null;
+  const kind = o.kind || 'minor';
+  const title = w ? (w.name + (step ? ': ' + step.title : o.finish ? ' — complete' : '')) : '';
+  REL.newCtx = { kind, wp: o.wp || null, step: o.step || null, finish: !!o.finish, diff: d };
+  const s = relSummary(d);
+  box.innerHTML = `<div class="bk-box" style="border-color:var(--accent)"><h3>New ${kind} release</h3>
+    <div class="rel-form">
+      <label>Version <input id="rel-v" value="${escapeAttr(relNext(kind))}" style="width:90px"></label>
+      <label>Kind <select id="rel-k"><option value="minor" ${kind === 'minor' ? 'selected' : ''}>minor</option><option value="major" ${kind === 'major' ? 'selected' : ''}>major</option></select></label>
+      <label style="flex:1">Title <input id="rel-t" value="${escapeAttr(title)}" placeholder="e.g. Portal comparison: CBRQ and DSQ done"></label>
+    </div>
+    <textarea id="rel-n" rows="2" placeholder="Extra note for the release notes (optional)"></textarea>
+    <h4 style="margin:12px 0 4px">What changed since ${escapeHtml(latest.version)}</h4>
+    ${relOverviewHtml(d)}
+    ${d.breaking && kind === 'minor' ? '<div class="bk-msg warn">Renamed or removed variables, or changed answer codes: analysis scripts may need updating. Consider a major version.</div>' : ''}
+    ${!(s.added || s.removed || s.changed || s.order_only) ? '<div class="bk-msg warn">Nothing changed since ' + escapeHtml(latest.version) + '.</div>' : ''}
+    <details><summary>Details per variable</summary>${relDetailHtml(d, 200)}</details>
+    <div style="margin-top:10px"><button class="btn-primary" id="rel-go" onclick="relCreate()">Create version</button> <button class="btn-secondary" onclick="document.getElementById('rel-new').innerHTML=''">Cancel</button></div>
+  </div>`;
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+function relOverviewHtml(d) {
+  const insts = Object.keys(d.byInst).sort();
+  const top = Object.keys(d.fieldCount).sort((a, b) => d.fieldCount[b] - d.fieldCount[a]).slice(0, 12);
+  return `<p>${relCounts(relSummary(d)) || 'No changes.'}</p>
+    ${insts.length ? `<table class="dash-table"><thead><tr><th>Instrument</th><th>New</th><th>Removed</th><th>Changed</th><th>Moved only</th></tr></thead><tbody>
+      ${insts.map(i => { const x = d.byInst[i]; return `<tr><td>${escapeHtml(i)}</td><td>${x.added || ''}</td><td>${x.removed || ''}</td><td>${x.changed || ''}</td><td>${x.order || ''}</td></tr>`; }).join('')}</tbody></table>` : ''}
+    ${top.length ? `<p class="bk-note">Fields changed most: ${top.map(k => escapeHtml(relFieldLabel(k)) + ' (' + d.fieldCount[k] + ')').join(', ')}</p>` : ''}`;
+}
+function relDetailHtml(d, max) {
+  const cut = s => { s = String(s || ''); return s.length > 300 ? s.slice(0, 300) + '…' : s; };
+  const ch = d.changed.filter(c => !c.onlyOrder).slice(0, max || 1e9);
+  return `${d.added.length ? `<p><b>New:</b> ${d.added.map(a => '<code>' + escapeHtml(a.name) + '</code>').join(', ')}</p>` : ''}
+    ${d.removed.length ? `<p><b>Removed:</b> ${d.removed.map(a => '<code>' + escapeHtml(a.name) + '</code>').join(', ')}</p>` : ''}
+    ${ch.map(c => `<div class="rel-var"><b><code>${escapeHtml(c.name)}</code></b>${c.oldName !== c.name ? ' <span class="bk-note">(was ' + escapeHtml(c.oldName) + ')</span>' : ''} <span class="bk-note">${escapeHtml(c.instrument)}</span>
+      <table class="dash-table"><tbody>${c.fields.filter(f => f.key !== 'display_order').map(f => `<tr><td style="width:22%">${escapeHtml(relFieldLabel(f.key))}</td><td class="bk-pre" style="width:39%">${escapeHtml(cut(f.before)) || '<i class="bk-note">empty</i>'}</td><td class="bk-pre">${escapeHtml(cut(f.after)) || '<i class="bk-note">empty</i>'}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+    ${d.changed.filter(c => !c.onlyOrder).length > ch.length ? '<p class="bk-note">… more in the Word notes.</p>' : ''}`;
+}
+async function relCreate() {
+  const ctx = REL.newCtx; if (!ctx) return;
+  const v = (document.getElementById('rel-v').value || '').trim();
+  const kind = document.getElementById('rel-k').value;
+  const title = (document.getElementById('rel-t').value || '').trim();
+  const notes = (document.getElementById('rel-n').value || '').trim();
+  if (!relParse(v)) { cloudShowToast('error', 'Use a version number like 1.2 or 2.0'); return; }
+  const btn = document.getElementById('rel-go'); btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    const { error } = await bkClient().rpc('admin_create_release', { p_version: v, p_kind: kind, p_title: title, p_notes: notes,
+      p_summary: relSummary(ctx.diff), p_work_package: ctx.wp, p_step_id: ctx.step, p_as_of: null });
+    if (error) throw error;
+    if (ctx.finish && ctx.wp) { const w = REL.packages.find(x => x.id === ctx.wp); if (w) { w.status = 'done'; w.done_at = new Date().toISOString(); w.steps = (w.steps || []).map(st => st.done_at && !st.release_version ? Object.assign({}, st, { release_version: v }) : st); await relSavePackage(w); } }
+    cloudShowToast('success', 'Version ' + v + ' created. Release notes: 📄 Notes in the list.', 7000);
+    REL.newCtx = null; REL.pendingDiff = null;
+    await relRender();
+  } catch (e) { cloudShowToast('error', 'Could not create the version: ' + (e.message || e)); btn.disabled = false; btn.textContent = 'Create version'; }
+}
+async function relCreateBaseline() {
+  const at = (document.getElementById('rel-base-at') || {}).value;
+  if (!at) { cloudShowToast('error', 'Choose the moment'); return; }
+  if (!confirmInline('Create version 1.0 as of ' + at.replace('T', ' ') + '?')) return;
+  try {
+    const iso = new Date(at).toISOString();
+    const { error } = await bkClient().rpc('admin_create_release', { p_version: '1.0', p_kind: 'baseline', p_title: 'Central codebook 1.0',
+      p_notes: 'Rebuilt from the change log: the codebook before the first logged change.', p_summary: {}, p_work_package: null, p_step_id: null, p_as_of: iso });
+    if (error) throw error;
+    const snap = await relSnapshot('1.0');
+    cloudShowToast('success', 'Version 1.0 created (' + (snap.variables || []).length + ' variables).', 7000);
+    relRender();
+  } catch (e) { cloudShowToast('error', 'Could not create 1.0: ' + (e.message || e)); }
+}
+async function relDelete(version) {
+  if (!confirmInline('Delete version ' + version + '? Its frozen copy is removed (the codebook itself does not change).')) return;
+  const { error } = await bkClient().from('codebook_releases').delete().eq('version', version);
+  if (error) { cloudShowToast('error', error.message); return; }
+  delete REL.diffCache['snap:' + version];
+  relRender();
+}
+async function relPair() {
+  const a = document.getElementById('rel-a').value, b = document.getElementById('rel-b').value;
+  const A = (await relSnapshot(a)).variables || [];
+  const B = b === '__now' ? await relCurrentRows() : ((await relSnapshot(b)).variables || []);
+  return { a, b: b === '__now' ? 'now' : b, d: relDiff(A, B) };
+}
+async function relCompareShow() {
+  const out = document.getElementById('rel-cmp'); out.innerHTML = '<p class="bk-note">Comparing…</p>';
+  try { const p = await relPair(); out.innerHTML = `<h4 style="margin:10px 0 4px">${escapeHtml(p.a)} → ${escapeHtml(p.b)}</h4>${relOverviewHtml(p.d)}<details><summary>Details per variable</summary>${relDetailHtml(p.d, 300)}</details>`; }
+  catch (e) { out.innerHTML = `<div class="bk-msg bad">${escapeHtml(e.message || e)}</div>`; }
+}
+async function relCompareWord() {
+  try { const p = await relPair(); await relWord({ version: p.b, title: 'Comparison ' + p.a + ' → ' + p.b, isComparison: true }, p.a, p.d); }
+  catch (e) { cloudShowToast('error', e.message || e); }
+}
+async function relNotesFor(version) {
+  try {
+    const r = REL.list.find(x => x.version === version); if (!r || !r.previous_version) return;
+    const d = relDiff((await relSnapshot(r.previous_version)).variables || [], (await relSnapshot(version)).variables || []);
+    await relWord(r, r.previous_version, d);
+  } catch (e) { cloudShowToast('error', 'Could not make the notes: ' + (e.message || e)); }
+}
+async function relWord(rel, prev, d) {
+  const D = await histLoadDocx();
+  const P = (t, o) => new D.Paragraph(Object.assign({ children: [new D.TextRun({ text: String(t == null ? '' : t), ...(o && o.run || {}) })], spacing: { after: 80 } }, o && o.para || {}));
+  const H = (t, l) => new D.Paragraph({ text: t, heading: l, spacing: { before: 200, after: 80 } });
+  const cell = (t, head) => new D.TableCell({ children: String(t == null ? '' : t).split(/\r?\n/).map(line => new D.Paragraph({ children: [new D.TextRun({ text: line, bold: !!head, size: 18 })] })),
+    shading: head ? { fill: 'E7ECEF', type: D.ShadingType.CLEAR, color: 'auto' } : undefined });
+  const table = (head, rows) => new D.Table({ width: { size: 100, type: D.WidthType.PERCENTAGE },
+    rows: [new D.TableRow({ tableHeader: true, children: head.map(h => cell(h, true)) })].concat(rows.map(r => new D.TableRow({ children: r.map(c => cell(c)) }))) });
+  const s = relSummary(d), ch = [];
+  ch.push(new D.Paragraph({ text: rel.isComparison ? 'PCNN central codebook — ' + rel.title : 'PCNN central codebook — release notes ' + rel.version, heading: D.HeadingLevel.TITLE }));
+  ch.push(P((rel.created_at ? bkDay(rel.created_at) : bkDay(new Date().toISOString())) + (rel.kind ? ' · ' + rel.kind + ' version' : '') + ' · compared with ' + prev + (rel.created_by ? ' · ' + bkWho(rel.created_by) : ''), { run: { color: '5C6472' } }));
+  if (rel.title && !rel.isComparison) ch.push(P(rel.title, { run: { bold: true } }));
+  if (rel.notes) ch.push(P(rel.notes));
+  ch.push(H('Overview', D.HeadingLevel.HEADING_1));
+  ch.push(P(relCounts(s) || 'No changes.'));
+  if (d.breaking) ch.push(P('Contains renamed or removed variables or changed answer codes: analysis scripts and mappings may need updating.', { run: { bold: true } }));
+  const insts = Object.keys(d.byInst).sort();
+  if (insts.length) ch.push(table(['Instrument', 'New', 'Removed', 'Changed', 'Moved only'], insts.map(i => { const x = d.byInst[i]; return [i, x.added || '', x.removed || '', x.changed || '', x.order || '']; })));
+  const top = Object.keys(d.fieldCount).sort((a, b) => d.fieldCount[b] - d.fieldCount[a]);
+  if (top.length) { ch.push(P('')); ch.push(table(['Field', 'Variables changed'], top.map(k => [relFieldLabel(k), d.fieldCount[k]]))); }
+  ch.push(H('Details per instrument', D.HeadingLevel.HEADING_1));
+  const secs = new Set(); d.added.concat(d.removed, d.changed).forEach(x => (splitInstrumentName(x.instrument).length ? splitInstrumentName(x.instrument) : ['(no instrument)']).forEach(i => secs.add(i)));
+  const inSec = (x, sec) => sec === '(no instrument)' ? !splitInstrumentName(x.instrument).length : splitInstrumentName(x.instrument).indexOf(sec) >= 0;
+  Array.from(secs).sort().forEach(sec => {
+    ch.push(H(sec, D.HeadingLevel.HEADING_2));
+    const add = d.added.filter(x => inSec(x, sec)), rem = d.removed.filter(x => inSec(x, sec));
+    const chg = d.changed.filter(x => inSec(x, sec) && !x.onlyOrder), mov = d.changed.filter(x => inSec(x, sec) && x.onlyOrder);
+    if (add.length) { ch.push(P('New variables (' + add.length + ')', { run: { bold: true } })); ch.push(table(['Variable', 'Question (EN)'], add.map(a => [a.name, a.label || '–']))); }
+    if (rem.length) { ch.push(P('Removed variables (' + rem.length + ')', { run: { bold: true } })); ch.push(P(rem.map(r => r.name).join(', '))); }
+    if (chg.length) {
+      ch.push(P('Changed variables (' + chg.length + ')', { run: { bold: true } }));
+      chg.forEach(c => {
+        ch.push(P(c.name + (c.oldName !== c.name ? '  (was ' + c.oldName + ')' : ''), { run: { bold: true, font: 'Consolas', size: 19 } }));
+        ch.push(table(['Field', 'Before (' + prev + ')', 'After (' + rel.version + ')'], c.fields.filter(f => f.key !== 'display_order').map(f => [relFieldLabel(f.key), f.before || '–', f.after || '–'])));
+      });
+    }
+    if (mov.length) ch.push(P('Order changed for ' + mov.length + ' variable' + (mov.length === 1 ? '' : 's') + '.', { run: { color: '5C6472' } }));
+  });
+  const doc = new D.Document({ styles: { default: { document: { run: { font: 'Calibri', size: 21 } } } },
+    sections: [{ properties: { page: { margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: ch }] });
+  const name = (rel.isComparison ? 'Codebook_comparison_' + prev + '_to_' + rel.version : 'Codebook_release_notes_' + rel.version) + '.docx';
+  bkSave(await D.Packer.toBlob(doc), name.replace(/[^\w.\-]+/g, '_'));
+  cloudShowToast('success', 'Ready: ' + name);
+}
+async function relDownload(version, fmt) {
+  try {
+    const snap = await relSnapshot(version);
+    const base = 'PCNN_central_codebook_v' + version.replace(/[^\w.]+/g, '_');
+    if (fmt === 'json') { bkSave(new Blob([JSON.stringify(Object.assign({ version }, snap), null, 1)], { type: 'application/json' }), base + '.json'); return; }
+    const vars = snap.variables || [];
+    const keys = []; const seen = new Set();
+    vars.forEach(v => Object.keys(relFlat(v)).forEach(k => { if (!seen.has(k)) { seen.add(k); keys.push(k); } }));
+    const front = ['variable_name_cbs', 'Instrument', 'item_number', 'variable_label_nl', 'variable_label_en'].filter(k => seen.has(k));
+    const cols = front.concat(keys.filter(k => front.indexOf(k) < 0));
+    const aoa = [cols.map(relFieldLabel)].concat(vars.map(v => { const f = relFlat(v); return cols.map(k => relNorm(f[k])); }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'Codebook ' + version);
+    const inst = snap.instruments || [];
+    if (inst.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(inst.map(i => ({ name: i.name, status: i.status, description: i.description }))), 'Instruments');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Version', version], ['Frozen at', snap.taken_at], ['State as of', snap.as_of], ['Variables', vars.length]]), 'About');
+    XLSX.writeFile(wb, base + '.xlsx');
+  } catch (e) { cloudShowToast('error', 'Could not download: ' + (e.message || e)); }
+}
+
+// load status after sign-in (admins) and show the banner
+window.addEventListener('cloud-authenticated', () => {
+  setTimeout(async () => { if (!isAdminRole()) return; await bkLoadStatus(); await bkStaffNames(); bkRenderBanner(); }, 1500);
+});
+// ====== END v6.46 backup + releases ======
+
+// ====== v6.47: Discussions per variable + "since you last looked" (migration 36) ======
+// Discussions: staff (admin, editor, ontology engineer) only. A thread starts on
+// a variable, others reply; the author of the thread or an admin marks it
+// resolved. @Name mentions show up for that person under "Mentioned you".
+// Discussions are not codebook content, so they are not in the change log.
+
+const DISC = { all: [], loaded: 0, byVar: new Map(), names: null };
+function discOn() { return typeof isStaffRole === 'function' && isStaffRole(); }
+function discMe() { return window.cloudAuth && window.cloudAuth.user && window.cloudAuth.user.id; }
+async function discLoadAll(force) {
+  if (!discOn()) return [];
+  if (!force && DISC.loaded && Date.now() - DISC.loaded < 30000) return DISC.all;
+  const c = window.cloudAuth.client, out = [];
+  for (let from = 0; from < 100000; from += 1000) {
+    const { data, error } = await c.from('variable_comments').select('*').order('created_at', { ascending: true }).range(from, from + 999);
+    if (error) throw error;
+    out.push(...(data || [])); if (!data || data.length < 1000) break;
+  }
+  DISC.all = out.filter(x => !x.is_deleted); DISC.loaded = Date.now();
+  DISC.byVar = new Map();
+  DISC.all.forEach(x => { if (!DISC.byVar.has(x.variable_id)) DISC.byVar.set(x.variable_id, []); DISC.byVar.get(x.variable_id).push(x); });
+  await bkStaffNames();
+  return DISC.all;
+}
+function discOpenCount(varId) { return (DISC.byVar.get(varId) || []).filter(x => !x.parent_id && x.status === 'open').length; }
+function discBadge(v) {
+  if (!discOn() || !v || !v.id) return '';
+  const n = discOpenCount(v.id);
+  return n ? ` <span class="disc-badge" title="${n} open discussion${n === 1 ? '' : 's'}" onclick="event.stopPropagation(); openViewDialog('${escapeAttr(v._uid)}'); setTimeout(()=>{const x=document.querySelector('.disc-box'); if(x) x.scrollIntoView({behavior:'smooth'});},250)">💬 ${n}</span>` : '';
+}
+function discVarById(id) { return (state.codebook || []).find(v => v.id === id); }
+function discVarName(id) { const v = discVarById(id); return v ? (getId(v) || '(no name)') : '(variable not loaded)'; }
+function discBodyHtml(text) {
+  const names = Object.values(BK.staff || {}).filter(Boolean).sort((a, b) => b.length - a.length);
+  let h = escapeHtml(text || '').replace(/\n/g, '<br>');
+  names.forEach(n => { const e = escapeHtml(n).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); h = h.replace(new RegExp('@' + e + '(?![\\w])', 'g'), '<span class="disc-at">@' + escapeHtml(n) + '</span>'); });
+  return h;
+}
+function discMentions(text) {
+  const ids = [];
+  Object.entries(BK.staff || {}).forEach(([id, n]) => { if (n && new RegExp('@' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w])').test(text || '')) ids.push(id); });
+  return ids;
+}
+function discThreads(varId) {
+  const all = DISC.byVar.get(varId) || [];
+  return all.filter(x => !x.parent_id).map(r => ({ root: r, replies: all.filter(x => x.parent_id === r.id) }))
+    .sort((a, b) => (a.root.status === b.root.status ? 0 : a.root.status === 'open' ? -1 : 1) || (a.root.created_at < b.root.created_at ? 1 : -1));
+}
+function discMsgHtml(m, isRoot, root) {
+  const me = discMe(), mine = m.created_by === me, admin = isAdminRole();
+  const canResolve = isRoot && (root.created_by === me || admin);
+  return `<div class="disc-msg${isRoot ? ' root' : ''}" data-id="${m.id}">
+    <div class="disc-meta"><b>${escapeHtml(bkWho(m.created_by))}</b> · ${bkDayTime(m.created_at)}${m.edited_at ? ' · edited' : ''}
+      ${isRoot ? `<span class="disc-st ${m.status}">${m.status === 'open' ? 'open' : 'resolved' + (m.resolved_by ? ' by ' + escapeHtml(bkWho(m.resolved_by)) : '')}</span>` : ''}
+      <span class="disc-acts">
+        ${mine ? `<button class="btn-link" onclick="discEdit('${m.id}')">edit</button> <button class="btn-link" onclick="discDelete('${m.id}')">delete</button>` : ''}
+        ${canResolve ? `<button class="btn-link" onclick="discResolve('${m.id}', ${m.status === 'open'})">${m.status === 'open' ? 'mark resolved' : 'reopen'}</button>` : ''}
+      </span></div>
+    <div class="disc-body">${discBodyHtml(m.body)}</div></div>`;
+}
+function discMentionPicker(target) {
+  const names = Object.entries(BK.staff || {}).filter(([id]) => id !== discMe()).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+  if (!names.length) return '';
+  return `<select class="disc-mention" onchange="discInsertMention('${target}', this)" style="width:auto"><option value="">@ mention…</option>${names.map(([id, n]) => `<option>${escapeHtml(n)}</option>`).join('')}</select>`;
+}
+function discInsertMention(target, sel) {
+  const ta = document.getElementById(target); if (!ta || !sel.value) return;
+  ta.value = (ta.value && !/\s$/.test(ta.value) ? ta.value + ' ' : ta.value) + '@' + sel.value + ' '; sel.value = ''; ta.focus();
+}
+async function discAppendToView(uid) {
+  if (!discOn()) return;
+  const v = findVarByUid(uid), body = document.getElementById('modal-view-body');
+  if (!v || !v.id || !body) return;
+  const box = document.createElement('div');
+  box.className = 'field-group disc-box'; box.setAttribute('data-var', v.id); box.setAttribute('data-uid', uid);
+  box.innerHTML = '<div class="field-group-title">Discussion</div><div class="disc-list">Loading…</div>';
+  const hb = body.querySelector('.hl-viewbox');   // before the History box (admins)
+  if (hb) body.insertBefore(box, hb); else body.appendChild(box);
+  try { await discLoadAll(); } catch (e) { box.querySelector('.disc-list').innerHTML = '<span class="bk-note">Discussions are not available (' + escapeHtml(e.message || e) + '). Run migration 36.</span>'; return; }
+  discRenderBox(box);
+}
+function discRenderBox(box) {
+  const varId = box.getAttribute('data-var');
+  const th = discThreads(varId);
+  box.querySelector('.disc-list').innerHTML = `
+    ${th.length ? th.map(t => `<div class="disc-thread ${t.root.status}">
+      ${discMsgHtml(t.root, true, t.root)}
+      ${t.replies.map(r => discMsgHtml(r, false, t.root)).join('')}
+      <div class="disc-reply"><textarea id="disc-r-${t.root.id}" rows="1" placeholder="Reply…"></textarea>
+        <div class="disc-row">${discMentionPicker('disc-r-' + t.root.id)}<button class="btn-mini" onclick="discPost('${varId}', '${t.root.id}')">Reply</button></div></div>
+    </div>`).join('') : '<p class="bk-note" style="margin:4px 0 8px">No discussion on this variable yet.</p>'}
+    <div class="disc-new"><textarea id="disc-new-${varId}" rows="2" placeholder="Start a discussion: a question, something to check, a decision to make…"></textarea>
+      <div class="disc-row">${discMentionPicker('disc-new-' + varId)}<button class="btn-primary btn-mini" onclick="discPost('${varId}', null)">Post</button></div></div>`;
+}
+function discRefreshOpenBoxes() {
+  document.querySelectorAll('.disc-box').forEach(discRenderBox);
+  if (state.currentTab === 'variables' && typeof refreshVariablesTab === 'function') refreshVariablesTab();
+  if (state.currentTab === 'dashboard') sinceRender();
+}
+async function discPost(varId, parentId) {
+  const ta = document.getElementById(parentId ? 'disc-r-' + parentId : 'disc-new-' + varId);
+  const text = (ta && ta.value || '').trim(); if (!text) return;
+  try {
+    const { error } = await window.cloudAuth.client.from('variable_comments').insert({ variable_id: varId, parent_id: parentId, body: text, status: 'open', mentions: discMentions(text), created_by: discMe() });
+    if (error) throw error;
+    await discLoadAll(true); discRefreshOpenBoxes();
+  } catch (e) { cloudShowToast('error', 'Could not post: ' + (e.message || e)); }
+}
+async function discUpdate(id, patch) {
+  try {
+    const { error } = await window.cloudAuth.client.from('variable_comments').update(patch).eq('id', id);
+    if (error) throw error;
+    await discLoadAll(true); discRefreshOpenBoxes();
+  } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e)); }
+}
+function discEdit(id) {
+  const m = DISC.all.find(x => x.id === id); if (!m) return;
+  const el = document.querySelector('.disc-msg[data-id="' + id + '"] .disc-body'); if (!el) return;
+  el.innerHTML = `<textarea id="disc-e-${id}" rows="2">${escapeHtml(m.body)}</textarea><div class="disc-row"><button class="btn-mini" onclick="discRefreshOpenBoxes()">Cancel</button><button class="btn-primary btn-mini" onclick="discSaveEdit('${id}')">Save</button></div>`;
+}
+function discSaveEdit(id) {
+  const t = (document.getElementById('disc-e-' + id).value || '').trim(); if (!t) return;
+  discUpdate(id, { body: t, mentions: discMentions(t), edited_at: new Date().toISOString() });
+}
+function discDelete(id) { if (!confirmInline('Delete this message?')) return; discUpdate(id, { is_deleted: true }); }
+function discResolve(id, resolve) {
+  discUpdate(id, resolve ? { status: 'resolved', resolved_by: discMe(), resolved_at: new Date().toISOString() } : { status: 'open', resolved_by: null, resolved_at: null });
+}
+
+// ---------- "Since you last looked" + discussions on the Dashboard ----------
+const SINCE = { since: null, rows: [], loadedAt: null, open: false };
+async function sinceLoad() {
+  const c = window.cloudAuth.client, me = discMe();
+  const { data: seen } = await c.from('user_seen').select('seen_until').eq('user_id', me).maybeSingle();
+  SINCE.since = seen && seen.seen_until ? seen.seen_until : new Date(Date.now() - 7 * 864e5).toISOString();
+  SINCE.firstTime = !(seen && seen.seen_until);
+  SINCE.loadedAt = new Date().toISOString();
+  const { data, error } = await c.rpc('changes_since', { p_since: SINCE.since, p_limit: 5000 });
+  if (error) throw error;
+  SINCE.rows = data || [];
+  const pc = await c.from('pending_changes').select('id, field_name, variable_id, status, reviewed_at, reviewed_by').eq('submitted_by', me).gt('reviewed_at', SINCE.since);
+  SINCE.reviewed = (pc && pc.data) || [];
+  return SINCE;
+}
+function sinceSummary() {
+  const rows = SINCE.rows.filter(r => !(r.action === 'update_field' && hNorm(r.old_value) === hNorm(r.new_value)));
+  const vars = new Set(rows.map(r => r.variable_id).filter(Boolean));
+  const people = {}, insts = {};
+  rows.forEach(r => {
+    const w = r.performed_by ? bkWho(r.performed_by) : 'database (SQL)'; people[w] = (people[w] || 0) + 1;
+    (splitInstrumentName(r.instrument || '').length ? splitInstrumentName(r.instrument) : ['(no instrument)']).forEach(i => { insts[i] = insts[i] || new Set(); insts[i].add(r.variable_id); });
+  });
+  const created = rows.filter(r => r.action === 'create'), deleted = rows.filter(r => r.action === 'delete');
+  const me = discMe();
+  const newMsgs = DISC.all.filter(x => x.created_at > SINCE.since && x.created_by !== me);
+  const mentions = DISC.all.filter(x => (x.mentions || []).includes(me) && x.created_by !== me);
+  const myOpenMentions = mentions.filter(x => { const root = x.parent_id ? DISC.all.find(y => y.id === x.parent_id) : x; return root && root.status === 'open'; });
+  return { rows, vars, people, insts, created, deleted, newMsgs, myOpenMentions };
+}
+async function sinceRender() {
+  if (!discOn()) return;
+  let host = document.getElementById('dash-since');
+  if (!host) {
+    const cards = document.getElementById('dash-cards'); if (!cards) return;
+    host = document.createElement('div'); host.id = 'dash-since'; cards.parentNode.insertBefore(host, cards);
+  }
+  let disc = document.getElementById('dash-disc');
+  if (!disc) { const inst = document.getElementById('dash-instruments'); disc = document.createElement('div'); disc.id = 'dash-disc'; inst.parentNode.insertBefore(disc, inst); }
+  host.innerHTML = '<div class="bk-box"><p class="bk-note">Loading what changed…</p></div>';
+  try { await Promise.all([sinceLoad(), discLoadAll(true)]); }
+  catch (e) { host.innerHTML = `<div class="bk-msg warn">“Since you last looked” is not available (${escapeHtml(e.message || e)}). Run migration 36.</div>`; disc.innerHTML = ''; return; }
+  const s = sinceSummary();
+  const peopleTxt = Object.entries(s.people).sort((a, b) => b[1] - a[1]).map(([w, n]) => escapeHtml(w) + ' (' + n + ')').join(', ');
+  const instTxt = Object.entries(s.insts).sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([i, set]) => escapeHtml(i) + ' (' + set.size + ')').join(', ');
+  const nothing = !s.rows.length && !s.newMsgs.length && !SINCE.reviewed.length;
+  host.innerHTML = `<div class="bk-box since">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
+      <div><h3>Since you last looked <span class="bk-note">— ${SINCE.firstTime ? 'last 7 days (first visit)' : bkDayTime(SINCE.since)}</span></h3></div>
+      <div>${isAdminRole() ? `<button class="btn-mini" onclick="sinceOpenLog()">Open in Log</button> ` : ''}<button class="btn-primary btn-mini" onclick="sinceMarkSeen()" ${nothing ? 'disabled' : ''}>✓ Mark all as seen</button></div>
+    </div>
+    ${nothing ? '<p>Nothing new.</p>' : `<ul class="since-list">
+      ${s.rows.length ? `<li><b>${s.rows.length} change${s.rows.length === 1 ? '' : 's'}</b> on <b>${s.vars.size} variable${s.vars.size === 1 ? '' : 's'}</b> by ${peopleTxt}</li>` : ''}
+      ${instTxt ? `<li>Instruments: ${instTxt}</li>` : ''}
+      ${s.created.length ? `<li>${s.created.length} new variable${s.created.length === 1 ? '' : 's'}: ${s.created.slice(0, 15).map(r => '<code>' + escapeHtml(r.variable_name || '?') + '</code>').join(', ')}${s.created.length > 15 ? '…' : ''}</li>` : ''}
+      ${s.deleted.length ? `<li>${s.deleted.length} moved to the Trash: ${s.deleted.slice(0, 15).map(r => '<code>' + escapeHtml(r.variable_name || '?') + '</code>').join(', ')}</li>` : ''}
+      ${s.newMsgs.length ? `<li>💬 ${s.newMsgs.length} new message${s.newMsgs.length === 1 ? '' : 's'} in discussions</li>` : ''}
+      ${SINCE.reviewed.length ? `<li>Your suggestions reviewed: ${SINCE.reviewed.filter(x => x.status === 'approved').length} approved, ${SINCE.reviewed.filter(x => x.status === 'rejected').length} rejected (see Pending)</li>` : ''}
+    </ul>
+    ${s.rows.length ? `<details ${SINCE.open ? 'open' : ''} ontoggle="SINCE.open=this.open"><summary>Show the changes</summary>${sinceListHtml(s.rows)}</details>` : ''}`}
+  </div>`;
+  discDashRender(s);
+  sinceBadge(s);
+}
+function sinceListHtml(rows) {
+  const cut = x => { x = x == null ? '' : String(x); return x.length > 120 ? x.slice(0, 120) + '…' : x; };
+  const act = { create: 'new variable', delete: 'moved to Trash', restore: 'restored', reorder: 'order changed', approve_change: 'suggestion approved', reject_change: 'suggestion rejected' };
+  return `<table class="dash-table"><thead><tr><th>When</th><th>Who</th><th>Variable</th><th>What</th><th>Before → after</th></tr></thead><tbody>
+    ${rows.slice(0, 300).map(r => { const v = discVarById(r.variable_id); return `<tr>
+      <td style="white-space:nowrap">${bkDayTime(r.performed_at)}</td><td>${escapeHtml(r.performed_by ? bkWho(r.performed_by) : 'SQL')}</td>
+      <td>${v ? `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}')"><code>${escapeHtml(r.variable_name || '')}</code></a>` : `<code>${escapeHtml(r.variable_name || '')}</code>`}</td>
+      <td>${escapeHtml(act[r.action] || relFieldLabel(r.field_name) || r.action)}</td>
+      <td class="bk-pre">${r.action === 'update_field' ? (r.old_value == null && r.new_value == null ? '<span class="bk-note">(not shown)</span>' : escapeHtml(cut(r.old_value) || '–') + ' → ' + escapeHtml(cut(r.new_value) || '–')) : ''}</td></tr>`; }).join('')}
+    </tbody></table>${rows.length > 300 ? '<p class="bk-note">First 300 shown.</p>' : ''}`;
+}
+async function sinceMarkSeen() {
+  try {
+    const { error } = await window.cloudAuth.client.from('user_seen').upsert({ user_id: discMe(), seen_until: SINCE.loadedAt || new Date().toISOString(), updated_at: new Date().toISOString() });
+    if (error) throw error;
+    cloudShowToast('success', 'Marked as seen. Next time you see only what changed after this.');
+    sinceRender();
+  } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e)); }
+}
+function sinceOpenLog() {
+  switchTab('history');
+  setTimeout(() => {
+    const d = new Date(SINCE.since), p = n => String(n).padStart(2, '0');
+    const from = document.getElementById('hl-from');
+    if (from) { from.value = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); if (typeof histFilterChanged === 'function') histFilterChanged(); }
+  }, 300);
+}
+function sinceBadge(s) {
+  const tab = document.querySelector('.tab[data-tab="dashboard"]'); if (!tab) return;
+  let b = document.getElementById('tab-count-dash');
+  if (!b) { b = document.createElement('span'); b.className = 'count'; b.id = 'tab-count-dash'; tab.appendChild(b); }
+  const n = s.rows.length + s.newMsgs.length;
+  b.textContent = n > 999 ? '999+' : String(n); b.style.display = n ? '' : 'none';
+  b.title = n ? 'New since you last looked' : '';
+}
+function discDashRender(s) {
+  const el = document.getElementById('dash-disc'); if (!el) return;
+  const roots = DISC.all.filter(x => !x.parent_id && x.status === 'open');
+  const insts = Array.from(new Set(roots.flatMap(r => splitInstrumentName((discVarById(r.variable_id) || {}).Instrument || '')))).sort();
+  const f = DISC.filter || (DISC.filter = { inst: '', who: '' });
+  const people = Array.from(new Set(roots.map(r => r.created_by))).map(id => [id, bkWho(id)]);
+  const list = roots.filter(r => (!f.inst || variableBelongsTo(discVarById(r.variable_id) || {}, f.inst)) && (!f.who || r.created_by === f.who))
+    .sort((a, b) => a.created_at < b.created_at ? 1 : -1);
+  const replies = id => DISC.all.filter(x => x.parent_id === id);
+  el.innerHTML = `<div class="bk-box">
+    <h3>Open discussions <span class="bk-note">(${roots.length})</span></h3>
+    ${s.myOpenMentions.length ? `<div class="bk-msg ok"><b>Mentioned you (${s.myOpenMentions.length}):</b> ${s.myOpenMentions.slice(0, 20).map(m => { const v = discVarById(m.variable_id); return v ? `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}')"><code>${escapeHtml(getId(v))}</code></a> (${escapeHtml(bkWho(m.created_by))})` : ''; }).join(', ')}</div>` : ''}
+    ${roots.length ? `<div class="disc-filters"><select style="width:auto" onchange="DISC.filter.inst=this.value; discDashRender(sinceSummary())"><option value="">All instruments</option>${insts.map(i => `<option ${f.inst === i ? 'selected' : ''}>${escapeHtml(i)}</option>`).join('')}</select>
+      <select style="width:auto" onchange="DISC.filter.who=this.value; discDashRender(sinceSummary())"><option value="">Everyone</option>${people.map(([id, n]) => `<option value="${id}" ${f.who === id ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('')}</select></div>
+    <table class="dash-table"><thead><tr><th>Variable</th><th>Instrument</th><th>Started by</th><th>Message</th><th>Replies</th></tr></thead><tbody>
+    ${list.slice(0, 200).map(r => { const v = discVarById(r.variable_id); const rp = replies(r.id); return `<tr>
+      <td>${v ? `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}'); setTimeout(()=>{const x=document.querySelector('.disc-box'); if(x) x.scrollIntoView({behavior:'smooth'});},250)"><code>${escapeHtml(getId(v))}</code></a>` : '<span class="bk-note">(not loaded)</span>'}</td>
+      <td>${escapeHtml(v ? histInstOf(v) : '')}</td><td>${escapeHtml(bkWho(r.created_by))}<div class="bk-note">${bkDay(r.created_at)}</div></td>
+      <td class="bk-pre">${discBodyHtml(r.body.length > 220 ? r.body.slice(0, 220) + '…' : r.body)}</td>
+      <td>${rp.length ? rp.length + '<div class="bk-note">last ' + bkDay(rp[rp.length - 1].created_at) + '</div>' : ''}</td></tr>`; }).join('')}
+    </tbody></table>` : '<p class="bk-note">No open discussions. Start one from the View dialog of any variable (👁).</p>'}
+  </div>`;
+}
+
+window.addEventListener('cloud-authenticated', () => {
+  setTimeout(() => {
+    // discussion box in the View dialog (before History, which admins also get)
+    ['openViewDialog', 'openViewDialogCompact'].forEach(name => {
+      const orig = window[name];
+      if (typeof orig !== 'function' || orig.__discPatched) return;
+      window[name] = function (uid) { const r = orig.apply(this, arguments); discAppendToView(uid); return r; };
+      window[name].__discPatched = true; window[name].__histPatched = orig.__histPatched;
+    });
+    // 💬 badge next to variable names
+    if (typeof window.fxBadge === 'function' && !window.fxBadge.__disc) {
+      const orig = window.fxBadge;
+      window.fxBadge = function (v) { return orig.apply(this, arguments) + discBadge(v); };
+      window.fxBadge.__disc = true;
+    }
+    // "since you last looked" on the Dashboard
+    if (typeof window.renderDashboard === 'function' && !window.renderDashboard.__since) {
+      const orig = window.renderDashboard;
+      window.renderDashboard = function () { const r = orig.apply(this, arguments); sinceRender(); return r; };
+      window.renderDashboard.__since = true;
+    }
+  }, 900);
+  // load counts once after sign-in (badge on the Dashboard tab, 💬 in the list)
+  setTimeout(async () => {
+    if (!discOn()) return;
+    try { await bkStaffNames(); await Promise.all([discLoadAll(true), sinceLoad()]); sinceBadge(sinceSummary()); if (state.currentTab === 'variables') refreshVariablesTab(); } catch (_) {}
+  }, 2500);
+});
+// ====== END v6.47 discussions + since ======
+
+
 
 
 
@@ -9024,7 +10125,7 @@ function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   var _adminBtn = document.getElementById("admin-tab-btn");
-  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports","compare"].indexOf(name) !== -1);
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports","compare","backup","releases"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   // v6.42: the instrument selector and its info box only on the tabs that use them
   document.body.classList.toggle("no-inst-bar", !(name === "variables" || name === "bulk"));
@@ -9038,6 +10139,8 @@ function switchTab(name) {
   else if (name === "imports") loadImports();
   else if (name === "dashboard") renderDashboard();
   else if (name === "quality") renderQuality(true);
+  else if (name === "backup") bkRender();
+  else if (name === "releases") relRender();
 }
 
 // ============ QUALITY TAB (v6.39) ============
