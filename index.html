@@ -529,6 +529,29 @@
   .admin-menu-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint, #b6bac2); padding: 7px 12px 3px; }
   .admin-menu-label:not(:first-child) { border-top: 1px solid var(--border, #e3e5e8); margin-top: 4px; }
   .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  /* v6.48 tasks */
+  .task-sum { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin: 0 0 8px; }
+  .task-quick { cursor:pointer; font:inherit; font-size:12px; padding:3px 10px; }
+  .task-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin: 8px 0; font-size: 12.5px; }
+  .task-table td { vertical-align: top; }
+  .task-title { font-weight: 500; }
+  .task-details { margin-top: 2px; white-space: pre-wrap; }
+  .task-prio { display:inline-block; font-size:10.5px; padding:1px 8px; border-radius:10px; border:1px solid var(--border); white-space:nowrap; }
+  .task-prio.high { background:#fdeceb; color:#8a1c13; border-color:#f3c7c2; }
+  .task-prio.low { color: var(--text-muted); }
+  .task-st, .task-st-sel { font-size: 11.5px; }
+  .task-st { display:inline-block; padding:1px 8px; border-radius:10px; border:1px solid var(--border); }
+  .task-st.done, .task-st-sel.done { background:#E1F5EE; color:#0b4f3e; }
+  .task-st.in_progress, .task-st-sel.in_progress { background:#FAEEDA; color:#6b3d06; }
+  .task-st.cancelled, .task-st-sel.cancelled { color: var(--text-muted); }
+  .task-row.done td, .task-row.cancelled td { color: var(--text-muted); }
+  .task-row.cancelled .task-title { text-decoration: line-through; }
+  tr.overdue td:first-child { box-shadow: inset 3px 0 0 #c0392b; }
+  .task-late { font-size:10.5px; color:#8a1c13; }
+  .task-form label { display:block; font-size:0.85rem; margin: 6px 0; }
+  .task-form .rel-form label { display:flex; margin: 6px 0; }
+  .task-h4 { margin: 10px 0 4px; font-size: 0.86rem; font-weight: 600; }
+  .fch-box .bk-pre { font-family: var(--mono); font-size: 11px; white-space: pre; min-width: 230px; }
   /* v6.47 discussions + since */
   .disc-badge { display: inline-block; font-size: 10.5px; padding: 0 6px; margin-left: 4px; border-radius: 9px; background: #e7f0fb; color: #1e4f8a; border: 1px solid #c7dbf3; cursor: pointer; vertical-align: 1px; }
   .disc-thread { border: 1px solid var(--border, #e3e5e8); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; background: #fff; }
@@ -1597,7 +1620,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.47.0
+      Codebook Editor — Cloud edition · v6.48.0
     </div>
   </div>
 </div>
@@ -1632,7 +1655,7 @@
           <div class="rv-brand-title">Codebook</div>
           <div class="rv-brand-sub">PCNN variable dictionary</div>
         </div>
-        <span class="rv-version-pill">v6.31 · cloud viewer</span>
+        <span class="rv-version-pill">v6.48.0 · researcher view</span>
       </div>
       <div class="rv-topbar-actions">
         <button class="rv-btn" id="rv-exit-preview-btn" onclick="rvPreviewExit()" style="display:none">← Exit preview</button>
@@ -1870,7 +1893,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.47.0 cloud</span>
+      <span class="version">v6.48.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1938,6 +1961,7 @@
     <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab staff-only" data-tab="dashboard" role="tab" onclick="switchTab('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
     <button class="tab staff-only" data-tab="quality" role="tab" onclick="switchTab('quality')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Quality</button>
+    <button class="tab staff-only" data-tab="tasks" role="tab" onclick="switchTab('tasks')"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Tasks <span class="count" id="tab-count-tasks" style="display:none;">0</span></button>
     <div class="tab-dropdown admin-only" id="admin-dropdown">
       <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Admin ▾</button>
       <div class="admin-menu" id="admin-menu">
@@ -2207,6 +2231,17 @@
     </div>
     <div id="dash-cards" class="dash-cards"></div>
     <div id="dash-instruments"></div>
+  </div>
+
+  <div class="tab-panel staff-only" id="panel-tasks" role="tabpanel">
+    <div style="margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.1rem;">Tasks</h2>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Work to do on the codebook, per work group. Admins add and assign tasks; the person a task is assigned to sets its status.</p>
+      </div>
+      <button class="btn-mini" onclick="tasksRender(true)">↻ Refresh</button>
+    </div>
+    <div id="tasks-body"></div>
   </div>
 
   <div class="tab-panel admin-only" id="panel-imports" role="tabpanel">
@@ -2559,8 +2594,8 @@
           <label style="cursor: pointer; font-weight: 400; color: var(--text); margin: 0; display: flex; align-items: flex-start; gap: 8px;">
             <input type="checkbox" id="excel-respect-copyright" style="margin-top: 3px;">
             <div>
-              <div>Respect <code>public_access</code> field</div>
-              <div class="hint" style="margin-top: 2px;">Hide variables where <code>public_access</code> is not <code>"yes"</code>. Restricted instruments show one placeholder row with a contact message.</div>
+              <div>Hide copyrighted instruments</div>
+              <div class="hint" style="margin-top: 2px;">Instruments whose variables have <code>copyright_status</code> = <code>restricted</code> are replaced by one placeholder row with the contact e-mail below.</div>
             </div>
           </label>
           <label style="margin-top: 10px;">Contact email</label>
@@ -2581,7 +2616,7 @@
 </div> <!-- /app -->
 
 <footer style="max-width: 1200px; margin: 2rem auto 1rem; padding: 1rem; text-align: center; font-size: 11px; color: var(--text-faint); border-top: 1px solid var(--border);">
-  Codebook Editor <span id="footer-version">v4.8</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
+  Codebook Editor <span id="footer-version">v6.48.0</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
   <a href="javascript:void(0)" onclick="document.getElementById('modal-about').style.display='flex'" style="color: var(--text-muted);">About &amp; license</a>
 </footer>
 
@@ -2600,7 +2635,7 @@
       <p style="margin-top: 14px;"><strong>Author:</strong> <span id="about-author">Hajar Hasannejadasl</span><br>
       <strong>Affiliation:</strong> Maastricht University Medical Centre+ (MUMC+)<br>
       <strong>Project:</strong> Post-COVID Network Netherlands (PCNN), funded by ZonMw<br>
-      <strong>Version:</strong> <span id="about-version">v4.8</span><br>
+      <strong>Version:</strong> <span id="about-version">v6.48.0</span><br>
       <strong>Created:</strong> 2026</p>
 
       <p style="margin-top: 14px;"><strong>Contact:</strong><br>
@@ -2615,7 +2650,7 @@
       </div>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;"><strong>How to cite:</strong><br>
-      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v4.8) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
+      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v6.48.0) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;">When you save the codebook, a <code>_meta</code> block is added to the JSON output recording the tool name, version, author, and timestamp of the last edit.</p>
     </div>
@@ -4698,7 +4733,9 @@ async function loadPendingChanges() {
       .select('*')
       .in('id', varIds);
     if (vErr) { console.error('var fetch error', vErr); }
-    (vars || []).forEach(v => { varMap[v.id] = v; });
+    // v6.47.1: database rows use lower-case column names; bring them to the
+    // Editor's names, so the card shows the variable name and current values.
+    (vars || []).map(v => (typeof normalizeCloudRow === 'function' ? normalizeCloudRow(v) : v)).forEach(v => { varMap[v.id] = v; });
   }
 
   PENDING_STATE.items = data || [];
@@ -8134,6 +8171,307 @@ window.addEventListener('cloud-authenticated', () => {
 });
 // ====== END v6.47 discussions + since ======
 
+// ====== v6.48: Tasks (migration 41) + FAIR code history (migration 40) ======
+// Tasks: staff read all. Admins create, edit and assign; the person a task is
+// assigned to (or an admin) changes its status through set_task_status().
+// Tasks without a person are the admins' queue. A task can point to variables.
+// FAIR code history: earlier / alternative codes removed from a variable, shown
+// read-only in the View dialog.
+
+const TASKS = { all: [], links: [], loaded: 0, ok: null, err: '', filter: { group: '', status: 'active', who: '', q: '' }, form: null };
+const TASK_STATUS = { open: 'Open', in_progress: 'In progress', done: 'Done', cancelled: 'Cancelled' };
+const TASK_PRIO = { high: 'High', normal: 'Normal', low: 'Low' };
+const TASK_PRIO_ORDER = { high: 0, normal: 1, low: 2 };
+function taskOn() { return typeof isStaffRole === 'function' && isStaffRole(); }
+async function taskLoad(force) {
+  if (!taskOn()) return TASKS;
+  if (!force && TASKS.loaded && Date.now() - TASKS.loaded < 30000) return TASKS;
+  const c = window.cloudAuth.client;
+  const [t, l] = await Promise.all([
+    c.from('tasks').select('*').order('id', { ascending: true }),
+    c.from('task_variables').select('*')
+  ]);
+  TASKS.loaded = Date.now();
+  if (t.error || l.error) { TASKS.ok = false; TASKS.err = (t.error || l.error).message || String(t.error || l.error); TASKS.all = []; TASKS.links = []; return TASKS; }
+  TASKS.ok = true; TASKS.err = ''; TASKS.all = t.data || []; TASKS.links = l.data || [];
+  await bkStaffNames();
+  return TASKS;
+}
+function taskById(id) { return TASKS.all.find(t => String(t.id) === String(id)); }
+function taskVarIds(id) { return TASKS.links.filter(x => String(x.task_id) === String(id)).map(x => x.variable_id); }
+function taskVars(id) { return taskVarIds(id).map(discVarById).filter(Boolean); }
+function taskTasksOfVar(varId) { const ids = new Set(TASKS.links.filter(x => x.variable_id === varId).map(x => String(x.task_id))); return TASKS.all.filter(t => ids.has(String(t.id))); }
+function taskActive(t) { return t.status === 'open' || t.status === 'in_progress'; }
+function taskMine(t) { return !!t.assigned_to && t.assigned_to === discMe(); }
+function taskCanSetStatus(t) { return isAdminRole() || taskMine(t); }
+function taskGroups() { return Array.from(new Set(TASKS.all.map(t => t.work_group).filter(Boolean))).sort((a, b) => a.localeCompare(b)); }
+function taskWho(t) { return t.assigned_to ? bkWho(t.assigned_to) : 'Not assigned'; }
+function taskOverdue(t) { return taskActive(t) && t.due_date && t.due_date < new Date().toISOString().slice(0, 10); }
+function taskSort(a, b) {
+  return (taskActive(a) === taskActive(b) ? 0 : taskActive(a) ? -1 : 1)
+    || ((TASK_PRIO_ORDER[a.priority] ?? 1) - (TASK_PRIO_ORDER[b.priority] ?? 1))
+    || String(a.due_date || '9999').localeCompare(String(b.due_date || '9999'))
+    || (Number(a.id) - Number(b.id));
+}
+function taskVarLinks(t, max) {
+  if (typeof ensureUids === 'function') ensureUids();   // View links need _uid
+  const vs = taskVars(t.id), ids = taskVarIds(t.id), n = max || 6;
+  if (!ids.length) return '<span class="bk-note">—</span>';
+  const shown = vs.slice(0, n).map(v => `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}')"><code>${escapeHtml(getId(v))}</code></a>`).join(', ');
+  const more = ids.length - Math.min(vs.length, n);
+  return shown + (more > 0 ? ` <span class="bk-note">+${more} more</span>` : '');
+}
+function taskStatusCtl(t) {
+  if (!taskCanSetStatus(t)) return `<span class="task-st ${t.status}">${escapeHtml(TASK_STATUS[t.status] || t.status)}</span>`;
+  return `<select class="task-st-sel ${t.status}" onchange="taskSetStatus(${Number(t.id)}, this.value)">${Object.entries(TASK_STATUS).map(([k, l]) => `<option value="${k}" ${t.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+}
+function taskTitleHtml(t) {
+  const d = t.details ? String(t.details) : '';
+  return `<div class="task-title">${escapeHtml(t.title)}</div>${d ? `<div class="bk-note task-details">${escapeHtml(d.length > 260 ? d.slice(0, 260) + '…' : d)}</div>` : ''}`;
+}
+function taskRowHtml(t) {
+  return `<tr class="task-row ${t.status}${taskOverdue(t) ? ' overdue' : ''}">
+    <td><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || t.priority)}</span></td>
+    <td>${taskTitleHtml(t)}</td>
+    <td>${taskVarLinks(t)}</td>
+    <td>${escapeHtml(t.work_group || '')}</td>
+    <td>${escapeHtml(taskWho(t))}</td>
+    <td style="white-space:nowrap">${t.due_date ? escapeHtml(t.due_date) + (taskOverdue(t) ? ' <span class="task-late">overdue</span>' : '') : ''}</td>
+    <td>${taskStatusCtl(t)}${t.status === 'done' && t.done_at ? `<div class="bk-note">${bkDay(t.done_at)}${t.done_by ? ' · ' + escapeHtml(bkWho(t.done_by)) : ''}</div>` : ''}</td>
+    <td>${isAdminRole() ? `<button class="btn-mini" onclick="taskOpenForm(${Number(t.id)})">Edit</button>` : ''}</td></tr>`;
+}
+function taskFiltered() {
+  const f = TASKS.filter, me = discMe(), q = (f.q || '').toLowerCase().trim();
+  return TASKS.all.filter(t => {
+    if (f.group && t.work_group !== f.group) return false;
+    if (f.status === 'active' && !taskActive(t)) return false;
+    if (f.status && f.status !== 'active' && f.status !== 'all' && t.status !== f.status) return false;
+    if (f.who === 'me' && t.assigned_to !== me) return false;
+    if (f.who === 'none' && t.assigned_to) return false;
+    if (f.who && f.who !== 'me' && f.who !== 'none' && t.assigned_to !== f.who) return false;
+    if (q) {
+      const hay = [t.title, t.details, t.work_group, taskWho(t), ...taskVars(t.id).map(getId)].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort(taskSort);
+}
+async function tasksRender(force) {
+  const host = document.getElementById('tasks-body'); if (!host) return;
+  if (!taskOn()) { host.innerHTML = ''; return; }
+  host.innerHTML = '<p class="bk-note">Loading tasks…</p>';
+  await taskLoad(force);
+  if (!TASKS.ok) { host.innerHTML = `<div class="bk-msg warn">Tasks are not available (${escapeHtml(TASKS.err)}). Run migration 41 in Supabase, then reload.</div>`; return; }
+  const f = TASKS.filter, groups = taskGroups();
+  const people = Object.entries(BK.staff || {}).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+  const list = taskFiltered();
+  const active = TASKS.all.filter(taskActive);
+  const nMine = active.filter(taskMine).length, nNone = active.filter(t => !t.assigned_to).length;
+  host.innerHTML = `
+    <div class="task-sum">
+      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'me',q:''}; tasksRender()">Mine: <b>${nMine}</b></button>
+      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'none',q:''}; tasksRender()">Not assigned: <b>${nNone}</b></button>
+      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'',q:''}; tasksRender()">All open: <b>${active.length}</b></button>
+      <span style="flex:1"></span>
+      ${isAdminRole() ? '<button class="btn-primary btn-mini" onclick="taskOpenForm(null)">+ New task</button>' : ''}
+    </div>
+    <div id="task-form-host"></div>
+    <div class="task-filters">
+      <select onchange="TASKS.filter.group=this.value; tasksRender()" style="width:auto"><option value="">All work groups</option>${groups.map(g => `<option ${f.group === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}</select>
+      <select onchange="TASKS.filter.status=this.value; tasksRender()" style="width:auto">
+        ${[['active', 'Open and in progress'], ['open', 'Open'], ['in_progress', 'In progress'], ['done', 'Done'], ['cancelled', 'Cancelled'], ['all', 'All']].map(([k, l]) => `<option value="${k}" ${f.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <select onchange="TASKS.filter.who=this.value; tasksRender()" style="width:auto">
+        <option value="">Everyone</option><option value="me" ${f.who === 'me' ? 'selected' : ''}>Assigned to me</option><option value="none" ${f.who === 'none' ? 'selected' : ''}>Not assigned</option>
+        ${people.map(([id, n]) => `<option value="${escapeAttr(id)}" ${f.who === id ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('')}</select>
+      <input type="text" id="task-q" placeholder="Search title, details, variable…" value="${escapeAttr(f.q || '')}" style="width:220px">
+      <span class="bk-note">${list.length} shown</span>
+    </div>
+    ${list.length ? `<div class="q-scroll"><table class="dash-table task-table"><thead><tr><th>Priority</th><th>Task</th><th>Variables</th><th>Work group</th><th>Assigned to</th><th>Due</th><th>Status</th><th></th></tr></thead>
+      <tbody>${list.map(taskRowHtml).join('')}</tbody></table></div>`
+      : `<p class="bk-note" style="padding:10px 0">No tasks match these filters.${isAdminRole() && !TASKS.all.length ? ' Use “+ New task” to add one.' : ''}</p>`}`;
+  const qi = host.querySelector('#task-q');
+  if (qi) qi.addEventListener('input', () => { clearTimeout(TASKS._qt); TASKS._qt = setTimeout(() => { TASKS.filter.q = qi.value; tasksRender().then(() => { const x = document.getElementById('task-q'); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } }); }, 300); });
+  if (TASKS.form) taskRenderForm();
+  taskBadge();
+}
+function taskOpenForm(id, presetVarIds) {
+  if (!isAdminRole()) return;
+  const t = id != null ? taskById(id) : null;
+  TASKS.form = t ? { id: t.id, title: t.title, details: t.details || '', work_group: t.work_group || '', assigned_to: t.assigned_to || '', priority: t.priority || 'normal', due_date: t.due_date || '', status: t.status, vars: taskVars(t.id).map(getId).join(', ') }
+    : { id: null, title: '', details: '', work_group: TASKS.filter.group || '', assigned_to: '', priority: 'normal', due_date: '', status: 'open', vars: (presetVarIds || []).map(discVarById).filter(Boolean).map(getId).join(', ') };
+  if (state.currentTab !== 'tasks') { switchTab('tasks'); return; }   // tasksRender opens the form
+  taskRenderForm();
+}
+function taskRenderForm() {
+  const host = document.getElementById('task-form-host'); if (!host || !TASKS.form) return;
+  const f = TASKS.form, groups = taskGroups();
+  const people = Object.entries(BK.staff || {}).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+  host.innerHTML = `<div class="bk-box task-form">
+    <h3>${f.id ? 'Edit task' : 'New task'}</h3>
+    <label>Title <input type="text" id="tf-title" value="${escapeAttr(f.title)}" maxlength="300"></label>
+    <label>Details <textarea id="tf-details" rows="3">${escapeHtml(f.details)}</textarea></label>
+    <div class="rel-form">
+      <label>Work group <input type="text" id="tf-group" list="tf-groups" value="${escapeAttr(f.work_group)}" style="width:200px"><datalist id="tf-groups">${groups.map(g => `<option value="${escapeAttr(g)}">`).join('')}</datalist></label>
+      <label>Assigned to <select id="tf-who" style="width:auto"><option value="">Not assigned (admins)</option>${people.map(([pid, n]) => `<option value="${escapeAttr(pid)}" ${f.assigned_to === pid ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('')}</select></label>
+      <label>Priority <select id="tf-prio" style="width:auto">${Object.entries(TASK_PRIO).map(([k, l]) => `<option value="${k}" ${f.priority === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label>Due <input type="date" id="tf-due" value="${escapeAttr(f.due_date)}"></label>
+      ${f.id ? `<label>Status <select id="tf-status" style="width:auto">${Object.entries(TASK_STATUS).map(([k, l]) => `<option value="${k}" ${f.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
+    </div>
+    <label>Variables <span class="bk-note">(names, separated by commas or new lines; may be empty)</span><textarea id="tf-vars" rows="2">${escapeHtml(f.vars)}</textarea></label>
+    <div id="tf-msg"></div>
+    <div class="bk-actions"><button class="btn-mini" onclick="TASKS.form=null; document.getElementById('task-form-host').innerHTML=''">Cancel</button>
+      <button class="btn-primary btn-mini" id="tf-save" onclick="taskSave()">${f.id ? 'Save' : 'Add task'}</button></div>
+  </div>`;
+  const ti = document.getElementById('tf-title'); if (ti) ti.focus();
+}
+function taskResolveVars(text) {
+  const names = String(text || '').split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+  const byName = new Map((state.codebook || []).filter(v => !v._deleted && v.id).map(v => [getId(v).toLowerCase(), v]));
+  const found = [], missing = [];
+  names.forEach(n => { const v = byName.get(n.toLowerCase()); if (v) { if (!found.includes(v.id)) found.push(v.id); } else missing.push(n); });
+  return { found, missing };
+}
+async function taskSave() {
+  if (!isAdminRole() || !TASKS.form) return;
+  const msg = document.getElementById('tf-msg');
+  const val = id => (document.getElementById(id) || {}).value || '';
+  const title = val('tf-title').trim();
+  if (!title) { msg.innerHTML = '<div class="bk-msg warn">A title is needed.</div>'; return; }
+  const { found, missing } = taskResolveVars(val('tf-vars'));
+  if (missing.length) { msg.innerHTML = `<div class="bk-msg warn">Not found in the codebook: ${missing.map(m => '<code>' + escapeHtml(m) + '</code>').join(', ')}. Correct or remove them.</div>`; return; }
+  const row = { title, details: val('tf-details').trim() || null, work_group: val('tf-group').trim() || null, assigned_to: val('tf-who') || null, priority: val('tf-prio') || 'normal', due_date: val('tf-due') || null, updated_at: new Date().toISOString() };
+  const c = window.cloudAuth.client, editing = TASKS.form.id;
+  const btn = document.getElementById('tf-save'); if (btn) btn.disabled = true;
+  try {
+    let id = editing;
+    if (editing) {
+      const st = val('tf-status');
+      if (st && st !== TASKS.form.status) { row.status = st; row.done_at = st === 'done' ? new Date().toISOString() : null; row.done_by = st === 'done' ? discMe() : null; }
+      const { error } = await c.from('tasks').update(row).eq('id', editing); if (error) throw error;
+    } else {
+      row.source = 'editor'; row.created_by = discMe();
+      const { data, error } = await c.from('tasks').insert(row).select('id').single(); if (error) throw error;
+      id = data.id;
+    }
+    const before = editing ? taskVarIds(editing) : [];
+    const add = found.filter(x => !before.includes(x)), del = before.filter(x => !found.includes(x));
+    if (del.length) { const { error } = await c.from('task_variables').delete().eq('task_id', id).in('variable_id', del); if (error) throw error; }
+    if (add.length) { const { error } = await c.from('task_variables').insert(add.map(variable_id => ({ task_id: id, variable_id }))); if (error) throw error; }
+    TASKS.form = null;
+    cloudShowToast('success', editing ? 'Task saved.' : 'Task added.');
+    await taskLoad(true); tasksRender(); taskRefreshViewBoxes();
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    msg.innerHTML = `<div class="bk-msg bad">Could not save: ${escapeHtml(e.message || e)}</div>`;
+  }
+}
+async function taskSetStatus(id, status) {
+  const t = taskById(id); if (!t || !taskCanSetStatus(t)) return;
+  try {
+    const { error } = await window.cloudAuth.client.rpc('set_task_status', { p_task_id: Number(id), p_status: status });
+    if (error) throw error;
+    cloudShowToast('success', 'Status: ' + (TASK_STATUS[status] || status));
+    await taskLoad(true);
+    if (state.currentTab === 'tasks') tasksRender(); else taskBadge();
+    if (state.currentTab === 'dashboard') taskDashRender();
+    taskRefreshViewBoxes();
+  } catch (e) { cloudShowToast('error', 'Could not change the status: ' + (e.message || e)); await taskLoad(true); if (state.currentTab === 'tasks') tasksRender(); }
+}
+function taskBadge() {
+  const tab = document.querySelector('.tab[data-tab="tasks"]'); if (!tab) return;
+  const b = document.getElementById('tab-count-tasks'); if (!b) return;
+  const active = TASKS.all.filter(taskActive);
+  const n = active.filter(taskMine).length + (isAdminRole() ? active.filter(t => !t.assigned_to).length : 0);
+  b.textContent = String(n); b.style.display = n ? '' : 'none';
+  b.title = n ? (isAdminRole() ? 'Open tasks for you and not assigned' : 'Open tasks assigned to you') : '';
+}
+async function taskDashRender() {
+  if (!taskOn()) return;
+  let el = document.getElementById('dash-tasks');
+  if (!el) {
+    const cards = document.getElementById('dash-cards'); if (!cards) return;
+    el = document.createElement('div'); el.id = 'dash-tasks'; cards.parentNode.insertBefore(el, cards);
+  }
+  const since = document.getElementById('dash-since');   // keep "Since you last looked" first
+  if (since && since.nextSibling !== el) since.parentNode.insertBefore(el, since.nextSibling);
+  await taskLoad();
+  if (!TASKS.ok) { el.innerHTML = `<div class="bk-msg warn">Tasks are not available (${escapeHtml(TASKS.err)}). Run migration 41.</div>`; return; }
+  const active = TASKS.all.filter(taskActive).sort(taskSort);
+  const mine = active.filter(taskMine), none = isAdminRole() ? active.filter(t => !t.assigned_to) : [];
+  const mini = (t) => `<tr class="${taskOverdue(t) ? 'overdue' : ''}"><td><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || '')}</span></td><td>${taskTitleHtml(t)}</td><td>${taskVarLinks(t, 3)}</td><td>${escapeHtml(t.work_group || '')}</td><td style="white-space:nowrap">${t.due_date ? escapeHtml(t.due_date) : ''}</td><td>${taskStatusCtl(t)}</td></tr>`;
+  const tbl = (rows) => `<table class="dash-table task-table"><thead><tr><th>Priority</th><th>Task</th><th>Variables</th><th>Work group</th><th>Due</th><th>Status</th></tr></thead><tbody>${rows.slice(0, 15).map(mini).join('')}</tbody></table>${rows.length > 15 ? `<p class="bk-note">${rows.length - 15} more in the Tasks tab.</p>` : ''}`;
+  el.innerHTML = `<div class="bk-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>Tasks</h3><button class="btn-mini" onclick="switchTab('tasks')">Open Tasks</button></div>
+    <h4 class="task-h4">Assigned to me (${mine.length})</h4>
+    ${mine.length ? tbl(mine) : '<p class="bk-note">No open tasks assigned to you.</p>'}
+    ${isAdminRole() ? `<h4 class="task-h4">Not assigned (${none.length})</h4>${none.length ? tbl(none) : '<p class="bk-note">Every open task has someone.</p>'}` : ''}
+  </div>`;
+  taskBadge();
+}
+// ---------- View dialog: tasks of the variable + FAIR code history ----------
+async function taskAppendToView(uid) {
+  if (!taskOn()) return;
+  const v = findVarByUid(uid), body = document.getElementById('modal-view-body');
+  if (!v || !v.id || !body) return;
+  const box = document.createElement('div');
+  box.className = 'field-group task-box'; box.setAttribute('data-var', v.id); box.setAttribute('data-uid', uid);
+  box.innerHTML = '<div class="field-group-title">Tasks</div><div class="task-list">Loading…</div>';
+  const before = body.querySelector('.disc-box') || body.querySelector('.hl-viewbox');
+  if (before) body.insertBefore(box, before); else body.appendChild(box);
+  try { await taskLoad(); } catch (_) {}
+  taskRenderViewBox(box);
+  fchAppendToView(v, box);
+}
+function taskRenderViewBox(box) {
+  const varId = box.getAttribute('data-var');
+  const list = box.querySelector('.task-list'); if (!list) return;
+  if (!TASKS.ok) { list.innerHTML = '<span class="bk-note">Tasks are not available. Run migration 41.</span>'; return; }
+  const ts = taskTasksOfVar(varId).sort(taskSort);
+  list.innerHTML = `${ts.length ? `<table class="dash-table task-table"><tbody>${ts.map(t => `<tr class="task-row ${t.status}${taskOverdue(t) ? ' overdue' : ''}">
+      <td><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || '')}</span></td><td>${taskTitleHtml(t)}</td>
+      <td>${escapeHtml(taskWho(t))}${t.due_date ? `<div class="bk-note">due ${escapeHtml(t.due_date)}</div>` : ''}</td><td>${taskStatusCtl(t)}</td></tr>`).join('')}</tbody></table>`
+    : '<p class="bk-note" style="margin:4px 0">No tasks for this variable.</p>'}
+    ${isAdminRole() ? `<button class="btn-mini" onclick="taskNewForVar('${escapeAttr(box.getAttribute('data-uid'))}')">+ New task for this variable</button>` : ''}`;
+}
+function taskRefreshViewBoxes() { document.querySelectorAll('.task-box').forEach(taskRenderViewBox); }
+function taskNewForVar(uid) {
+  const v = findVarByUid(uid); if (!v) return;
+  if (typeof closeModal === 'function') closeModal('view');
+  taskOpenForm(null, [v.id]);
+}
+async function fchAppendToView(v, taskBox) {
+  try {
+    const { data, error } = await window.cloudAuth.client.from('fair_code_history').select('*').eq('variable_id', v.id).order('created_at', { ascending: true });
+    if (error || !data || !data.length) return;   // table missing or nothing kept: show nothing
+    const box = document.createElement('div');
+    box.className = 'field-group fch-box';
+    box.innerHTML = `<div class="field-group-title">Earlier / alternative FAIR codes</div>
+      <table class="dash-table"><thead><tr><th>Field</th><th>Kind</th><th>Codes</th><th>Note</th><th>Kept</th></tr></thead><tbody>
+      ${data.map(r => `<tr><td><code>${escapeHtml(r.field_name)}</code></td><td>${escapeHtml(r.kind)}</td><td class="bk-pre">${escapeHtml(r.value)}</td><td class="bk-note">${escapeHtml(r.note || '')}</td><td class="bk-note" style="white-space:nowrap">${bkDay(r.created_at)}</td></tr>`).join('')}
+      </tbody></table>`;
+    if (taskBox && taskBox.parentNode) taskBox.parentNode.insertBefore(box, taskBox.nextSibling);
+  } catch (_) {}
+}
+
+window.addEventListener('cloud-authenticated', () => {
+  setTimeout(() => {
+    ['openViewDialog', 'openViewDialogCompact'].forEach(name => {
+      const orig = window[name];
+      if (typeof orig !== 'function' || orig.__taskPatched) return;
+      window[name] = function (uid) { const r = orig.apply(this, arguments); taskAppendToView(uid); return r; };
+      window[name].__taskPatched = true; window[name].__discPatched = orig.__discPatched; window[name].__histPatched = orig.__histPatched;
+    });
+    if (typeof window.renderDashboard === 'function' && !window.renderDashboard.__tasks) {
+      const orig = window.renderDashboard;
+      window.renderDashboard = function () { const r = orig.apply(this, arguments); taskDashRender(); return r; };
+      window.renderDashboard.__tasks = true; window.renderDashboard.__since = orig.__since;
+    }
+  }, 1000);
+  setTimeout(async () => { if (!taskOn()) return; try { await taskLoad(true); taskBadge(); } catch (_) {} }, 2600);
+});
+// ====== END v6.48 tasks + FAIR code history ======
+
+
 
 
 
@@ -8707,7 +9045,7 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 
 // ============ STATE ============
-const TOOL_VERSION = "v4.8";
+const TOOL_VERSION = "v6.48.0";
 
 const state = {
   codebook: null,
@@ -10139,6 +10477,7 @@ function switchTab(name) {
   else if (name === "imports") loadImports();
   else if (name === "dashboard") renderDashboard();
   else if (name === "quality") renderQuality(true);
+  else if (name === "tasks") tasksRender(true);
   else if (name === "backup") bkRender();
   else if (name === "releases") relRender();
 }
@@ -10149,7 +10488,7 @@ function switchTab(name) {
 // "OK, intentional" are stored in quality_exceptions (migration 31).
 const FAIR_STATUS_LABELS = { confirmed: '✅ Confirmed', needs_review: '🟠 Needs review', proposed: '🔵 Proposed by us', not_coded: '⚪ Not coded' };
 const FAIR_STATUS_FIELDS = new Set(['fair_status', 'value_fair_status']);
-const Q_DEFAULT_MISSING = ['sources', 'Theme', 'Subdomain', 'variable_label_EN', 'value_labels_EN', 'variable_name_FAIR', 'value_coding_FAIR', 'fair_status', 'value_fair_status'];
+const Q_DEFAULT_MISSING = ['sources', 'Theme', 'Subdomain', 'variable_label_EN', 'value_labels_EN', 'variable_name_FAIR', 'value_labels_FAIR', 'fair_status', 'value_fair_status'];
 const Q_KNOWN_PREFIX = ['sct', 'lnc', 'ncit', 'pcnn'];
 const Q_PREFIX_TYPO = { nci: 'ncit', snct: 'sct', svg: 'sct', sctid: 'sct', loinc: 'lnc', snomed: 'sct' };
 const Q_MAPPING_OK = ['exact match', 'close match', 'broad match', 'narrow match', 'related match'];
@@ -10176,6 +10515,10 @@ window._q = { sub: 'checks', inst: '', showOk: false, checkFilter: '', exc: new 
               fairSel: new Set(), scaleQ: '' };
 
 function qv(v, k) { if (!v) return ''; let x = v[k]; if (x == null) { const lk = Object.keys(v).find(z => z.toLowerCase() === k.toLowerCase()); x = lk ? v[lk] : ''; } return x == null ? '' : String(x).trim(); }
+// v6.48: the FAIR codes of the answer options are in value_label_FAIR_merged (final) or value_labels_FAIR;
+// value_coding_FAIR is an old copy, used only when the other two are empty. value_coding holds the code names.
+function qValCodes(v) { return qv(v, 'value_label_FAIR_merged') || qv(v, 'value_labels_FAIR') || qv(v, 'value_coding_FAIR'); }
+function qValCodesField(v) { return qv(v, 'value_label_FAIR_merged') ? 'value_label_FAIR_merged' : qv(v, 'value_labels_FAIR') ? 'value_labels_FAIR' : 'value_coding_FAIR'; }
 function qNorm(s) { return String(s || '').toLowerCase().replace(/[‘’'"`]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim(); }
 function qWords(s) { return new Set(qNorm(s).split(' ').filter(w => w.length > 1)); }
 function qJacc(a, b) { if (!a.size || !b.size) return 0; let n = 0; a.forEach(w => { if (b.has(w)) n++; }); return n / (a.size + b.size - n); }
@@ -10327,11 +10670,11 @@ function runQualityChecks(rows) {
     });
     if (issues.size) add('fair_format', [v], `${field}: ${[...issues].join(' · ')}`, field);
   };
-  rows.forEach(v => { fmt(v, 'variable_name_FAIR'); fmt(v, 'variable_name_FAIR_merged'); fmt(v, 'value_coding_FAIR'); });
+  rows.forEach(v => { fmt(v, 'variable_name_FAIR'); fmt(v, 'variable_name_FAIR_merged'); fmt(v, 'value_labels_FAIR'); fmt(v, 'value_label_FAIR_merged'); fmt(v, 'value_coding_FAIR'); });
 
   // answer options
   rows.forEach(v => {
-    const nl = qCodes(qv(v, 'value_labels_NL')), en = qCodes(qv(v, 'value_labels_EN')), fc = qCodes(qv(v, 'value_coding_FAIR'));
+    const nl = qCodes(qv(v, 'value_labels_NL')), en = qCodes(qv(v, 'value_labels_EN')), fc = qCodes(qValCodes(v));
     const probs = [];
     if (nl.length && en.length && nl.join('|') !== en.join('|')) probs.push(`NL codes [${nl.join(', ')}] vs EN codes [${en.join(', ')}]`);
     const base = nl.length ? nl : en;
@@ -10364,8 +10707,8 @@ function runQualityChecks(rows) {
       const t = qv(v, k); if (t && (t.length > 40 || /review|propos|must|check again|niet|todo/i.test(t))) add('note_in_by', [v], `${k}: “${truncate(t, 90)}”`, k);
     });
     const mr = qv(v, 'Mapping_relationship'); if (mr && !Q_MAPPING_OK.includes(mr.toLowerCase())) add('mapping_value', [v], `“${mr}” — expected one of: ${Q_MAPPING_OK.join(', ')}`);
-    [['fair_status', 'variable_name_FAIR'], ['value_fair_status', 'value_coding_FAIR']].forEach(([sf, cf]) => {
-      const st = qv(v, sf), code = qv(v, cf) || (sf === 'fair_status' ? qv(v, 'variable_name_FAIR_merged') : ''); if (!st) return;
+    [['fair_status', 'variable_name_FAIR'], ['value_fair_status', 'value_labels_FAIR']].forEach(([sf, cf]) => {
+      const st = qv(v, sf), code = sf === 'fair_status' ? (qv(v, cf) || qv(v, 'variable_name_FAIR_merged')) : qValCodes(v); if (!st) return;
       if (st === 'not_coded' && code) add('status_conflict', [v], `${sf} is “not coded” but ${cf} has a code`, sf);
       else if (st !== 'not_coded' && !code) add('status_conflict', [v], `${sf} is “${FAIR_STATUS_LABELS[st] || st}” but ${cf} is empty`, sf);
     });
@@ -10379,6 +10722,7 @@ function qSuggestStatus(v, kind) {
     const merged = qv(v, 'variable_name_FAIR_merged'), code = merged || qv(v, 'variable_name_FAIR'), by = qv(v, 'Var_FAIR_code_checked_by');
     const mr = qv(v, 'Mapping_relationship').toLowerCase(), note = qv(v, 'Mapping_note'), prop = qv(v, 'proposed_code');
     if (!code) return ['not_coded', 'no FAIR code'];
+    if (qv(v, 'fair_status') === 'needs_review' && /lnc_L[AP]/.test(code)) return ['needs_review', 'LOINC LA/LP code marked for re-check'];
     if (/(^|[^a-z])pcnn_/i.test(code)) return ['proposed', 'own pcnn_ code'];
     if (mr && mr !== 'exact match') return ['needs_review', 'mapping: ' + mr];
     if (note) return ['needs_review', 'mapping note: ' + truncate(note, 50)];
@@ -10389,8 +10733,9 @@ function qSuggestStatus(v, kind) {
   }
   const hasValues = qv(v, 'value_labels_NL') || qv(v, 'value_labels_EN');
   if (!hasValues) return [null, 'no answer options'];
-  const code = qv(v, 'value_coding_FAIR'), by = qv(v, 'Val_FAIR_code_checked_by');
+  const code = qValCodes(v), by = qv(v, 'Val_FAIR_code_checked_by');
   if (!code) return ['not_coded', 'no FAIR value codes'];
+  if (qv(v, 'value_fair_status') === 'needs_review' && /lnc_L[AP]/.test(code)) return ['needs_review', 'LOINC LA/LP codes marked for re-check'];
   if (/(^|[^a-z])pcnn_/i.test(code)) return ['proposed', 'own pcnn_ codes'];
   if (/review|different|must/i.test(by)) return ['needs_review', 'note in checked_by'];
   if (by) return ['confirmed', 'checked by ' + truncate(by, 30)];
@@ -10427,12 +10772,13 @@ async function renderQuality(reload) {
   const nScales = new Set(scope.map(v => qNorm(qv(v, 'value_labels_EN'))).filter(Boolean)).size;
   const nMissing = scope.filter(v => !qv(v, 'sources') || !qv(v, 'variable_label_EN') || !(qv(v, 'variable_name_FAIR') || qv(v, 'variable_name_FAIR_merged'))).length;
   const nFair = scope.filter(v => { const [sg] = qSuggestStatus(v, 'variable'); return sg && qv(v, 'fair_status') !== sg; }).length;
+  const nReview = scope.filter(v => qv(v, 'fair_status') === 'needs_review' || qv(v, 'value_fair_status') === 'needs_review').length;
   const subs = [
     ['checks',  '⚠', 'Checks',         `${openF.filter(f => !DUPS.includes(f.check)).length} findings`, 'All automatic checks'],
     ['dups',    '⧉', 'Duplicates',     `${openF.filter(f => DUPS.includes(f.check)).length} findings`, 'Names, questions, portal names'],
     ['missing', '◌', 'Missing values', `${nMissing} variables`, 'No source, EN label or FAIR code'],
     ['scales',  '≡', 'Answer scales',  `${nScales} scales`, 'Shared and similar answers'],
-    ['fair',    '✓', 'FAIR status',    `${nFair} to set or check`, 'Confirmed / review / proposed'],
+    ['fair',    '✓', 'FAIR status',    `${nFair} to set or check · ${nReview} need review`, 'Confirmed / review / proposed'],
   ];
   host.innerHTML = `<div class="q-bar">
       <label class="field-inline" style="display:flex;gap:6px;align-items:center;font-size:12.5px;">Instrument
@@ -10485,7 +10831,7 @@ function qRenderChecks(el, only) {
 }
 
 function qApplicable(v, f) {
-  if (f === 'value_labels_EN' || f === 'value_coding_FAIR' || f === 'value_fair_status') return !!(qv(v, 'value_labels_NL') || qv(v, 'value_labels_EN') || qv(v, 'value_coding_FAIR'));
+  if (f === 'value_labels_EN' || f === 'value_coding_FAIR' || f === 'value_labels_FAIR' || f === 'value_fair_status') return !!(qv(v, 'value_labels_NL') || qv(v, 'value_labels_EN') || qValCodes(v));
   return true;
 }
 function qRenderMissing(el) {
@@ -10540,16 +10886,20 @@ function qRenderScales(el) {
 
 function qRenderFair(el) {
   const q = window._q, kind = q.fairKind, field = kind === 'variable' ? 'fair_status' : 'value_fair_status';
-  const codeField = kind === 'variable' ? 'variable_name_FAIR' : 'value_coding_FAIR';
+  const codeField = kind === 'variable' ? 'variable_name_FAIR' : 'value_labels_FAIR';
+  const codeOf = v => kind === 'variable' ? qv(v, codeField) : qValCodes(v);
+  const stF = q.fairStored || '';   // v6.48: filter on the stored status
   const fieldExists = (state.allFields || []).includes(field) || qRows().some(v => field in v);
   const canEdit = ['write', 'propose'].includes(accessOf(field));
-  const list = qRows().filter(qInScope).map(v => { const [sug, why] = qSuggestStatus(v, kind); return { v, cur: qv(v, field), sug, why }; }).filter(x => x.sug);
+  const list = qRows().filter(qInScope).map(v => { const [sug, why] = qSuggestStatus(v, kind); return { v, cur: qv(v, field), sug, why }; }).filter(x => x.sug || (stF && stF !== '(not set)' && x.cur === stF));
   const counts = {}; list.forEach(x => { const k = x.cur || '(not set)'; counts[k] = (counts[k] || 0) + 1; });
   const sugCounts = {}; list.forEach(x => { sugCounts[x.sug] = (sugCounts[x.sug] || 0) + 1; });
-  const shown = q.fairOnlyDiff ? list.filter(x => x.cur !== x.sug) : list;
+  const shown = stF ? list.filter(x => stF === '(not set)' ? !x.cur : x.cur === stF)
+              : q.fairOnlyDiff ? list.filter(x => x.cur !== x.sug) : list;
   el.innerHTML = `<div class="q-bar">
       <div class="q-sub" style="margin:0;"><button class="${kind === 'variable' ? 'active' : ''}" onclick="window._q.fairKind='variable'; window._q.fairSel=new Set(); renderQuality();">Variable code</button><button class="${kind === 'values' ? 'active' : ''}" onclick="window._q.fairKind='values'; window._q.fairSel=new Set(); renderQuality();">Value codes</button></div>
-      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;"><input type="checkbox" id="q-fdiff" ${q.fairOnlyDiff ? 'checked' : ''}> Only where the status is not set or differs from the suggestion</label>
+      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;">Stored status <select id="q-fstored" style="width:auto"><option value="">Any</option>${['needs_review', 'confirmed', 'proposed', 'not_coded'].map(k => `<option value="${k}" ${stF === k ? 'selected' : ''}>${escapeHtml(FAIR_STATUS_LABELS[k])}</option>`).join('')}<option value="(not set)" ${stF === '(not set)' ? 'selected' : ''}>Not set</option></select></label>
+      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400;${stF ? 'opacity:.5;' : ''}"><input type="checkbox" id="q-fdiff" ${q.fairOnlyDiff ? 'checked' : ''} ${stF ? 'disabled' : ''}> Only where the status is not set or differs from the suggestion</label>
       <span style="flex:1"></span><button class="btn-mini" id="q-fexp">Download list</button></div>
     ${fieldExists ? '' : '<div class="msg msg-warn">The status fields do not exist yet — run migration 31 in Supabase, then reload. Suggestions are shown below already.</div>'}
     <div class="q-bar" style="font-size:12.5px;"><strong>Stored:</strong> ${Object.keys(counts).map(k => `<span class="q-pill">${escapeHtml(FAIR_STATUS_LABELS[k] || k)}: ${counts[k]}</span>`).join(' ')}
@@ -10559,18 +10909,19 @@ function qRenderFair(el) {
       <button class="btn-primary btn-mini" id="q-fapply" ${q.fairSel.size ? '' : 'disabled'}>Apply suggested status to ${q.fairSel.size} selected</button></div>` : ''}
     <div class="q-scroll"><table class="q-table"><thead><tr>${canEdit && fieldExists ? '<th></th>' : ''}<th>Variable</th><th>Instrument</th><th>${escapeHtml(codeField)}</th><th>Stored</th><th>Suggested</th><th>Why</th></tr></thead><tbody>
     ${shown.slice(0, 1000).map(x => `<tr>${canEdit && fieldExists ? `<td><input type="checkbox" data-fs="${escapeAttr(x.v._uid)}" ${q.fairSel.has(x.v._uid) ? 'checked' : ''}></td>` : ''}<td>${qVarLink(x.v)}</td><td class="q-muted">${escapeHtml(x.v[state.instrumentField] || '')}</td>
-      <td style="font-family:var(--mono);font-size:11px;">${escapeHtml(truncate(qv(x.v, codeField), 70)) || '<span class="q-muted">—</span>'}${kind === 'variable' && qv(x.v, 'variable_name_FAIR_merged') && qv(x.v, 'variable_name_FAIR_merged') !== qv(x.v, codeField) ? `<div class="q-muted">merged: ${escapeHtml(truncate(qv(x.v, 'variable_name_FAIR_merged'), 60))}</div>` : ''}</td>
-      <td>${x.cur ? escapeHtml(FAIR_STATUS_LABELS[x.cur] || x.cur) : '<span class="q-muted">not set</span>'}</td><td>${escapeHtml(FAIR_STATUS_LABELS[x.sug])}</td><td class="q-muted">${escapeHtml(x.why)}</td></tr>`).join('') || `<tr><td colspan="7" class="q-muted" style="padding:14px;">Nothing to show.</td></tr>`}
+      <td style="font-family:var(--mono);font-size:11px;">${escapeHtml(truncate(codeOf(x.v), 70)) || '<span class="q-muted">—</span>'}${kind === 'variable' && qv(x.v, 'variable_name_FAIR_merged') && qv(x.v, 'variable_name_FAIR_merged') !== qv(x.v, codeField) ? `<div class="q-muted">merged: ${escapeHtml(truncate(qv(x.v, 'variable_name_FAIR_merged'), 60))}</div>` : ''}</td>
+      <td>${x.cur ? escapeHtml(FAIR_STATUS_LABELS[x.cur] || x.cur) : '<span class="q-muted">not set</span>'}</td><td>${x.sug ? escapeHtml(FAIR_STATUS_LABELS[x.sug]) : '<span class="q-muted">—</span>'}</td><td class="q-muted">${escapeHtml(x.why)}</td></tr>`).join('') || `<tr><td colspan="7" class="q-muted" style="padding:14px;">Nothing to show.</td></tr>`}
     </tbody></table></div>`;
   el.querySelector('#q-fdiff').addEventListener('change', e => { q.fairOnlyDiff = e.target.checked; renderQuality(); });
-  el.querySelector('#q-fexp').addEventListener('click', () => qExport('fair_status_' + kind, ['variable', 'instrument', codeField, 'stored_status', 'suggested_status', 'why'], shown.map(x => [qName(x.v), x.v[state.instrumentField] || '', qv(x.v, codeField), x.cur, x.sug, x.why])));
+  el.querySelector('#q-fstored').addEventListener('change', e => { q.fairStored = e.target.value; q.fairSel = new Set(); renderQuality(); });
+  el.querySelector('#q-fexp').addEventListener('click', () => qExport('fair_status_' + kind, ['variable', 'instrument', codeField, 'stored_status', 'suggested_status', 'why'], shown.map(x => [qName(x.v), x.v[state.instrumentField] || '', codeOf(x.v), x.cur, x.sug || '', x.why])));
   el.querySelectorAll('[data-fs]').forEach(cb => cb.addEventListener('change', () => { if (cb.checked) q.fairSel.add(cb.dataset.fs); else q.fairSel.delete(cb.dataset.fs); const b = document.getElementById('q-fapply'); if (b) { b.disabled = !q.fairSel.size; b.textContent = `Apply suggested status to ${q.fairSel.size} selected`; } }));
   const all = el.querySelector('#q-fall'); if (all) all.addEventListener('click', () => { shown.forEach(x => q.fairSel.add(x.v._uid)); renderQuality(); });
   const none = el.querySelector('#q-fnone'); if (none) none.addEventListener('click', () => { q.fairSel = new Set(); renderQuality(); });
   const ap = el.querySelector('#q-fapply');
   if (ap) ap.addEventListener('click', () => {
     const changes = [];
-    list.filter(x => q.fairSel.has(x.v._uid) && x.cur !== x.sug).forEach(x => {
+    list.filter(x => q.fairSel.has(x.v._uid) && x.sug && x.cur !== x.sug).forEach(x => {
       changes.push({ globalIndex: state.codebook.indexOf(x.v), variable_name: getId(x.v), fieldChanges: { [field]: { old: x.cur, new: x.sug } } });
     });
     if (!changes.length) { alert('The selected rows already have the suggested status.'); return; }
@@ -10861,6 +11212,10 @@ function findVarByUid(uid) { return state.codebook.find(v => v._uid === uid); }
 
 // ============ BULK EDIT TAB ============
 function refreshBulkTab() {
+  // v6.47.1: the Edit dialog borrows selectedFields for its preview; after Cancel there
+  // it left fields without a bulk configuration and the Bulk tab crashed. Keep only
+  // fields that were really picked in Bulk edit.
+  state.selectedFields = (state.selectedFields || []).filter(f => state.fieldConfigs && state.fieldConfigs[f]);
   if (!state.selectedInstrument) {
     document.getElementById("fields-grid").innerHTML = `<div style="grid-column: 1/-1; padding: 1rem; text-align: center; color: var(--text-muted);">Select an instrument to start bulk editing.</div>`;
     document.getElementById("field-editors-container").innerHTML = "";
