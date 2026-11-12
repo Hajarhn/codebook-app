@@ -295,6 +295,18 @@
     .topbar { padding: 0.5rem 0.75rem; }
     .infobar { gap: 0.75rem; }
   }
+  /* v6.53 */
+  .task-cm-btn { background: none; border: 1px solid var(--border); border-radius: 12px; padding: 1px 8px; font-size: 11.5px; color: var(--text-muted); cursor: pointer; margin-top: 4px; }
+  .task-cm-btn.new { border-color: #d9a400; color: #8a5a00; background: #fff6dc; }
+  .task-cm-row td { background: var(--bg-subtle, #fafaf7); }
+  .task-cm { max-width: 760px; padding: 4px 0; }
+  .task-cm-item { border-left: 3px solid var(--border); padding: 3px 0 3px 9px; margin-bottom: 7px; }
+  .task-cm-h { display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; }
+  .task-cm-del { margin-left: auto; font-size: 11px; padding: 1px 6px; }
+  .task-cm-body { font-size: 13px; white-space: normal; }
+  .task-cm textarea { width: 100%; margin-top: 4px; }
+  .q-task-link { text-decoration: none; font-size: 11.5px; }
+  .q-task-link.done { background: #E1F5EE; }
 </style>
 
 <!-- ====== CLOUD ADDITION: Supabase JS SDK ====== -->
@@ -552,6 +564,40 @@
   .task-form .rel-form label { display:flex; margin: 6px 0; }
   .task-h4 { margin: 10px 0 4px; font-size: 0.86rem; font-weight: 600; }
   .fch-box .bk-pre { font-family: var(--mono); font-size: 11px; white-space: pre; min-width: 230px; }
+  /* v6.50 */
+  #link-file-btn, #autosave-indicator { display: none !important; }   /* file-version auto-save: not used in the cloud edition */
+  .infobar { display: none !important; }   /* file-version bar: the cloud edition always works on the database */
+  #bk-banner details.bk-fold { border: 1px solid #f0d4a3; background: #FAEEDA; border-radius: 8px; padding: 6px 12px; margin: 8px 0; font-size: 0.85rem; color: #6b3d06; }
+  #bk-banner details.bk-fold.bad { border-color: #f3c7c2; background: #fdeceb; color: #8a1c13; }
+  #bk-banner details.bk-fold summary { cursor: pointer; font-weight: 600; }
+  #bk-banner details.bk-fold .bk-msg { margin: 6px 0 0; }
+  /* v6.49 */
+  .task-prio.normal { background:#e8f0fb; color:#1d4f91; border-color:#c9daf3; }
+  .task-prio.low { background:#f1f3f5; color:#5c6472; border-color:#e1e4e8; }
+  .task-vars .bk-note { margin-bottom: 2px; }
+  .task-more { display:inline; }
+  .task-more summary { display:inline; cursor:pointer; color: var(--accent-text, #4338ca); font-size: 11.5px; margin-left: 4px; }
+  .task-more[open] summary { display:block; margin: 2px 0; }
+  .task-stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 8px 0; }
+  .task-stat { display:flex; flex-direction:column; align-items:flex-start; text-align:left; border:1px solid var(--border); border-radius:10px; padding:10px 12px; background: var(--surface, #fff); cursor:pointer; font: inherit; }
+  .task-stat:hover { border-color: var(--accent, #0f766e); }
+  .task-stat .ts-num { font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .task-stat .ts-label { font-size: 12.5px; }
+  .task-stat .ts-sub { font-size: 11px; color: var(--text-muted); }
+  .task-stat.bad .ts-num { color:#a1271a; }
+  .task-stat.warn .ts-num { color:#8a5300; }
+  .task-next-row { display:flex; gap:8px; align-items:baseline; padding:4px 0; border-bottom:1px solid var(--border); font-size: 0.86rem; flex-wrap: wrap; }
+  .browse-head { background: var(--surface-2, #f6f7f9); font-weight: 600; font-size: 11.5px; color: var(--text-muted); position: sticky; top: 0; z-index: 1; }
+  .browse-head .row-name { color: var(--text-muted); font-family: inherit; font-size: 11.5px; }
+  .browse-row .row-col { flex: 1 1 0; min-width: 110px; word-break: break-word; }
+  .browse-row .row-col-multi { white-space: pre-line; font-size: 12px; }
+  .vcols-dialog { max-width: 620px; width: 100%; }
+  .vcols-list { max-height: 46vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+  .vcols-gtitle { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); margin: 8px 0 2px; }
+  .vcols-item { display:block; font-size: 0.85rem; padding: 2px 0; font-weight: 400; }
+  .vcols-chosen { display:flex; gap:4px; flex-wrap:wrap; }
+  .pc-now { display:block; margin-top: 3px; }
+  .task-st-sel { min-width: 118px; }
   /* v6.47 discussions + since */
   .disc-badge { display: inline-block; font-size: 10.5px; padding: 0 6px; margin-left: 4px; border-radius: 9px; background: #e7f0fb; color: #1e4f8a; border: 1px solid #c7dbf3; cursor: pointer; vertical-align: 1px; }
   .disc-thread { border: 1px solid var(--border, #e3e5e8); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; background: #fff; }
@@ -1083,6 +1129,13 @@
   #rv-app .rv-vl { display:flex; gap:8px; align-items:baseline; }
   #rv-app .rv-vl-code { font-family:ui-monospace,Menlo,monospace; font-size:11px; background:#f1f5f9; border:0.5px solid #e2e8f0; border-radius:5px; padding:1px 7px; min-width:20px; text-align:center; color:#334155; flex-shrink:0; }
   #rv-app .rv-vl-label { font-size:13px; line-height:1.45; }
+  #rv-app .rv-ans { width:100%; border-collapse:collapse; font-size:13px; margin-top:2px; }
+  #rv-app .rv-ans th { text-align:left; font-weight:500; color:#6b7280; font-size:11.5px; padding:4px 8px 4px 0; border-bottom:1px solid #e5e7eb; }
+  #rv-app .rv-ans td { padding:5px 8px 5px 0; vertical-align:top; border-bottom:1px solid #f3f4f6; line-height:1.45; word-break:break-word; }
+  #rv-app .rv-ans td:first-child { width:56px; }
+  #rv-app .rv-ans-fair { font-family:ui-monospace,Menlo,monospace; font-size:12px; }
+  #rv-app .fair-link { color:inherit; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:2px; }
+  #rv-app .fair-link:hover { color:#0f766e; text-decoration-style:solid; }
   #rv-app .rv-fair-chip { display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:4px 10px; color:#1f2937; }
   #rv-app .rv-cell-empty     { color: var(--rv-text-faint); }
 
@@ -1620,7 +1673,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.48.0
+      Codebook Editor — Cloud edition · v6.54.0
     </div>
   </div>
 </div>
@@ -1655,7 +1708,7 @@
           <div class="rv-brand-title">Codebook</div>
           <div class="rv-brand-sub">PCNN variable dictionary</div>
         </div>
-        <span class="rv-version-pill">v6.48.0 · researcher view</span>
+        <span class="rv-version-pill">v6.54.0 · researcher view</span>
       </div>
       <div class="rv-topbar-actions">
         <button class="rv-btn" id="rv-exit-preview-btn" onclick="rvPreviewExit()" style="display:none">← Exit preview</button>
@@ -1893,7 +1946,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.48.0 cloud</span>
+      <span class="version">v6.54.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -1903,7 +1956,6 @@
       <span id="autosave-indicator" class="badge" style="display: none; cursor: help;" title=""></span>
       <button class="btn-secondary" id="link-file-btn" class="admin-only btn-secondary" onclick="linkOrUnlinkFile()" title="Link to a file on disk for auto-save (Chrome/Edge only)" style="display: none;">🔗 Link file</button>
       <button class="btn-secondary" onclick="openExcelDialog()">📊 Export Excel</button>
-      <button class="btn-primary admin-only" onclick="downloadJson()">💾 Save JSON</button>
     </div>
   </div>
 </header>
@@ -1937,7 +1989,6 @@
       <span class="label">ID field:</span>
       <code id="info-identifier">—</code>
     </div>
-    <button class="btn-mini admin-only" style="margin-left: auto;" onclick="confirmReset()">Change file</button>
   </div>
 
   <!-- Instrument selector -->
@@ -1958,27 +2009,25 @@
     <button class="tab active" data-tab="variables" role="tab" onclick="switchTab('variables')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>Variables <span class="count" id="tab-count-vars">0</span></button>
     <button class="tab oe-hide" data-tab="bulk" role="tab" onclick="switchTab('bulk')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Bulk edit</button>
     <button class="tab" data-tab="search" role="tab" onclick="switchTab('search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search <span class="count" id="tab-count-search" style="display:none;">0</span></button>
-    <button class="tab editor-and-up-only" data-tab="pending" role="tab" onclick="switchTab('pending')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
+    <button class="tab staff-only" data-tab="pending" role="tab" onclick="switchTab('pending')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Pending <span class="count" id="tab-count-pending" style="display:none;">0</span></button>
     <button class="tab staff-only" data-tab="dashboard" role="tab" onclick="switchTab('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
     <button class="tab staff-only" data-tab="quality" role="tab" onclick="switchTab('quality')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Quality</button>
     <button class="tab staff-only" data-tab="tasks" role="tab" onclick="switchTab('tasks')"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Tasks <span class="count" id="tab-count-tasks" style="display:none;">0</span></button>
+    <button class="tab editor-and-up-only" data-tab="history" role="tab" onclick="switchTab('history')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
     <div class="tab-dropdown admin-only" id="admin-dropdown">
       <button class="tab" type="button" id="admin-tab-btn" onclick="toggleAdminMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Admin ▾</button>
       <div class="admin-menu" id="admin-menu">
-        <div class="admin-menu-label">Overview</div>
-        <button type="button" onclick="switchTab('compare'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><path d="M12 3v18"/></svg>Compare with source</button>
-        <button type="button" onclick="switchTab('history'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>Log</button>
-        <div class="admin-menu-label">Safety &amp; versions</div>
-        <button type="button" onclick="switchTab('backup'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Backup</button>
-        <button type="button" onclick="switchTab('releases'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/></svg>Releases</button>
-        <div class="admin-menu-label">Content</div>
+        <div class="admin-menu-label">Codebook</div>
         <button type="button" onclick="switchTab('imports'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Imports</button>
+        <button type="button" onclick="switchTab('compare'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><path d="M12 3v18"/></svg>Compare with source</button>
         <button type="button" onclick="switchTab('trash'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Trash</button>
-        <div class="admin-menu-label">Configuration</div>
+        <div class="admin-menu-label">Versions &amp; safety</div>
+        <button type="button" onclick="switchTab('releases'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/></svg>Releases</button>
+        <button type="button" onclick="switchTab('backup'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Backup</button>
+        <div class="admin-menu-label">Setup</div>
         <button type="button" onclick="openFieldManager(); closeAdminMenu();"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="12" height="4" rx="1"/></svg>Manage fields</button>
-        <button type="button" onclick="switchTab('settings'); closeAdminMenu();"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>Settings</button>
-        <div class="admin-menu-label">People</div>
-        <button type="button" onclick="switchTab('users'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</button>
+        <button type="button" onclick="switchTab('settings'); closeAdminMenu();"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Codebook settings</button>
+        <button type="button" onclick="switchTab('users'); closeAdminMenu();"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users and roles</button>
       </div>
     </div>
     <!-- Activity (session changes) stays reachable via the "Unsaved changes" badge; tab-count-activity kept hidden so the counter still updates -->
@@ -1991,7 +2040,7 @@
       <input type="text" id="browse-search" placeholder="Search by name or label...">
       <button class="btn-primary btn-mini editor-and-up-only" onclick="openAddVariableDialog()">+ Add variable</button>
       <button class="btn-secondary btn-mini admin-only" onclick="openAddFieldDialog()">+ Add field</button>
-      <button class="btn-secondary btn-mini admin-only" onclick="openRemoveFieldDialog()">− Remove field</button>
+      <button class="btn-secondary btn-mini admin-only" onclick="openRemoveFieldDialog()" title="Hides a field from the screen for this session only. Nothing is deleted from the database.">Hide field (this session)</button>
     </div>
     <div id="browse-list" class="browse-list"></div>
   </div>
@@ -2103,7 +2152,7 @@
   </div>
 
   <!-- ============ SETTINGS TAB ============ -->
-  <div class="tab-panel editor-and-up-only" id="panel-pending" role="tabpanel">
+  <div class="tab-panel staff-only" id="panel-pending" role="tabpanel">
     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
       <div>
         <h2 style="margin: 0; font-size: 1.1rem;" id="pending-heading">Pending changes</h2>
@@ -2124,7 +2173,7 @@
     </div>
   </div>
 
-  <div class="tab-panel admin-only" id="panel-history" role="tabpanel">
+  <div class="tab-panel editor-and-up-only" id="panel-history" role="tabpanel">
     <div class="hl-head">
       <div>
         <h2 style="margin: 0; font-size: 1.1rem;">Log</h2>
@@ -2208,6 +2257,16 @@
       <span id="newuser-msg" style="font-size:12px; color:var(--text-muted); flex:1; min-width:200px;"></span>
     </div>
     <div id="users-list"><div class="empty-state"><p>Loading…</p></div></div>
+    <div class="bk-box" style="margin-top: 16px;">
+      <h3>What each role can do</h3>
+      <table class="dash-table"><tbody>
+        <tr><td style="width: 170px;"><strong>admin</strong></td><td>Everything: edits, approves or rejects suggestions, publishes or hides instruments, deletes and restores, imports, users and roles, field access, backups and releases. Sees and assigns all tasks.</td></tr>
+        <tr><td><strong>editor</strong></td><td>Edits variables and instrument descriptions directly; changes to fields set to “needs approval” become suggestions. Reads the Log. Sees unpublished instruments, and the tasks assigned to them.</td></tr>
+        <tr><td><strong>ontology_engineer</strong></td><td>Edits only the fields granted under Manage fields (for example the FAIR codes); other changes become suggestions, followed under <em>My suggestions</em>. Sees unpublished instruments, and the tasks assigned to them.</td></tr>
+        <tr><td><strong>researcher</strong></td><td>Reads published instruments in the researcher view; restricted instruments (for example PROMIS) show a 🔒 row instead of the questions. Can suggest changes.</td></tr>
+      </tbody></table>
+      <p class="bk-note">Which fields each role may edit is set per field under Admin → Manage fields.</p>
+    </div>
   </div>
 
   <div class="tab-panel staff-only" id="panel-quality" role="tabpanel">
@@ -2237,7 +2296,7 @@
     <div style="margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
       <div>
         <h2 style="margin: 0; font-size: 1.1rem;">Tasks</h2>
-        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Work to do on the codebook, per work group. Admins add and assign tasks; the person a task is assigned to sets its status.</p>
+        <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Work to do on the codebook, per work group. Admins see, add and assign all tasks; everyone else sees the tasks assigned to them and sets their status.</p>
       </div>
       <button class="btn-mini" onclick="tasksRender(true)">↻ Refresh</button>
     </div>
@@ -2268,39 +2327,24 @@
 
   <div class="tab-panel" id="panel-settings" role="tabpanel">
     <div style="margin-bottom: 1.25rem;">
-      <h2 style="margin: 0; font-size: 1.1rem;">Settings</h2>
-      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Codebook configuration. Field visibility and ordering live under Admin → Manage fields; instrument publish/hide lives on each instrument and in the Dashboard.</p>
+      <h2 style="margin: 0; font-size: 1.1rem;">Codebook settings</h2>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.85rem;">Choices an admin makes once, for everyone who uses this codebook.</p>
     </div>
 
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Export &amp; copyright</h2>
-    <div class="info-box" style="margin-top: 0;">
-      Instruments whose variables have <code>copyright_status</code> = <code>"restricted"</code> (or empty) are replaced by a placeholder row in copyright-respecting Excel exports and in the researcher viewer; <code>"public"</code> and <code>"licensed"</code> are shown in full. This is a convention, not a security boundary.
-    </div>
-    <label>Contact email shown on restricted instruments</label>
+    <div id="settings-saved"></div>
+
+    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
+    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 6px;">Copyright and contacts</h2>
+    <p class="hint" style="margin-top:0">Some instruments may not be shared in full (for example PROMIS, because of its licence). In copyright-respecting Excel exports their questions are replaced by one 🔒 row, which names the contact for that instrument. An instrument is restricted when its variables have <code>copyright_status</code> = restricted.</p>
+    <label>Default contact <span class="bk-note">(used for every restricted instrument without its own contact)</span></label>
     <input type="text" id="settings-contact-email" placeholder="contact@example.org" style="max-width: 460px;">
-    <div class="hint">Shown on 🔒 placeholder rows and used as the default in the Excel export dialog. Stored for this session.</div>
+    <div id="settings-copyright" style="margin-top: 12px;"></div>
 
-    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
-
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Identifier field</h2>
-    <div class="info-box" style="margin-top: 0;">
-      The unique name field for each variable — used for required-field validation in Add/Edit and to confirm deletions. Auto-detected; change it only if the wrong field was picked.
-    </div>
-    <select id="identifier-select" style="max-width: 460px;"></select>
-    <div id="identifier-status" class="hint" style="margin-top: 6px;"></div>
-
-    <hr style="margin: 1.75rem 0; border: none; border-top: 1px solid var(--border);">
-
-    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 10px;">Roles</h2>
-    <table class="dash-table" style="max-width: 640px;">
-      <tbody>
-        <tr><td style="width: 170px;"><strong>admin</strong></td><td>Everything: edit, publish/hide, delete, users, field access, settings.</td></tr>
-        <tr><td><strong>editor</strong></td><td>Edit variables, add/edit instrument descriptions, review pending suggestions. Sees unpublished instruments.</td></tr>
-        <tr><td><strong>ontology_engineer</strong></td><td>Edits only the fields granted under Admin → Manage fields (e.g. FAIR coding). Sees unpublished instruments.</td></tr>
-        <tr><td><strong>researcher</strong></td><td>Read-only viewer of published instruments; can suggest changes.</td></tr>
-      </tbody>
-    </table>
-    <div class="hint" style="margin-top: 8px;">Deleted variables go to Admin → Trash (restorable). All changes are recorded in Admin → Log. Use Export Excel / Save JSON for a point-in-time backup before big changes.</div>
+    <details style="margin-top: 1.75rem;"><summary class="bk-note" style="cursor:pointer">Technical: identifier field (normally chosen automatically)</summary>
+      <p class="hint">The field that names each variable uniquely; used to check required fields and to confirm deletions.</p>
+      <select id="identifier-select" style="max-width: 460px;"></select>
+      <div id="identifier-status" class="hint" style="margin-top: 6px;"></div>
+    </details>
   </div>
 
 </div> <!-- /workspace -->
@@ -2600,6 +2644,7 @@
           </label>
           <label style="margin-top: 10px;">Contact email</label>
           <input type="text" id="excel-contact-email" placeholder="contact@example.org">
+          <button type="button" class="btn-mini admin-only" style="margin-top:6px" onclick="excelSaveContact()" title="Use this address as the default contact for everyone; contacts per instrument are under Admin → Codebook settings">Save as default for everyone</button>
         </div>
       </details>
 
@@ -2616,7 +2661,7 @@
 </div> <!-- /app -->
 
 <footer style="max-width: 1200px; margin: 2rem auto 1rem; padding: 1rem; text-align: center; font-size: 11px; color: var(--text-faint); border-top: 1px solid var(--border);">
-  Codebook Editor <span id="footer-version">v6.48.0</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
+  Codebook Editor <span id="footer-version">v6.54.0</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
   <a href="javascript:void(0)" onclick="document.getElementById('modal-about').style.display='flex'" style="color: var(--text-muted);">About &amp; license</a>
 </footer>
 
@@ -2635,7 +2680,7 @@
       <p style="margin-top: 14px;"><strong>Author:</strong> <span id="about-author">Hajar Hasannejadasl</span><br>
       <strong>Affiliation:</strong> Maastricht University Medical Centre+ (MUMC+)<br>
       <strong>Project:</strong> Post-COVID Network Netherlands (PCNN), funded by ZonMw<br>
-      <strong>Version:</strong> <span id="about-version">v6.48.0</span><br>
+      <strong>Version:</strong> <span id="about-version">v6.54.0</span><br>
       <strong>Created:</strong> 2026</p>
 
       <p style="margin-top: 14px;"><strong>Contact:</strong><br>
@@ -2650,7 +2695,7 @@
       </div>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;"><strong>How to cite:</strong><br>
-      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v6.48.0) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
+      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v6.54.0) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;">When you save the codebook, a <code>_meta</code> block is added to the JSON output recording the tool name, version, author, and timestamp of the last edit.</p>
     </div>
@@ -3186,7 +3231,9 @@ function rvFieldVisible(appField) {
 }
 // Extra (non-core) fields the admin made visible, as app field names.
 const RV_CORE_FIELDS = ['Theme','Subdomain','Instrument','variable_name_CBS','variable_label_NL','variable_label_EN',
-  'value_labels_NL','value_labels_EN','variable_name_FAIR_merged','variable_name_FAIR'];
+  'value_labels_NL','value_labels_EN','variable_name_FAIR_merged','variable_name_FAIR',
+  // v6.54: shown in the Answers table / FAIR coding section, not as extra fields
+  'value_labels_FAIR','value_label_FAIR_merged','variable_coding_label','variable_coding_label_merged','value_coding','value_coding_merged'];
 function rvExtraFields() {
   const m = window.researcherAccess; if (!m) return [];
   const map = (typeof CLOUD_FIELD_CASE_MAP !== 'undefined') ? CLOUD_FIELD_CASE_MAP : {};
@@ -3510,6 +3557,59 @@ function rvFairCell(raw) {
   if (isEmpty) return `<td class="rv-md-val rv-cell-empty">—</td>`;
   return `<td class="rv-md-val"><span class="rv-fair-chip">${rvEscape(String(raw))}</span></td>`;
 }
+// ====== v6.54: answers table + FAIR coding section ======
+function rvTxt(r, k) { const v = r[k]; return (v === undefined || v === null) ? '' : String(v).trim(); }
+function rvFairLinks(text) {
+  return rvEscape(String(text)).replace(/\b(sct|lnc|ncit)_([A-Za-z0-9][A-Za-z0-9_\-]*)/g, (all, p, rest) => {
+    const info = (typeof fairCodeUrl === 'function') ? fairCodeUrl(p.toLowerCase(), rest) : null;
+    return info ? `<a class="fair-link" href="${rvEscape(info.url)}" target="_blank" rel="noopener noreferrer" title="Open ${rvEscape(info.code)} in ${info.sys}">${all}</a>` : all;
+  });
+}
+function rvAnswerFair(r) {
+  if (!rvFieldVisible('value_labels_FAIR')) return '';
+  return rvTxt(r, 'value_label_FAIR_merged') || rvTxt(r, 'value_labels_FAIR');
+}
+// Returns the answers table, or '' when no answer list can be read (the
+// labels are then shown as before).
+function rvAnswersTable(r) {
+  const cols = [];
+  if (rvFieldVisible('value_labels_NL')) cols.push({ label: 'Dutch', raw: rvTxt(r, 'value_labels_NL') });
+  if (rvFieldVisible('value_labels_EN')) cols.push({ label: 'English', raw: rvTxt(r, 'value_labels_EN') });
+  const fairRaw = rvAnswerFair(r);
+  if (rvFieldVisible('value_labels_FAIR')) cols.push({ label: 'FAIR code', raw: fairRaw, fair: true });
+  if (rvFieldVisible('value_coding')) cols.push({ label: 'Name of the FAIR code', raw: rvTxt(r, 'value_coding_merged') || rvTxt(r, 'value_coding') });
+  const used = cols.filter(c => c.raw);
+  if (!used.length) return '';
+  const order = [], maps = [];
+  let parsedAny = false;
+  used.forEach(c => {
+    const p = rvParseValues(c.raw) || []; if (p.length) parsedAny = true;
+    const m = {}; p.forEach(o => { if (!(o.code in m)) m[o.code] = o.label; if (order.indexOf(o.code) === -1) order.push(o.code); });
+    maps.push(m);
+  });
+  if (!parsedAny) return '';
+  const head = '<tr><th>Code</th>' + used.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
+  const body = order.map(code => '<tr><td><span class="rv-vl-code">' + rvEscape(code) + '</span></td>' + used.map((c, i) => {
+    const t = maps[i][code];
+    if (t === undefined || t === '') return '<td class="rv-cell-empty">—</td>';
+    return c.fair ? `<td class="rv-ans-fair">${rvFairLinks(t)}</td>` : `<td>${rvEscape(t)}</td>`;
+  }).join('') + '</tr>').join('');
+  return `<table class="rv-ans">${head}${body}</table>`;
+}
+function rvFairSection(r) {
+  const rows = [];
+  if (rvFieldVisible('variable_name_FAIR_merged') || rvFieldVisible('variable_name_FAIR')) {
+    const code = rvTxt(r, 'variable_name_FAIR_merged') || rvTxt(r, 'variable_name_FAIR');
+    if (code) rows.push(['Standardized name (FAIR code)', `<span class="rv-fair-chip">${rvFairLinks(code)}</span>`]);
+  }
+  if (rvFieldVisible('variable_coding_label')) {
+    const lbl = rvTxt(r, 'variable_coding_label_merged') || rvTxt(r, 'variable_coding_label');
+    if (lbl) rows.push(['Name of the FAIR code', rvEscape(lbl)]);
+  }
+  if (!rows.length) return '';
+  return `<div class="rv-md-section"><div class="rv-md-section-title">FAIR coding</div><table class="rv-md-table">${rows.map(([k, v]) => `<tr><td class="rv-md-key">${rvEscape(k)}</td><td class="rv-md-val">${v}</td></tr>`).join('')}</table></div>`;
+}
+// ====== END v6.54 ======
 function rvRenderDetail(r) {
   if (!r) return '<div class="rv-md-empty">Select a variable from the list.</div>';
   if (r._placeholder) {
@@ -3519,10 +3619,13 @@ function rvRenderDetail(r) {
       <span class="rv-restricted-msg">This questionnaire is copyrighted. Contact for the full item list.</span>
     </div></div>`;
   }
+  // v6.54: answers as one table (code | Dutch | English | FAIR code); the
+  // variable's own FAIR code and its label in a "FAIR coding" section.
+  const answersTbl = rvAnswersTable(r);
   const groups = [
     ['Classification', ['Theme', 'Subdomain']],
     ['Labels', ['variable_label_NL', 'variable_label_EN']],
-    ['Values', ['value_labels_NL', 'value_labels_EN', 'variable_name_FAIR_merged']]
+    ['Values', answersTbl ? [] : ['value_labels_NL', 'value_labels_EN']]
   ];
   const sections = groups.map(([title, keys]) => {
     const present = keys.filter(k => RV_COLUMNS.some(c => c.key === k) &&
@@ -3555,7 +3658,7 @@ function rvRenderDetail(r) {
       return `<tr><td class="rv-md-key">${rvEscape(rvColLabel(k))}</td>${valCell}</tr>`;
     }).join('');
     return `<div class="rv-md-section"><div class="rv-md-section-title">${title}</div><table class="rv-md-table">${rowsHtml}</table></div>`;
-  }).join('');
+  }).join('') + (answersTbl ? `<div class="rv-md-section"><div class="rv-md-section-title">Answers</div>${answersTbl}</div>` : '') + rvFairSection(r);
   return `<div class="rv-md-detail"><div class="rv-md-detail-inner">
     <div class="rv-md-detail-head">
       <span class="rv-md-detail-name">${rvEscape(r.variable_name_CBS || '')}${rvFxBadge(r)}</span>
@@ -4702,8 +4805,8 @@ async function loadPendingChanges() {
     .from('pending_changes')
     .select('*')
     .order('submitted_at', { ascending: false });
-  // Editors see only their own; admins see everything
-  if (role === 'editor') {
+  // Editors and ontology engineers see only their own; admins see everything
+  if (role !== 'admin') {
     query = query.eq('submitted_by', userId);
   }
   if (PENDING_STATE.filter !== 'all') {
@@ -4767,6 +4870,21 @@ function pcEscape(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// v6.49: helpers for the Pending cards
+function pcNorm(x) { return String(x == null ? '' : x).replace(/\s+/g, ' ').trim(); }
+function pcNowNote(change, currentVal) {
+  if (!change || change.status !== 'pending') return '';
+  if (pcNorm(currentVal) === pcNorm(change.old_value)) return '';
+  return '<span class="pc-meta pc-now">⚠ Changed since the suggestion — now: ' + (pcEscape(currentVal) || '<em>(empty)</em>') + '</span>';
+}
+function pcChangedRow(label, change, currentVal, isAdmin) {
+  const isPendingChange = change.status === 'pending';
+  const actions = (isPendingChange && isAdmin)
+    ? '<td class="pc-row-actions"><button class="btn-mini btn-approve btn-tiny" title="Approve this field" onclick="approvePending(\'' + change.id + '\')">✓</button><button class="btn-mini btn-reject btn-tiny" title="Reject this field" onclick="rejectPending(\'' + change.id + '\')">✕</button></td>'
+    : (isPendingChange ? '<td class="pc-row-actions"><span class="pc-meta">pending</span></td>'
+                       : '<td class="pc-row-actions"><span class="pc-status status-' + change.status + '" style="font-size:0.7rem;">' + change.status + '</span></td>');
+  return '<tr class="pc-row-changed"><td class="pc-fname">' + pcEscape(label) + '</td><td><span class="pc-old">' + (pcEscape(change.old_value) || '<em>(empty)</em>') + '</span><span class="pc-arrow">→</span><span class="pc-new">' + (pcEscape(change.new_value) || '<em>(empty)</em>') + '</span>' + pcNowNote(change, currentVal) + '</td>' + actions + '</tr>';
+}
 function renderPendingChanges() {
   const listEl = document.getElementById('pending-list');
   const myRole = (window.cloudAuth && window.cloudAuth.role) || '';
@@ -4785,7 +4903,8 @@ function renderPendingChanges() {
   const others = [];
   items.forEach(it => {
     if (it.change_type === 'edit_field' && it.variable_id) {
-      (editGroups[it.variable_id] = editGroups[it.variable_id] || []).push(it);
+      const gk = it.variable_id + '|' + (it.submitted_by || '');   // v6.49: one card per variable and person
+      (editGroups[gk] = editGroups[gk] || []).push(it);
     } else {
       others.push(it);
     }
@@ -4795,9 +4914,9 @@ function renderPendingChanges() {
 
   for (const vid of Object.keys(editGroups)) {
     const group = editGroups[vid];
-    const v = varMap[vid] || {};
+    const v = varMap[group[0].variable_id] || {};
     const deletedFlag = v.is_deleted ? ' <span class="pc-status status-rejected">deleted</span>' : '';
-    const vname = v.variable_name_CBS || (vid.slice(0, 8) + '…');
+    const vname = v.variable_name_CBS || (String(group[0].variable_id).slice(0, 8) + '…');
     const vinst = v.Instrument || '';
 
     const changeByField = {};
@@ -4820,7 +4939,7 @@ function renderPendingChanges() {
           + '<td class="pc-fname">' + pcEscape(f.label) + '</td>'
           + '<td><span class="pc-old">' + (pcEscape(change.old_value) || '<em>(empty)</em>') + '</span>'
           + '<span class="pc-arrow">→</span>'
-          + '<span class="pc-new">' + (pcEscape(change.new_value) || '<em>(empty)</em>') + '</span></td>'
+          + '<span class="pc-new">' + (pcEscape(change.new_value) || '<em>(empty)</em>') + '</span>' + pcNowNote(change, currentVal) + '</td>'
           + perFieldActions
           + '</tr>';
       }
@@ -4829,6 +4948,12 @@ function renderPendingChanges() {
         + '<td></td></tr>';
     }).join('');
 
+    // v6.49: suggestions on fields outside the 9 public fields were counted but not shown
+    const _pubDb = new Set(PENDING_PUBLIC_FIELDS.map(f => f.db.toLowerCase()));
+    const extraRows = group.filter(it => !_pubDb.has((it.field_name || '').toLowerCase())).map(change => {
+      const js = CLOUD_FIELD_CASE_MAP[(change.field_name || '').toLowerCase()] || change.field_name;
+      return pcChangedRow(fieldDisplayLabel(js), change, v[js], isAdmin);
+    }).join('');
     const pendingItems = group.filter(it => it.status === 'pending');
     const who = emailMap[group[0].submitted_by] || 'unknown';
     const when = group[0].submitted_at ? new Date(group[0].submitted_at).toLocaleString() : '';
@@ -4871,7 +4996,7 @@ function renderPendingChanges() {
       + '<span class="pc-meta">By ' + pcEscape(who) + ' · ' + pcEscape(when) + '</span>'
       + '</div>'
       + '<div class="pc-varhead"><strong>' + pcEscape(vname) + '</strong>' + (vinst ? ' <span class="pc-meta">· ' + pcEscape(vinst) + '</span>' : '') + deletedFlag + '</div>'
-      + '<table class="pc-table"><tbody>' + rows + '</tbody></table>'
+      + '<table class="pc-table"><tbody>' + extraRows + rows + '</tbody></table>'
       + actions
       + '</div>';
   }
@@ -4968,7 +5093,7 @@ async function refreshPendingBadge() {
     .from('pending_changes')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'pending');
-  if (role === 'editor') q = q.eq('submitted_by', userId);
+  if (role !== 'admin') q = q.eq('submitted_by', userId);   // v6.50: own suggestions only
   const { count } = await q;
   const badge = document.getElementById('tab-count-pending');
   if (badge) {
@@ -5376,7 +5501,7 @@ async function histResolveNames(items) {
 
 async function loadHistory(append) {
   const listEl = document.getElementById('history-list');
-  if (!listEl || !window.cloudAuth || window.cloudAuth.role !== 'admin') return;
+  if (!listEl || !window.cloudAuth || !['admin', 'editor'].includes(window.cloudAuth.role)) return;   // v6.50: editors read the Log
   if (HISTORY_STATE.loading) return;
   HISTORY_STATE.loading = true;
   if (!append) { HISTORY_STATE.page = 0; HISTORY_STATE.items = []; listEl.innerHTML = '<div class="empty-state"><p>Loading…</p></div>'; }
@@ -5561,7 +5686,7 @@ function renderHistory() {
 
 // ---------- History section in the View dialog ----------
 async function histAppendToView(uid) {
-  if (!window.cloudAuth || window.cloudAuth.role !== 'admin') return;
+  if (!window.cloudAuth || !['admin', 'editor'].includes(window.cloudAuth.role)) return;
   const v = findVarByUid(uid);
   const body = document.getElementById('modal-view-body');
   if (!v || !v.id || !body) return;
@@ -5966,7 +6091,8 @@ var CMP = (function () {
     portal: {
       'variable_raw_name': 'Var_portal_variable_raw_name', 'derived_variable_name': 'Var_portal_variable_raw_name',
       'fair_cleaned_colnames': 'Var_portal_FAIR_colnames', 'question': 'Var_label_portal', 'answers': 'Val_portal',
-      'raw_answer_codes': 'values', 'fair_answer_codes': 'value_coding_FAIR', 'question_type': 'field_type_portal',
+      'raw_answer_codes': 'values', 'fair_answer_codes': 'value_labels_FAIR',   // v6.53: was value_coding_FAIR (old copy column)
+      'question_type': 'field_type_portal',
       'routing': 'Dep_portal', 'calculation': 'calculation', 'cleaned_colnames': '@export', 'chapter': '@group',
       'active_from_version': '@info', 'inactive_from_version': '@info', 'inactive_or_changed_from_version': '@info',
       'studyphase flag (a or b)': '@info', 'confidential': '@info', 'validation': '@info', 'notes/source': '@info',
@@ -6463,6 +6589,10 @@ async function cmpLoadProfile() {
     CMPUI.profReady = true;
     const st = data && data[0] && data[0].settings;
     CMPUI.map = (st && st.map) || {};
+    // v6.53: a profile saved before v6.53 may still send "FAIR answer codes" to value_coding_FAIR; use value_labels_FAIR
+    CMPUI.mapFixed = [];
+    Object.keys(CMPUI.map).forEach(h => { if (String(h).toLowerCase().replace(/[\s_]+/g, '_').trim() === 'fair_answer_codes' && CMPUI.map[h] === 'value_coding_FAIR') { CMPUI.map[h] = 'value_labels_FAIR'; CMPUI.mapFixed.push(h); } });
+    if (CMPUI.mapFixed.length) console.info('Compare: "' + CMPUI.mapFixed.join('", "') + '" now compared with value_labels_FAIR (save the column settings to keep this).');
     CMPUI.sheetsOff = (st && st.sheetsOff) || null;
   } catch (e) { console.warn('compare_profiles unavailable (migration 35 not applied?)', e.message || e); CMPUI.map = {}; CMPUI.sheetsOff = null; }
 }
@@ -7286,7 +7416,10 @@ function bkRenderBanner() {
         (left > 0 ? ` <button class="btn-mini" onclick="bkSnooze()">Remind me tomorrow (${left} left)</button>` : ` <span class="bk-note">can no longer be postponed</span>`) + `</div>`);
     }
   }
-  el.innerHTML = msgs.join('');
+  // v6.50: one slim line; open it for the details. A red reminder keeps it open.
+  if (msgs.length <= 1) { el.innerHTML = msgs.join(''); return; }
+  const bad = msgs.some(m => m.indexOf('bk-msg bad') !== -1);
+  el.innerHTML = `<details class="bk-fold${bad ? ' bad' : ''}" ${bad || BK.bannerOpen ? 'open' : ''} ontoggle="BK.bannerOpen = this.open"><summary>🛟 Backup: ${msgs.length} points need attention</summary>${msgs.join('')}</details>`;
 }
 
 // ---------- full backup ----------
@@ -8178,7 +8311,7 @@ window.addEventListener('cloud-authenticated', () => {
 // FAIR code history: earlier / alternative codes removed from a variable, shown
 // read-only in the View dialog.
 
-const TASKS = { all: [], links: [], loaded: 0, ok: null, err: '', filter: { group: '', status: 'active', who: '', q: '' }, form: null };
+const TASKS = { all: [], links: [], loaded: 0, ok: null, err: '', filter: { group: '', status: 'active', who: '', prio: '', q: '' }, form: null };
 const TASK_STATUS = { open: 'Open', in_progress: 'In progress', done: 'Done', cancelled: 'Cancelled' };
 const TASK_PRIO = { high: 'High', normal: 'Normal', low: 'Low' };
 const TASK_PRIO_ORDER = { high: 0, normal: 1, low: 2 };
@@ -8194,6 +8327,7 @@ async function taskLoad(force) {
   TASKS.loaded = Date.now();
   if (t.error || l.error) { TASKS.ok = false; TASKS.err = (t.error || l.error).message || String(t.error || l.error); TASKS.all = []; TASKS.links = []; return TASKS; }
   TASKS.ok = true; TASKS.err = ''; TASKS.all = t.data || []; TASKS.links = l.data || [];
+  if (typeof taskCmLoad === 'function') await taskCmLoad();   // v6.53 (migration 45)
   await bkStaffNames();
   return TASKS;
 }
@@ -8215,11 +8349,15 @@ function taskSort(a, b) {
 }
 function taskVarLinks(t, max) {
   if (typeof ensureUids === 'function') ensureUids();   // View links need _uid
-  const vs = taskVars(t.id), ids = taskVarIds(t.id), n = max || 6;
+  // v6.49: every variable is reachable; after the first few the rest open with "+N more"
+  const vs = taskVars(t.id).slice().sort((a, b) => getId(a).localeCompare(getId(b), undefined, { numeric: true }));
+  const ids = taskVarIds(t.id), n = max || 4;
   if (!ids.length) return '<span class="bk-note">—</span>';
-  const shown = vs.slice(0, n).map(v => `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}')"><code>${escapeHtml(getId(v))}</code></a>`).join(', ');
-  const more = ids.length - Math.min(vs.length, n);
-  return shown + (more > 0 ? ` <span class="bk-note">+${more} more</span>` : '');
+  const link = v => `<a href="#" onclick="event.preventDefault(); openViewDialog('${escapeAttr(v._uid)}')"><code>${escapeHtml(getId(v))}</code></a>`;
+  const notLoaded = ids.length - vs.length;
+  const first = vs.slice(0, n).map(link).join(', ');
+  const rest = vs.slice(n);
+  return `<div class="task-vars">${ids.length > n ? `<div class="bk-note">${ids.length} variables</div>` : ''}${first}${rest.length ? `<details class="task-more"><summary>+${rest.length} more</summary>${rest.map(link).join(', ')}</details>` : ''}${notLoaded > 0 ? ` <span class="bk-note" title="Linked variables that are not in the list: in the Trash, or hidden for your role">(${notLoaded} in the Trash or hidden)</span>` : ''}</div>`;
 }
 function taskStatusCtl(t) {
   if (!taskCanSetStatus(t)) return `<span class="task-st ${t.status}">${escapeHtml(TASK_STATUS[t.status] || t.status)}</span>`;
@@ -8232,13 +8370,13 @@ function taskTitleHtml(t) {
 function taskRowHtml(t) {
   return `<tr class="task-row ${t.status}${taskOverdue(t) ? ' overdue' : ''}">
     <td><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || t.priority)}</span></td>
-    <td>${taskTitleHtml(t)}</td>
+    <td>${taskTitleHtml(t)}${typeof taskCmToggle === 'function' ? taskCmToggle(t) : ''}</td>
     <td>${taskVarLinks(t)}</td>
     <td>${escapeHtml(t.work_group || '')}</td>
     <td>${escapeHtml(taskWho(t))}</td>
     <td style="white-space:nowrap">${t.due_date ? escapeHtml(t.due_date) + (taskOverdue(t) ? ' <span class="task-late">overdue</span>' : '') : ''}</td>
     <td>${taskStatusCtl(t)}${t.status === 'done' && t.done_at ? `<div class="bk-note">${bkDay(t.done_at)}${t.done_by ? ' · ' + escapeHtml(bkWho(t.done_by)) : ''}</div>` : ''}</td>
-    <td>${isAdminRole() ? `<button class="btn-mini" onclick="taskOpenForm(${Number(t.id)})">Edit</button>` : ''}</td></tr>`;
+    <td>${isAdminRole() ? `<button class="btn-mini" onclick="taskOpenForm(${Number(t.id)})">Edit</button>` : ''}</td></tr>${typeof taskCmRow === 'function' ? taskCmRow(t) : ''}`;
 }
 function taskFiltered() {
   const f = TASKS.filter, me = discMe(), q = (f.q || '').toLowerCase().trim();
@@ -8249,6 +8387,7 @@ function taskFiltered() {
     if (f.who === 'me' && t.assigned_to !== me) return false;
     if (f.who === 'none' && t.assigned_to) return false;
     if (f.who && f.who !== 'me' && f.who !== 'none' && t.assigned_to !== f.who) return false;
+    if (f.prio && t.priority !== f.prio) return false;
     if (q) {
       const hay = [t.title, t.details, t.work_group, taskWho(t), ...taskVars(t.id).map(getId)].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
@@ -8269,9 +8408,9 @@ async function tasksRender(force) {
   const nMine = active.filter(taskMine).length, nNone = active.filter(t => !t.assigned_to).length;
   host.innerHTML = `
     <div class="task-sum">
-      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'me',q:''}; tasksRender()">Mine: <b>${nMine}</b></button>
-      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'none',q:''}; tasksRender()">Not assigned: <b>${nNone}</b></button>
-      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'',q:''}; tasksRender()">All open: <b>${active.length}</b></button>
+      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'me',prio:'',q:''}; tasksRender()">Mine: <b>${nMine}</b></button>
+      ${isAdminRole() ? `<button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'none',prio:'',q:''}; tasksRender()">Not assigned: <b>${nNone}</b></button>
+      <button class="q-pill task-quick" onclick="TASKS.filter={group:'',status:'active',who:'',prio:'',q:''}; tasksRender()">All open: <b>${active.length}</b></button>` : '<span class="bk-note">You see the tasks assigned to you. An admin adds and assigns tasks.</span>'}
       <span style="flex:1"></span>
       ${isAdminRole() ? '<button class="btn-primary btn-mini" onclick="taskOpenForm(null)">+ New task</button>' : ''}
     </div>
@@ -8280,9 +8419,10 @@ async function tasksRender(force) {
       <select onchange="TASKS.filter.group=this.value; tasksRender()" style="width:auto"><option value="">All work groups</option>${groups.map(g => `<option ${f.group === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}</select>
       <select onchange="TASKS.filter.status=this.value; tasksRender()" style="width:auto">
         ${[['active', 'Open and in progress'], ['open', 'Open'], ['in_progress', 'In progress'], ['done', 'Done'], ['cancelled', 'Cancelled'], ['all', 'All']].map(([k, l]) => `<option value="${k}" ${f.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
-      <select onchange="TASKS.filter.who=this.value; tasksRender()" style="width:auto">
+      <select onchange="TASKS.filter.who=this.value; tasksRender()" style="width:auto;${isAdminRole() ? '' : 'display:none'}">
         <option value="">Everyone</option><option value="me" ${f.who === 'me' ? 'selected' : ''}>Assigned to me</option><option value="none" ${f.who === 'none' ? 'selected' : ''}>Not assigned</option>
         ${people.map(([id, n]) => `<option value="${escapeAttr(id)}" ${f.who === id ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('')}</select>
+      <select onchange="TASKS.filter.prio=this.value; tasksRender()" style="width:auto"><option value="">All priorities</option>${Object.entries(TASK_PRIO).map(([k, l]) => `<option value="${k}" ${f.prio === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <input type="text" id="task-q" placeholder="Search title, details, variable…" value="${escapeAttr(f.q || '')}" style="width:220px">
       <span class="bk-note">${list.length} shown</span>
     </div>
@@ -8294,11 +8434,11 @@ async function tasksRender(force) {
   if (TASKS.form) taskRenderForm();
   taskBadge();
 }
-function taskOpenForm(id, presetVarIds) {
+function taskOpenForm(id, presetVarIds, preset) {
   if (!isAdminRole()) return;
   const t = id != null ? taskById(id) : null;
   TASKS.form = t ? { id: t.id, title: t.title, details: t.details || '', work_group: t.work_group || '', assigned_to: t.assigned_to || '', priority: t.priority || 'normal', due_date: t.due_date || '', status: t.status, vars: taskVars(t.id).map(getId).join(', ') }
-    : { id: null, title: '', details: '', work_group: TASKS.filter.group || '', assigned_to: '', priority: 'normal', due_date: '', status: 'open', vars: (presetVarIds || []).map(discVarById).filter(Boolean).map(getId).join(', ') };
+    : Object.assign({ id: null, title: '', details: '', work_group: TASKS.filter.group || '', assigned_to: '', priority: 'normal', due_date: '', status: 'open', source: '', vars: (presetVarIds || []).map(discVarById).filter(Boolean).map(getId).join(', ') }, preset || {});
   if (state.currentTab !== 'tasks') { switchTab('tasks'); return; }   // tasksRender opens the form
   taskRenderForm();
 }
@@ -8307,7 +8447,7 @@ function taskRenderForm() {
   const f = TASKS.form, groups = taskGroups();
   const people = Object.entries(BK.staff || {}).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
   host.innerHTML = `<div class="bk-box task-form">
-    <h3>${f.id ? 'Edit task' : 'New task'}</h3>
+    <h3>${f.id ? 'Edit task' : 'New task'}</h3>${!f.id && /^quality:/.test(f.source || '') ? '<p class="bk-note" style="margin-top:-4px">Made from a Quality finding. Check the text and choose who works on it; the finding will then show the task number.</p>' : ''}
     <label>Title <input type="text" id="tf-title" value="${escapeAttr(f.title)}" maxlength="300"></label>
     <label>Details <textarea id="tf-details" rows="3">${escapeHtml(f.details)}</textarea></label>
     <div class="rel-form">
@@ -8349,7 +8489,7 @@ async function taskSave() {
       if (st && st !== TASKS.form.status) { row.status = st; row.done_at = st === 'done' ? new Date().toISOString() : null; row.done_by = st === 'done' ? discMe() : null; }
       const { error } = await c.from('tasks').update(row).eq('id', editing); if (error) throw error;
     } else {
-      row.source = 'editor'; row.created_by = discMe();
+      row.source = TASKS.form.source || 'editor'; row.created_by = discMe();
       const { data, error } = await c.from('tasks').insert(row).select('id').single(); if (error) throw error;
       id = data.id;
     }
@@ -8385,7 +8525,12 @@ function taskBadge() {
   b.textContent = String(n); b.style.display = n ? '' : 'none';
   b.title = n ? (isAdminRole() ? 'Open tasks for you and not assigned' : 'Open tasks assigned to you') : '';
 }
-async function taskDashRender() {
+function taskGoto(filter) {
+  TASKS.filter = Object.assign({ group: '', status: 'active', who: '', prio: '', q: '' }, filter || {});
+  switchTab('tasks');
+}
+async function taskDashRender_v649() {
+  // v6.49: a short summary on the Dashboard (replaced by My items in v6.53); the full list lives in the Tasks tab
   if (!taskOn()) return;
   let el = document.getElementById('dash-tasks');
   if (!el) {
@@ -8397,14 +8542,22 @@ async function taskDashRender() {
   await taskLoad();
   if (!TASKS.ok) { el.innerHTML = `<div class="bk-msg warn">Tasks are not available (${escapeHtml(TASKS.err)}). Run migration 41.</div>`; return; }
   const active = TASKS.all.filter(taskActive).sort(taskSort);
-  const mine = active.filter(taskMine), none = isAdminRole() ? active.filter(t => !t.assigned_to) : [];
-  const mini = (t) => `<tr class="${taskOverdue(t) ? 'overdue' : ''}"><td><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || '')}</span></td><td>${taskTitleHtml(t)}</td><td>${taskVarLinks(t, 3)}</td><td>${escapeHtml(t.work_group || '')}</td><td style="white-space:nowrap">${t.due_date ? escapeHtml(t.due_date) : ''}</td><td>${taskStatusCtl(t)}</td></tr>`;
-  const tbl = (rows) => `<table class="dash-table task-table"><thead><tr><th>Priority</th><th>Task</th><th>Variables</th><th>Work group</th><th>Due</th><th>Status</th></tr></thead><tbody>${rows.slice(0, 15).map(mini).join('')}</tbody></table>${rows.length > 15 ? `<p class="bk-note">${rows.length - 15} more in the Tasks tab.</p>` : ''}`;
+  const mine = active.filter(taskMine), none = active.filter(t => !t.assigned_to);
+  const overdueMine = mine.filter(taskOverdue), high = (isAdminRole() ? active : mine).filter(t => t.priority === 'high');
+  const stat = (n, label, sub, filter, tone) => `<button class="task-stat ${tone || ''}" onclick='taskGoto(${JSON.stringify(filter)})'><span class="ts-num">${n}</span><span class="ts-label">${label}</span>${sub ? `<span class="ts-sub">${sub}</span>` : ''}</button>`;
+  const next = mine.slice(0, 5);
   el.innerHTML = `<div class="bk-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>Tasks</h3><button class="btn-mini" onclick="switchTab('tasks')">Open Tasks</button></div>
-    <h4 class="task-h4">Assigned to me (${mine.length})</h4>
-    ${mine.length ? tbl(mine) : '<p class="bk-note">No open tasks assigned to you.</p>'}
-    ${isAdminRole() ? `<h4 class="task-h4">Not assigned (${none.length})</h4>${none.length ? tbl(none) : '<p class="bk-note">Every open task has someone.</p>'}` : ''}
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>Tasks</h3><button class="btn-mini" onclick="taskGoto({})">Open Tasks</button></div>
+    <div class="task-stats">
+      ${stat(mine.length, 'Assigned to me', 'open or in progress', { who: 'me' })}
+      ${stat(overdueMine.length, 'Overdue', 'mine, past the due date', { who: 'me' }, overdueMine.length ? 'bad' : '')}
+      ${stat(high.length, 'High priority', isAdminRole() ? 'all open' : 'mine', isAdminRole() ? { prio: 'high' } : { who: 'me', prio: 'high' }, high.length ? 'warn' : '')}
+      ${isAdminRole() ? stat(none.length, 'Not assigned', 'waiting for someone', { who: 'none' }, none.length ? 'warn' : '') : ''}
+    </div>
+    ${next.length ? `<div class="task-next"><div class="task-h4">Next for you</div>${next.map(t => `<div class="task-next-row"><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || '')}</span>
+        <a href="#" onclick="event.preventDefault(); taskGoto({ who: 'me' })">${escapeHtml(t.title)}</a>
+        <span class="bk-note">${escapeHtml(TASK_STATUS[t.status] || t.status)}${t.due_date ? ' · due ' + escapeHtml(t.due_date) : ''}${taskOverdue(t) ? ' <span class="task-late">overdue</span>' : ''}</span></div>`).join('')}</div>`
+      : '<p class="bk-note" style="margin-top:8px">No open tasks assigned to you.</p>'}
   </div>`;
   taskBadge();
 }
@@ -8471,6 +8624,401 @@ window.addEventListener('cloud-authenticated', () => {
 });
 // ====== END v6.48 tasks + FAIR code history ======
 
+// ====== v6.49: saved settings (migration 42) + Variables list columns ======
+// app_settings holds codebook-wide settings an admin saves for everyone:
+//   variables_columns — default columns of the Variables list (array of field names)
+//   contact_email     — contact shown on restricted instruments
+// Each user can still pick their own columns; that choice stays in this browser.
+const APPSET = { loaded: false, ok: null, err: '', values: {} };
+async function appSetLoad() {
+  try {
+    const { data, error } = await window.cloudAuth.client.from('app_settings').select('key, value');
+    if (error) throw error;
+    APPSET.values = {}; (data || []).forEach(r => { APPSET.values[r.key] = r.value; });
+    APPSET.ok = true; APPSET.err = '';
+  } catch (e) { APPSET.ok = false; APPSET.err = e.message || String(e); }
+  APPSET.loaded = true;
+  if (APPSET.values.contact_email && !state.contactEmail) state.contactEmail = APPSET.values.contact_email;
+  return APPSET;
+}
+async function appSetSave(key, value) {
+  const { error } = await window.cloudAuth.client.from('app_settings')
+    .upsert({ key, value, updated_at: new Date().toISOString(), updated_by: discMe() });
+  if (error) throw error;
+  APPSET.values[key] = value;
+}
+
+const VCOLS_LOCAL = 'cb_var_columns_v1';
+const VCOLS_FALLBACK = ['variable_label_EN'];
+const VCOLS_MAX = 6;
+function vcolsAllowed() {
+  return (state.allFields || []).filter(f => f && f !== 'id' && !String(f).startsWith('_') && f !== state.identifierField
+    && f !== state.instrumentField && (typeof accessOf !== 'function' || accessOf(f) !== 'none'));
+}
+function vcolsDefault() { const d = APPSET.values.variables_columns; return Array.isArray(d) && d.length ? d : VCOLS_FALLBACK; }
+function vcolsMine() { try { const x = JSON.parse(localStorage.getItem(VCOLS_LOCAL) || 'null'); return Array.isArray(x) && x.length ? x : null; } catch (_) { return null; } }
+function vcolsCurrent() { const ok = new Set(vcolsAllowed()); const c = (vcolsMine() || vcolsDefault()).filter(f => ok.has(f)).slice(0, VCOLS_MAX); return c.length ? c : VCOLS_FALLBACK.filter(f => ok.has(f)); }
+function vcolsHeader(cols) {
+  return `<div class="browse-row browse-head"><span class="row-idx">#</span><span class="row-name">${escapeHtml(fieldDisplayLabel(state.identifierField))}</span>
+    ${cols.map(f => `<span class="row-col" title="${escapeAttr(f)}">${escapeHtml(fieldDisplayLabel(f))}</span>`).join('')}
+    <span class="row-actions"><button class="btn-mini" onclick="vcolsOpen()" title="Choose the columns of this list">Columns ▾</button></span></div>`;
+}
+function vcolsCell(v, f, i) {
+  let x = v[f];
+  if (f === 'variable_label_EN' && (x == null || String(x).trim() === '')) x = v.variable_label;
+  if (x == null || String(x).trim() === '') return `<span class="row-col">${f === 'variable_label_EN' ? '<span class="row-nolabel">(no label)</span>' : '<span class="row-nolabel">—</span>'}</span>`;
+  x = String(x);
+  if (typeof FAIR_STATUS_FIELDS !== 'undefined' && FAIR_STATUS_FIELDS.has(f)) x = FAIR_STATUS_LABELS[x] || x;
+  const max = i === 0 ? 110 : 70;
+  const multi = /\n/.test(x);
+  return `<span class="row-col${multi ? ' row-col-multi' : ''}" title="${escapeAttr(x.length > max ? x.slice(0, 600) : '')}">${escapeHtml(truncate(x, max))}</span>`;
+}
+function vcolsCells(v, cols) { return cols.map((f, i) => vcolsCell(v, f, i)).join(''); }
+
+function vcolsOpen() {
+  const cur = vcolsCurrent(), allowed = vcolsAllowed(), mine = vcolsMine(), def = vcolsDefault();
+  const groups = {};
+  allowed.forEach(f => { const g = (typeof fieldGroupOf === 'function' && fieldGroupOf(f)) || 'other'; (groups[g] = groups[g] || []).push(f); });
+  const ov = document.createElement('div'); ov.className = 'bk-overlay'; ov.id = 'vcols-overlay';
+  ov.innerHTML = `<div class="bk-dialog vcols-dialog">
+    <h3>Columns of the Variables list</h3>
+    <p class="bk-note">Pick up to ${VCOLS_MAX}. The variable name is always the first column. ${mine ? 'You are using <b>your own</b> columns (saved in this browser).' : 'You are using the <b>default</b> columns.'}</p>
+    <div class="vcols-chosen" id="vcols-chosen"></div>
+    <input type="text" id="vcols-filter" placeholder="Filter fields…" style="width:100%;margin:6px 0">
+    <div class="vcols-list">${Object.keys(groups).map(g => `<div class="vcols-group"><div class="vcols-gtitle">${escapeHtml(g)}</div>
+      ${groups[g].map(f => `<label class="vcols-item" data-f="${escapeAttr(f.toLowerCase() + ' ' + fieldDisplayLabel(f).toLowerCase())}"><input type="checkbox" value="${escapeAttr(f)}" ${cur.includes(f) ? 'checked' : ''}> ${escapeHtml(fieldDisplayLabel(f))} <code class="bk-note">${escapeHtml(f)}</code></label>`).join('')}</div>`).join('')}</div>
+    <p class="bk-note">Default for everyone: ${def.map(f => escapeHtml(fieldDisplayLabel(f))).join(', ')}</p>
+    <div class="bk-actions">
+      <button class="btn-mini" onclick="document.getElementById('vcols-overlay').remove()">Cancel</button>
+      ${mine ? '<button class="btn-mini" onclick="vcolsUseDefault()">Use the default</button>' : ''}
+      ${isAdminRole() ? `<button class="btn-mini" onclick="vcolsSaveDefault()" ${APPSET.ok === false ? 'disabled title="Run migration 42 first"' : ''}>Save as default for everyone</button>` : ''}
+      <button class="btn-primary btn-mini" onclick="vcolsSaveMine()">Use these columns</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  const order = cur.slice();
+  const drawChosen = () => { document.getElementById('vcols-chosen').innerHTML = order.length ? order.map((f, i) => `<span class="q-pill">${i + 1}. ${escapeHtml(fieldDisplayLabel(f))}</span>`).join(' ') : '<span class="bk-note">No column chosen: the label column is used.</span>'; };
+  ov.querySelectorAll('.vcols-item input').forEach(cb => cb.addEventListener('change', () => {
+    if (cb.checked) { if (order.length >= VCOLS_MAX) { cb.checked = false; cloudShowToast('error', 'At most ' + VCOLS_MAX + ' columns.'); return; } order.push(cb.value); }
+    else order.splice(order.indexOf(cb.value), 1);
+    drawChosen();
+  }));
+  ov.querySelector('#vcols-filter').addEventListener('input', e => { const q = e.target.value.toLowerCase(); ov.querySelectorAll('.vcols-item').forEach(l => { l.style.display = !q || l.dataset.f.includes(q) ? '' : 'none'; }); });
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  VCOLS_ORDER = order; drawChosen();
+}
+let VCOLS_ORDER = [];
+function vcolsClose() { const o = document.getElementById('vcols-overlay'); if (o) o.remove(); refreshVariablesTab(); if (state.currentTab === 'settings') appSetRenderSettings(); }
+function vcolsSaveMine() { try { localStorage.setItem(VCOLS_LOCAL, JSON.stringify(VCOLS_ORDER.slice(0, VCOLS_MAX))); } catch (_) {} vcolsClose(); }
+function vcolsUseDefault() { try { localStorage.removeItem(VCOLS_LOCAL); } catch (_) {} vcolsClose(); }
+async function vcolsSaveDefault() {
+  if (!isAdminRole()) return;
+  try {
+    await appSetSave('variables_columns', VCOLS_ORDER.slice(0, VCOLS_MAX));
+    try { localStorage.removeItem(VCOLS_LOCAL); } catch (_) {}
+    cloudShowToast('success', 'Saved as the default columns for everyone.');
+    vcolsClose();
+  } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e) + (APPSET.ok === false ? ' (run migration 42)' : '')); }
+}
+
+// ---------- Codebook settings page ----------
+function appSetRenderSettings() {
+  const host = document.getElementById('settings-saved'); if (!host) return;
+  const def = vcolsDefault(), admin = isAdminRole();
+  host.innerHTML = `${APPSET.ok === false ? `<div class="bk-msg warn">Saved settings are not available (${escapeHtml(APPSET.err)}). Run migration 42 in Supabase, then reload.</div>` : ''}
+    <h2 style="font-size: 14px; font-weight: 500; margin-bottom: 6px;">Variables list: default columns</h2>
+    <p class="hint" style="margin-top:0">The columns everyone sees in the Variables tab, after the variable name: <b>${def.map(f => escapeHtml(fieldDisplayLabel(f))).join(', ')}</b>. Each person can still choose their own with <em>Columns ▾</em> at the right end of the column headers in the Variables tab.</p>
+    ${admin ? '<button class="btn-mini" onclick="vcolsOpen()">Choose the default columns…</button>' : ''}`;
+  const email = document.getElementById('settings-contact-email');
+  if (email) {
+    email.value = state.contactEmail || APPSET.values.contact_email || '';
+    email.disabled = !admin;
+    let btn = document.getElementById('settings-contact-save');
+    if (!btn && admin) {
+      btn = document.createElement('button'); btn.id = 'settings-contact-save'; btn.className = 'btn-mini'; btn.textContent = 'Save'; btn.style.marginLeft = '6px';
+      btn.onclick = async () => { try { await appSetSave('contact_email', email.value.trim()); state.contactEmail = email.value.trim(); cloudShowToast('success', 'Contact email saved for everyone.'); } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e) + ' (migration 42?)'); } };
+      email.insertAdjacentElement('afterend', btn);
+    }
+  }
+}
+
+window.addEventListener('cloud-authenticated', () => {
+  setTimeout(async () => {
+    await appSetLoad();
+    if (state.currentTab === 'variables' && typeof refreshVariablesTab === 'function') refreshVariablesTab();
+    if (typeof window.refreshSettingsTab === 'function' && !window.refreshSettingsTab.__appset) {
+      const orig = window.refreshSettingsTab;
+      window.refreshSettingsTab = function () { const r = orig.apply(this, arguments); appSetRenderSettings(); return r; };
+      window.refreshSettingsTab.__appset = true;
+    }
+  }, 700);
+});
+// ====== END v6.49 settings + columns ======
+
+// ====== v6.50: Pending tab named by role ======
+function pendingNameByRole() {
+  const admin = isAdminRole();
+  const tab = document.querySelector('.tab[data-tab="pending"]');
+  if (tab) { const t = Array.from(tab.childNodes).find(n => n.nodeType === 3 && n.textContent.trim()); if (t) t.textContent = (admin ? 'Review' : 'My suggestions') + ' '; }
+  const h = document.getElementById('pending-heading'), sub = document.getElementById('pending-subheading');
+  if (h) h.textContent = admin ? 'Review suggestions' : 'My suggestions';
+  if (sub) sub.textContent = admin ? 'Changes suggested by editors, ontology engineers and researchers. Approve or reject each field.' : 'Changes you suggested and what happened to them. An admin approves or rejects each field.';
+}
+window.addEventListener('cloud-authenticated', () => { setTimeout(pendingNameByRole, 300); });
+async function excelSaveContact() {
+  const el = document.getElementById('excel-contact-email'); if (!el || !isAdminRole()) return;
+  try { await appSetSave('contact_email', el.value.trim()); state.contactEmail = el.value.trim(); cloudShowToast('success', 'Saved as the default contact for everyone.'); }
+  catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e) + ' (migration 42?)'); }
+}
+// ====== END v6.50 ======
+
+// ====== v6.52: Codebook settings — copyright contacts per instrument (migration 44) ======
+const INSTCOPY = { ok: null, err: '', contacts: {}, showAll: false };
+async function instCopyLoad() {
+  try {
+    const { data, error } = await window.cloudAuth.client.from('instruments').select('name, copyright_contact');
+    if (error) throw error;
+    INSTCOPY.contacts = {}; (data || []).forEach(r => { if (r.copyright_contact) INSTCOPY.contacts[r.name] = r.copyright_contact; });
+    INSTCOPY.ok = true; INSTCOPY.err = '';
+  } catch (e) { INSTCOPY.ok = false; INSTCOPY.err = e.message || String(e); }
+}
+function instCopyContact(atom) { return INSTCOPY.contacts[atom] || ''; }
+// Restricted = copyright_status 'restricted' on its variables, or a PROMIS / EQ-5 name
+// (the rule of migration 39 in the Viewer's researcher_codebook view).
+function instCopyByName(a) { return /^(PROMIS|EQ-5)/i.test(String(a || '')); }
+function instCopyRestricted() {
+  const set = new Map();   // atom -> number of variables with copyright_status restricted
+  (state.codebook || []).filter(v => !v._deleted).forEach(v => {
+    if (typeof isPublicAccessRestricted === 'function' && isPublicAccessRestricted(v))
+      splitInstrumentName(v[state.instrumentField]).forEach(a => set.set(a, (set.get(a) || 0) + 1));
+  });
+  (typeof getAllAtomicInstruments === 'function' ? getAllAtomicInstruments() : []).forEach(a => { if (instCopyByName(a) && !set.has(a)) set.set(a, 0); });
+  return set;
+}
+async function instCopyRender() {
+  const host = document.getElementById('settings-copyright'); if (!host) return;
+  if (INSTCOPY.ok === null) await instCopyLoad();
+  const admin = isAdminRole(), restricted = instCopyRestricted();
+  const all = (typeof getAllAtomicInstruments === 'function' ? getAllAtomicInstruments() : []).slice().sort((a, b) => a.localeCompare(b));
+  const list = (INSTCOPY.showAll ? all : all.filter(a => restricted.has(a) || instCopyContact(a)))
+    .sort((a, b) => (restricted.has(b) - restricted.has(a)) || a.localeCompare(b));
+  host.innerHTML = `${INSTCOPY.ok === false ? `<div class="bk-msg warn">Contacts per instrument are not available yet (${escapeHtml(INSTCOPY.err)}). Run migration 44, then reload.</div>` : ''}
+    <div class="task-filters"><label style="font-weight:400;display:flex;gap:6px;align-items:center"><input type="checkbox" ${INSTCOPY.showAll ? 'checked' : ''} onchange="INSTCOPY.showAll=this.checked; instCopyRender()"> Show all instruments</label>
+      <span class="bk-note">${restricted.size} restricted instrument${restricted.size === 1 ? '' : 's'}</span></div>
+    ${list.length ? `<table class="dash-table"><thead><tr><th>Instrument</th><th>Restricted</th><th>Contact for this instrument</th><th></th></tr></thead><tbody>
+      ${list.map(a => `<tr><td>${escapeHtml(a)}</td>
+        <td>${restricted.has(a) ? (restricted.get(a) ? `🔒 yes <span class="bk-note">(copyright_status on ${restricted.get(a)} variables)</span>` : `🔒 in the Viewer <span class="bk-note">(by its name only; Excel export follows copyright_status)</span>`) : '<span class="bk-note">no</span>'}</td>
+        <td><input type="text" data-inst="${escapeAttr(a)}" value="${escapeAttr(instCopyContact(a))}" placeholder="${escapeAttr(state.contactEmail ? 'default: ' + state.contactEmail : 'name@example.org')}" ${admin && INSTCOPY.ok ? '' : 'disabled'} style="width:100%;max-width:340px"></td>
+        <td>${admin && INSTCOPY.ok ? `<button class="btn-mini" onclick="instCopySave(this)">Save</button>` : ''}</td></tr>`).join('')}
+    </tbody></table>` : '<p class="bk-note">No restricted instrument at the moment. An instrument is restricted when its variables have <code>copyright_status</code> = restricted.</p>'}`;
+}
+async function instCopySave(btn) {
+  const input = btn.closest('tr').querySelector('input[data-inst]'); if (!input || !isAdminRole()) return;
+  const name = input.getAttribute('data-inst'), val = input.value.trim();
+  try {
+    const { error } = await window.cloudAuth.client.from('instruments').upsert({ name, copyright_contact: val || null }, { onConflict: 'name' });
+    if (error) throw error;
+    if (val) INSTCOPY.contacts[name] = val; else delete INSTCOPY.contacts[name];
+    cloudShowToast('success', val ? `Contact for ${name} saved.` : `${name} now uses the default contact.`);
+  } catch (e) { cloudShowToast('error', 'Could not save: ' + (e.message || e)); }
+}
+window.addEventListener('cloud-authenticated', () => {
+  setTimeout(() => {
+    if (typeof window.appSetRenderSettings === 'function' && !window.appSetRenderSettings.__copy) {
+      const orig = window.appSetRenderSettings;
+      window.appSetRenderSettings = function () { const r = orig.apply(this, arguments); instCopyRender(); return r; };
+      window.appSetRenderSettings.__copy = true;
+    }
+    instCopyLoad();
+  }, 900);
+});
+// ====== END v6.52 ======
+// ====== v6.53: comments on tasks (migration 45), "Make task" from Quality, "My items" on the Dashboard ======
+// Comments: everyone who can see a task can read and write its comments (RLS of
+// migration 45 follows the task rules of migration 43). "New" = written by
+// someone else after you last opened the thread (kept in this browser).
+const TASK_CM_SEEN_KEY = 'cb_task_cm_seen_v1';
+TASKS.comments = []; TASKS.cmOk = null; TASKS.cmOpen = new Set();
+function taskCmSeen() { try { return JSON.parse(localStorage.getItem(TASK_CM_SEEN_KEY) || '{}') || {}; } catch (_) { return {}; } }
+function taskCmMarkSeen(id) { try { const s = taskCmSeen(); s[id] = new Date().toISOString(); localStorage.setItem(TASK_CM_SEEN_KEY, JSON.stringify(s)); } catch (_) {} }
+async function taskCmLoad() {
+  try {
+    const { data, error } = await window.cloudAuth.client.from('task_comments').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    TASKS.comments = (data || []).filter(x => !x.is_deleted); TASKS.cmOk = true;
+  } catch (e) { TASKS.comments = []; TASKS.cmOk = false; console.warn('task_comments unavailable (migration 45 not applied?)', e.message || e); }
+}
+function taskCmOf(id) { return TASKS.comments.filter(x => String(x.task_id) === String(id)); }
+function taskCmNew(id) {
+  const me = discMe(), seen = taskCmSeen()[id] || '';
+  return taskCmOf(id).filter(x => x.created_by !== me && (!seen || x.created_at > seen)).length;
+}
+function taskCmToggle(t) {
+  if (!TASKS.cmOk) return '';
+  const n = taskCmOf(t.id).length, nw = taskCmNew(t.id);
+  return `<div><button class="task-cm-btn${nw ? ' new' : ''}" onclick="taskCmOpenToggle(${Number(t.id)})" title="Comments on this task">💬 ${n ? n + ' comment' + (n === 1 ? '' : 's') : 'Comment'}${nw ? ` · <b>${nw} new</b>` : ''}</button></div>`;
+}
+function taskCmRow(t) {
+  if (!TASKS.cmOk || !TASKS.cmOpen.has(String(t.id))) return '';
+  const me = discMe(), list = taskCmOf(t.id);
+  return `<tr class="task-cm-row"><td></td><td colspan="7"><div class="task-cm">
+    ${list.length ? list.map(x => `<div class="task-cm-item"><div class="task-cm-h"><b>${escapeHtml(bkWho(x.created_by))}</b> <span class="bk-note">${bkDayTime(x.created_at)}${x.edited_at ? ' · edited' : ''}</span>
+        ${x.created_by === me || isAdminRole() ? `<button class="btn-mini task-cm-del" onclick="taskCmHide(${Number(x.id)})" title="Hide this comment (kept in the database)">Remove</button>` : ''}</div>
+        <div class="task-cm-body">${discBodyHtml(x.body)}</div></div>`).join('') : '<p class="bk-note" style="margin:2px 0 6px">No comments yet.</p>'}
+    <textarea id="task-cm-in-${Number(t.id)}" rows="2" placeholder="Write a comment (what you did, a question for the admin…)"></textarea>
+    <div class="bk-actions"><button class="btn-primary btn-mini" onclick="taskCmPost(${Number(t.id)})">Post</button></div>
+  </div></td></tr>`;
+}
+function taskCmOpenToggle(id) {
+  const k = String(id);
+  if (TASKS.cmOpen.has(k)) TASKS.cmOpen.delete(k); else { TASKS.cmOpen.add(k); taskCmMarkSeen(k); }
+  tasksRender();
+}
+async function taskCmPost(id) {
+  const el = document.getElementById('task-cm-in-' + id); const body = el ? el.value.trim() : '';
+  if (!body) return;
+  try {
+    const { error } = await window.cloudAuth.client.from('task_comments').insert({ task_id: Number(id), body, created_by: discMe() });
+    if (error) throw error;
+    await taskCmLoad(); taskCmMarkSeen(String(id));
+    cloudShowToast('success', 'Comment posted.');
+    tasksRender();
+  } catch (e) { cloudShowToast('error', 'Could not post the comment: ' + (e.message || e)); }
+}
+async function taskCmHide(cid) {
+  if (!confirm('Remove this comment? It stays in the database but is no longer shown.')) return;
+  try {
+    const { error } = await window.cloudAuth.client.from('task_comments').update({ is_deleted: true, edited_at: new Date().toISOString() }).eq('id', cid);
+    if (error) throw error;
+    await taskCmLoad(); tasksRender();
+  } catch (e) { cloudShowToast('error', 'Could not remove the comment: ' + (e.message || e)); }
+}
+
+function taskOpenNewComments(ids) {
+  TASKS.cmOpen = new Set(ids.map(String)); ids.forEach(id => taskCmMarkSeen(String(id)));
+  taskGoto({ status: 'all' });
+}
+
+// ---------- Quality → task ----------
+// A task made from a finding remembers it in tasks.source ("quality:<check>#<key>"),
+// so the finding shows "Task #12" afterwards instead of the button.
+window._qTaskF = {};
+function qTaskSrc(check, key) { return 'quality:' + check + '#' + key; }
+function qTaskFor(src) { return (TASKS.all || []).find(t => t.source === src); }
+function qTaskEnsureLoaded() {
+  if (TASKS.loaded || TASKS._qLoading || !taskOn()) return;
+  TASKS._qLoading = true;
+  taskLoad().then(() => { TASKS._qLoading = false; if (state.currentTab === 'quality') renderQuality(); }).catch(() => { TASKS._qLoading = false; });
+}
+function qTaskLink(t) {
+  return `<a href="#" class="q-pill q-task-link ${t.status}" onclick="event.preventDefault(); taskGoto({ status: 'all', q: ${escapeAttr(JSON.stringify(t.title))} })" title="${escapeAttr(t.title)}">📋 Task #${Number(t.id)} · ${escapeHtml(TASK_STATUS[t.status] || t.status)}</a>`;
+}
+function qTaskBtn(f) {
+  if (!isAdminRole()) return '';
+  qTaskEnsureLoaded();
+  if (!TASKS.ok) return '';
+  const src = qTaskSrc(f.check, f.key), t = qTaskFor(src);
+  if (t) return qTaskLink(t);
+  const k = 'f' + Object.keys(window._qTaskF).length; window._qTaskF[k] = { one: f };
+  return `<button class="btn-mini" onclick="qMakeTask('${k}')" title="Make a task from this finding">+ Task</button>`;
+}
+function qTaskAllBtn(check, list) {
+  if (!isAdminRole() || !list || list.length < 2) return '';
+  qTaskEnsureLoaded();
+  if (!TASKS.ok) return '';
+  const inst = window._q.inst || '';
+  const src = qTaskSrc(check, 'all' + (inst ? '@' + inst : '')), t = qTaskFor(src);
+  if (t) return qTaskLink(t);
+  const k = 'g' + Object.keys(window._qTaskF).length; window._qTaskF[k] = { check, list: list.slice(), inst, src };
+  return `<button class="btn-mini" onclick="qMakeTask('${k}')" title="One task for all ${list.length} findings of this check">+ One task for all ${list.length}</button>`;
+}
+function qMakeTask(k) {
+  const x = window._qTaskF[k]; if (!x) return;
+  const prio = s => s === 'error' ? 'high' : s === 'warn' ? 'normal' : 'low';
+  const day = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (x.one) {
+    const f = x.one, c = Q_CHECKS[f.check] || { title: f.check, sev: 'info' }, names = f.vars.map(qName);
+    taskOpenForm(null, f.vars.map(v => v.id).filter(Boolean), {
+      title: `Quality: ${c.title} — ${names.slice(0, 3).join(', ')}${names.length > 3 ? ' +' + (names.length - 3) : ''}`,
+      details: `${f.detail}\n\nFrom the Quality tab, ${day}.`,
+      work_group: 'Quality', priority: prio(c.sev), source: qTaskSrc(f.check, f.key)
+    });
+  } else {
+    const c = Q_CHECKS[x.check] || { title: x.check, sev: 'info' };
+    const ids = Array.from(new Set(x.list.flatMap(f => f.vars.map(v => v.id)).filter(Boolean)));
+    const lines = x.list.slice(0, 40).map(f => '- ' + f.vars.map(qName).join(', ') + ': ' + f.detail);
+    taskOpenForm(null, ids, {
+      title: `Quality: ${c.title} (${x.list.length} findings${x.inst ? ', ' + x.inst : ''})`,
+      details: lines.join('\n') + (x.list.length > 40 ? `\n… and ${x.list.length - 40} more (see the Quality tab)` : '') + `\n\nFrom the Quality tab, ${day}.`,
+      work_group: 'Quality', priority: prio(c.sev), source: x.src
+    });
+  }
+}
+
+// ---------- Dashboard: "My items" (replaces the v6.48 Tasks card) ----------
+const MYI = { pending: null, myPending: null, loadedAt: 0 };
+async function myItemsLoad() {
+  if (Date.now() - MYI.loadedAt < 20000) return;
+  const c = window.cloudAuth.client, me = discMe();
+  try {
+    const all = await c.from('pending_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+    const mine = await c.from('pending_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending').eq('submitted_by', me);
+    MYI.pending = isAdminRole() ? (all.count || 0) : null; MYI.myPending = mine.count || 0;
+  } catch (_) { MYI.pending = null; MYI.myPending = null; }
+  MYI.loadedAt = Date.now();
+}
+async function taskDashRender() {
+  if (!taskOn()) return;
+  let el = document.getElementById('dash-tasks');
+  if (!el) {
+    const cards = document.getElementById('dash-cards'); if (!cards) return;
+    el = document.createElement('div'); el.id = 'dash-tasks'; cards.parentNode.insertBefore(el, cards);
+  }
+  const since = document.getElementById('dash-since');   // keep "Since you last looked" first
+  if (since && since.nextSibling !== el) since.parentNode.insertBefore(el, since.nextSibling);
+  await Promise.all([taskLoad(), myItemsLoad(), (typeof discLoadAll === 'function' ? discLoadAll().catch(() => []) : null)]);
+  const admin = isAdminRole(), role = window.cloudAuth.role, me = discMe();
+  const tiles = [];
+  const stat = (n, label, sub, onclick, tone) => `<button class="task-stat ${n ? tone || '' : ''}" onclick="${onclick}"><span class="ts-num">${n}</span><span class="ts-label">${label}</span>${sub ? `<span class="ts-sub">${sub}</span>` : ''}</button>`;
+  const go = f => escapeAttr('taskGoto(' + JSON.stringify(f) + ')');
+  let active = [], mine = [];
+  if (TASKS.ok) {
+    active = TASKS.all.filter(taskActive).sort(taskSort); mine = active.filter(taskMine);
+    const overdue = mine.filter(taskOverdue), none = active.filter(t => !t.assigned_to);
+    const newCm = TASKS.cmOk ? TASKS.all.filter(t => taskCmNew(t.id) > 0) : [];
+    tiles.push(stat(mine.length, 'My tasks', 'open or in progress', go({ who: 'me' })));
+    if (overdue.length) tiles.push(stat(overdue.length, 'Overdue', 'mine, past the due date', go({ who: 'me' }), 'bad'));
+    if (admin) tiles.push(stat(none.length, 'Tasks not assigned', 'waiting for someone', go({ who: 'none' }), 'warn'));
+    if (newCm.length) tiles.push(stat(newCm.length, 'Tasks with new comments', 'written by others', escapeAttr('taskOpenNewComments(' + JSON.stringify(newCm.map(t => String(t.id))) + ')'), 'warn'));
+  }
+  if (admin && MYI.pending != null) tiles.push(stat(MYI.pending, 'Suggestions to review', 'from editors and ontology engineers', "switchTab('pending')", 'warn'));
+  if (!admin && MYI.myPending != null && (role === 'ontology_engineer' || MYI.myPending)) tiles.push(stat(MYI.myPending, 'My suggestions', 'waiting for the admin', "switchTab('pending')"));
+  if (!admin && typeof SINCE !== 'undefined' && SINCE.reviewed && SINCE.reviewed.length) {
+    const ok = SINCE.reviewed.filter(x => x.status === 'approved').length, no = SINCE.reviewed.filter(x => x.status === 'rejected').length;
+    tiles.push(stat(SINCE.reviewed.length, 'Suggestions reviewed', `${ok} approved, ${no} rejected`, "switchTab('pending')", no ? 'warn' : ''));
+  }
+  if (typeof DISC !== 'undefined' && DISC.all) {
+    const ment = DISC.all.filter(x => (x.mentions || []).includes(me) && x.created_by !== me)
+      .filter(x => { const root = x.parent_id ? DISC.all.find(y => y.id === x.parent_id) : x; return root && root.status === 'open'; });
+    tiles.push(stat(ment.length, 'Mentioned me', 'in open discussions', "var d=document.getElementById('dash-disc'); if(d) d.scrollIntoView({behavior:'smooth'})", 'warn'));
+  }
+  const next = mine.slice(0, 5);
+  el.innerHTML = `<div class="bk-box my-items">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>My items</h3>${TASKS.ok ? '<button class="btn-mini" onclick="taskGoto({})">Open Tasks</button>' : ''}</div>
+    ${TASKS.ok ? '' : `<div class="bk-msg warn">Tasks are not available (${escapeHtml(TASKS.err)}). Run migration 41.</div>`}
+    <div class="task-stats">${tiles.join('')}</div>
+    ${TASKS.ok ? (next.length ? `<div class="task-next"><div class="task-h4">Next for you</div>${next.map(t => `<div class="task-next-row"><span class="task-prio ${t.priority}">${escapeHtml(TASK_PRIO[t.priority] || '')}</span>
+        <a href="#" onclick="event.preventDefault(); taskGoto({ who: 'me' })">${escapeHtml(t.title)}</a>
+        <span class="bk-note">${escapeHtml(TASK_STATUS[t.status] || t.status)}${t.due_date ? ' · due ' + escapeHtml(t.due_date) : ''}${taskOverdue(t) ? ' <span class="task-late">overdue</span>' : ''}${TASKS.cmOk && taskCmNew(t.id) ? ' · 💬 new' : ''}</span></div>`).join('')}</div>`
+      : '<p class="bk-note" style="margin-top:8px">No open tasks assigned to you.</p>') : ''}
+  </div>`;
+  taskBadge();
+}
+// ====== END v6.53 ======
+
+
+
+
+
 
 
 
@@ -8492,6 +9040,10 @@ async function openFieldManager() {
       accessByRole[r.role][r.field_name] = r.access;
     });
   } catch (e) { console.error('Could not load role_field_access', e); }
+  // v6.54: public Viewer fields (app_settings 'viewer_fields', migration 46)
+  try { await appSetLoad(); } catch (_) {}
+  { const vf = Array.isArray(APPSET.values.viewer_fields) ? APPSET.values.viewer_fields : VIEWER_FIELD_DEFAULT;
+    accessByRole.viewer = {}; VIEWER_FIELD_CHOICES.forEach(f => { accessByRole.viewer[f] = vf.indexOf(f) !== -1 ? 'read' : 'none'; }); }
   // Build a group-centric structure: ordered list of groups, each with ordered fields.
   // System / non-metadata fields that must NOT appear in the manager (no
   // field_metadata row exists for them, so they can't be reordered/renamed).
@@ -8524,7 +9076,7 @@ async function openFieldManager() {
   });
   const groups = groupOrder.map(g => ({ name: g, orig_name: g, fields: buckets[g] }));
   const sel = document.getElementById('fm-access-role');
-  FM_STATE = { groups: groups, dirty: false, access: accessByRole, accessRole: (sel && sel.value) || 'editor' };
+  FM_STATE = { groups: groups, dirty: false, viewerDirty: false, access: accessByRole, accessRole: (sel && sel.value) || 'editor' };
   fmChangeAccessRole(FM_STATE.accessRole);
   document.getElementById('fm-error').style.display = 'none';
   document.getElementById('fm-status').textContent = '';
@@ -8560,6 +9112,14 @@ function renderFieldManager() {
         + '<input class="fm-label-in" value="' + escapeAttr(fld.label) + '" oninput="fmEdit(' + gi + ',' + fi + ',this.value)" title="' + escapeAttr(labelTitle) + '">'
         + '<select class="fm-group-sel" onchange="fmMoveToGroup(' + gi + ',' + fi + ',this.value)" title="Move to group">' + fmGroupOptions(grp.name) + '</select>'
         + (function(){ var a = fmAccessOf(fld);
+            if (FM_STATE.accessRole === 'viewer') {
+              if (VIEWER_FIELD_CHOICES.indexOf(oeDbName(fld.field_name)) === -1)
+                return '<span class="fm-group-sel" style="display:inline-block;min-width:92px;color:var(--text-faint);text-align:center;" title="This field cannot be shown in the public Viewer">—</span>';
+              return '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Show this field in the public Viewer?" style="min-width:92px;">'
+                + '<option value="none"' + (a !== 'read' ? ' selected' : '') + '>hidden</option>'
+                + '<option value="read"' + (a === 'read' ? ' selected' : '') + '>visible</option>'
+                + '</select>';
+            }
             if (FM_STATE.accessRole === 'researcher') {
               // Researchers only ever read: choose whether the field is shown.
               return '<select class="fm-group-sel" onchange="fmSetAccess(' + gi + ',' + fi + ',this.value)" title="Show this field to researchers?" style="min-width:92px;">'
@@ -8647,9 +9207,17 @@ function fmEdit(gi, fi, val) {
   FM_STATE.dirty = true;
 }
 
+// v6.54: fields the public Viewer can show (migration 46 view viewer_fields
+// accepts only these). Saved as app_settings 'viewer_fields', not per role.
+const VIEWER_FIELD_CHOICES = ['Theme', 'Subdomain', 'variable_label_nl', 'variable_label_en', 'values',
+  'value_labels_nl', 'value_labels_en', 'variable_name_fair', 'variable_coding_label', 'value_labels_fair',
+  'value_coding', 'measurement_unit', 'item_number'];
+const VIEWER_FIELD_DEFAULT = ['Theme', 'Subdomain', 'variable_label_nl', 'variable_label_en',
+  'value_labels_nl', 'value_labels_en', 'variable_name_fair', 'value_labels_fair'];
 function fmDefaultAccess(role, dbField) {
   if (role === 'editor') return 'write';
   if (role === 'researcher') return RV_DEFAULT_FIELDS.indexOf(dbField) !== -1 ? 'read' : 'none';
+  if (role === 'viewer') return VIEWER_FIELD_DEFAULT.indexOf(dbField) !== -1 ? 'read' : 'none';
   return 'none';
 }
 function fmAccessOf(fld) {
@@ -8663,6 +9231,7 @@ function fmSetAccess(gi, fi, val) {
   const role = FM_STATE.accessRole;
   if (!FM_STATE.access[role]) FM_STATE.access[role] = {};
   FM_STATE.access[role][oeDbName(fld.field_name)] = val;
+  if (role === 'viewer') FM_STATE.viewerDirty = true;
   FM_STATE.dirty = true;
 }
 function fmSetFallback(gi, fi, val) {
@@ -8672,7 +9241,9 @@ function fmSetFallback(gi, fi, val) {
 function fmChangeAccessRole(role) {
   FM_STATE.accessRole = role;
   const hint = document.getElementById('fm-access-hint');
-  if (hint) hint.textContent = role === 'researcher'
+  if (hint) hint.textContent = role === 'viewer'
+    ? 'visible = shown in the public Viewer (password page) · hidden = never sent to the Viewer · — = this field cannot be shown there'
+    : role === 'researcher'
     ? 'visible = shown in the researcher viewer · hidden = never sent to researchers'
     : 'none = hidden · read = view only · propose = edit needs approval · write = edit directly';
   renderFieldManager();
@@ -8762,6 +9333,7 @@ async function saveFieldManager() {
     //    not server-enforceable yet). Upsert every entry the admin touched.
     const accessRows = [];
     Object.keys(FM_STATE.access || {}).forEach(role => {
+      if (role === 'viewer') return;   // v6.54: saved in app_settings below
       const m = FM_STATE.access[role] || {};
       Object.keys(m).forEach(dbField => {
         accessRows.push({ role: role, field_name: dbField, access: m[dbField] || 'none' });
@@ -8772,6 +9344,15 @@ async function saveFieldManager() {
         .from('role_field_access')
         .upsert(accessRows, { onConflict: 'role,field_name' });
       if (accErr) throw accErr;
+    }
+    // v6.54: public Viewer fields, in the field order of this list
+    if (FM_STATE.viewerDirty) {
+      const vm = FM_STATE.access.viewer || {};
+      const seen = new Set(), list = [];
+      flat.forEach(f => { const db = oeDbName(f.field_name); if (vm[db] === 'read' && VIEWER_FIELD_CHOICES.indexOf(db) !== -1 && !seen.has(db)) { seen.add(db); list.push(db); } });
+      VIEWER_FIELD_CHOICES.forEach(db => { if (vm[db] === 'read' && !seen.has(db)) { seen.add(db); list.push(db); } });
+      await appSetSave('viewer_fields', list);
+      FM_STATE.viewerDirty = false;
     }
 
     applyFieldOrdering();
@@ -9045,7 +9626,7 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 
 // ============ STATE ============
-const TOOL_VERSION = "v6.48.0";
+const TOOL_VERSION = "v6.53.0";
 
 const state = {
   codebook: null,
@@ -10463,7 +11044,7 @@ function switchTab(name) {
   state.currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   var _adminBtn = document.getElementById("admin-tab-btn");
-  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","history","imports","compare","backup","releases"].indexOf(name) !== -1);
+  if (_adminBtn) _adminBtn.classList.toggle("active", ["users","trash","settings","imports","compare","backup","releases"].indexOf(name) !== -1);
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
   // v6.42: the instrument selector and its info box only on the tabs that use them
   document.body.classList.toggle("no-inst-bar", !(name === "variables" || name === "bulk"));
@@ -10801,6 +11382,7 @@ async function renderQuality(reload) {
 
 function qRenderChecks(el, only) {
   const q = window._q, admin = isAdminRole();
+  window._qTaskF = {};
   let F = (q.F || runQualityChecks(qRows()).filter(f => f.vars.some(qInScope))).slice();
   const DUPS = ['name_dup', 'name_near', 'same_question', 'similar_question', 'same_q_diff_fair', 'portal_dup', 'item_dup'];
   F = only ? F.filter(f => only.includes(f.check)) : F.filter(f => !DUPS.includes(f.check));
@@ -10818,10 +11400,11 @@ function qRenderChecks(el, only) {
       <span style="flex:1"></span><button class="btn-mini" id="q-exp">Download list</button></div>
     <div class="q-chips"><span class="q-chip ${!q.checkFilter ? 'on' : ''}" data-c="">All (${F.length})</span>${order.map(k => `<span class="q-chip ${q.checkFilter === k ? 'on' : ''}" data-c="${k}"><span class="q-sev ${Q_CHECKS[k].sev}" style="display:inline-block;margin:0 5px 0 0;vertical-align:1px;"></span>${escapeHtml(Q_CHECKS[k].title)} (${by[k].length})</span>`).join('')}</div>
     ${F.length ? '' : '<div class="empty-state"><p>Nothing found. 🎉</p></div>'}
-    ${order.filter(k => !q.checkFilter || k === q.checkFilter).map(k => `<div class="q-card"><div class="q-card-h"><span class="q-sev ${Q_CHECKS[k].sev}" style="margin:0;"></span><strong style="font-size:13px;">${escapeHtml(Q_CHECKS[k].title)}</strong><span class="q-muted">${by[k].length}</span></div>
+    ${order.filter(k => !q.checkFilter || k === q.checkFilter).map(k => `<div class="q-card"><div class="q-card-h"><span class="q-sev ${Q_CHECKS[k].sev}" style="margin:0;"></span><strong style="font-size:13px;">${escapeHtml(Q_CHECKS[k].title)}</strong><span class="q-muted">${by[k].length}</span><span style="flex:1"></span>${admin ? qTaskAllBtn(k, by[k].filter(f => !q.exc.has(f.check + '#' + f.key))) : ''}</div>
       ${by[k].slice(0, 300).map(f => { const ok = q.exc.get(f.check + '#' + f.key);
         return `<div class="q-find" style="${ok ? 'opacity:.55;' : ''}">
           <div class="q-find-h"><span class="q-find-d">${escapeHtml(f.detail)}</span>${ok ? `<span class="q-pill" style="background:var(--success-bg,#E1F5EE);">✔ marked OK${ok.note ? ': ' + escapeHtml(ok.note) : ''}</span>` : ''}<span style="flex:1"></span>
+            ${admin && !ok ? qTaskBtn(f) : ''}
             ${admin && q.excReady ? (ok ? `<button class="btn-mini" onclick="qUnmark('${f.check}','${escapeAttr(f.key)}')">Undo OK</button>` : `<button class="btn-mini" onclick="qMarkOk('${f.check}','${escapeAttr(f.key)}')" title="Hide this finding for everyone">Mark OK</button>`) : ''}</div>
           <table class="q-ftable"><tbody>${f.vars.map(qVarRow).join('')}</tbody></table></div>`; }).join('')}
       ${by[k].length > 300 ? `<div class="q-row q-muted">… ${by[k].length - 300} more — use “Download list”.</div>` : ''}</div>`).join('')}`;
@@ -11155,7 +11738,8 @@ function refreshVariablesTab() {
     return;
   }
 
-  listEl.innerHTML = vars.map((v, i) => {
+  const _cols = (typeof vcolsCurrent === 'function') ? vcolsCurrent() : [];   // v6.49
+  listEl.innerHTML = (typeof vcolsHeader === 'function' ? vcolsHeader(_cols) : '') + vars.map((v, i) => {
     if (!matchesSearch(v, search)) return "";
     const isNew = v._added === true;
     const isDeleted = v._deleted === true;
@@ -11186,7 +11770,7 @@ function refreshVariablesTab() {
     return `<div class="browse-row ${isDeleted ? 'deleted' : ''}">
       <span class="row-idx">${i + 1}</span>
       <span class="row-name">${escapeHtml(getId(v) || "(no name)")}${badges}${fxBadge(v)}</span>
-      <span class="row-label">${labelHtml}</span>
+      ${_cols.length ? vcolsCells(v, _cols) : `<span class="row-label">${labelHtml}</span>`}
       <span class="row-actions">${actions}</span>
     </div>`;
   }).join("");
@@ -13369,8 +13953,9 @@ function applyCopyrightFilter(vars, fields, contactEmail, info) {
     const placeholder = {};
     placeholder[state.instrumentField] = atom;
     if (labelField) {
-      placeholder[labelField] = contactEmail
-        ? `This questionnaire requires permission. Contact: ${contactEmail}`
+      const _contact = (typeof instCopyContact === 'function' && instCopyContact(atom)) || contactEmail;   // v6.52: contact per instrument
+      placeholder[labelField] = _contact
+        ? `This questionnaire requires permission. Contact: ${_contact}`
         : `This questionnaire requires permission. Contact the codebook owner for access.`;
     }
     placeholder._restrictedPlaceholder = true;
@@ -13536,6 +14121,7 @@ function resetAll() {
         <option value="editor">Editor</option>
         <option value="ontology_engineer">Ontology Engineer</option>
         <option value="researcher">Researcher</option>
+        <option value="viewer">Public Viewer</option>
       </select>
       <span id="fm-access-hint" style="color: var(--text-faint);">none = hidden · read = view only · propose = edit needs approval · write = edit directly</span>
     </div>
