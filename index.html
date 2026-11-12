@@ -1134,6 +1134,7 @@
   #rv-app .rv-ans td { padding:5px 8px 5px 0; vertical-align:top; border-bottom:1px solid #f3f4f6; line-height:1.45; word-break:break-word; }
   #rv-app .rv-ans td:first-child { width:56px; }
   #rv-app .rv-ans-fair { font-family:ui-monospace,Menlo,monospace; font-size:12px; }
+  #rv-app .rv-ans-gap td { color:#9ca3af; font-style:italic; font-size:12px; }
   #rv-app .fair-link { color:inherit; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:2px; }
   #rv-app .fair-link:hover { color:#0f766e; text-decoration-style:solid; }
   #rv-app .rv-fair-chip { display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:4px 10px; color:#1f2937; }
@@ -1673,7 +1674,7 @@
     </div>
 
     <div class="cloud-auth-footer">
-      Codebook Editor — Cloud edition · v6.54.0
+      Codebook Editor — Cloud edition · v6.55.0
     </div>
   </div>
 </div>
@@ -1708,7 +1709,7 @@
           <div class="rv-brand-title">Codebook</div>
           <div class="rv-brand-sub">PCNN variable dictionary</div>
         </div>
-        <span class="rv-version-pill">v6.54.0 · researcher view</span>
+        <span class="rv-version-pill">v6.55.0 · researcher view</span>
       </div>
       <div class="rv-topbar-actions">
         <button class="rv-btn" id="rv-exit-preview-btn" onclick="rvPreviewExit()" style="display:none">← Exit preview</button>
@@ -1946,7 +1947,7 @@
     <div class="brand">
       <div class="logo">📚</div>
       <span>Codebook Editor</span>
-      <span class="version">v6.54.0 cloud</span>
+      <span class="version">v6.55.0 cloud</span>
     </div>
     <div class="topbar-status">
       <span id="status-badge" class="badge badge-info">Ready</span>
@@ -2661,7 +2662,7 @@
 </div> <!-- /app -->
 
 <footer style="max-width: 1200px; margin: 2rem auto 1rem; padding: 1rem; text-align: center; font-size: 11px; color: var(--text-faint); border-top: 1px solid var(--border);">
-  Codebook Editor <span id="footer-version">v6.54.0</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
+  Codebook Editor <span id="footer-version">v6.55.0</span> · © 2026 <strong id="footer-author">Hajar Hasannejadasl</strong> · All rights reserved ·
   <a href="javascript:void(0)" onclick="document.getElementById('modal-about').style.display='flex'" style="color: var(--text-muted);">About &amp; license</a>
 </footer>
 
@@ -2680,7 +2681,7 @@
       <p style="margin-top: 14px;"><strong>Author:</strong> <span id="about-author">Hajar Hasannejadasl</span><br>
       <strong>Affiliation:</strong> Maastricht University Medical Centre+ (MUMC+)<br>
       <strong>Project:</strong> Post-COVID Network Netherlands (PCNN), funded by ZonMw<br>
-      <strong>Version:</strong> <span id="about-version">v6.54.0</span><br>
+      <strong>Version:</strong> <span id="about-version">v6.55.0</span><br>
       <strong>Created:</strong> 2026</p>
 
       <p style="margin-top: 14px;"><strong>Contact:</strong><br>
@@ -2695,7 +2696,7 @@
       </div>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;"><strong>How to cite:</strong><br>
-      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v6.54.0) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
+      Hasannejadasl, H. (2026). <em>Codebook Editor</em> (v6.55.0) [Computer software]. Maastricht University Medical Centre+, Post-COVID Network Netherlands.</p>
 
       <p style="margin-top: 14px; color: var(--text-muted); font-size: 12px;">When you save the codebook, a <code>_meta</code> block is added to the JSON output recording the tool name, version, author, and timestamp of the last edit.</p>
     </div>
@@ -2962,9 +2963,15 @@ const CLOUD_FIELD_CASE_MAP = {
   // original case already because they were quoted at table-creation time.
 };
 
+// v6.55 (_merged clean-up step 2): these columns are copies of the main column
+// (or empty) since 12 Nov 2026 and are dropped by migration 48. The Editor no
+// longer reads, shows or writes them; everything uses the main column.
+const CLOUD_RETIRED_COLUMNS = new Set(['variable_name_fair_merged', 'variable_coding_label_merged',
+  'value_label_fair_merged', 'value_coding_merged', 'value_coding_fair', 'proposed_value_label_en']);
 function normalizeCloudRow(row) {
   const out = {};
   for (const k in row) {
+    if (CLOUD_RETIRED_COLUMNS.has(k)) continue;
     const targetKey = CLOUD_FIELD_CASE_MAP[k] || k;
     out[targetKey] = row[k];
   }
@@ -3006,7 +3013,7 @@ const CLOUD_DB_MANAGED_FIELDS = new Set(['created_at', 'updated_at']);
 
 // The complete set of REAL columns in the variables table. Anything not in
 // this set is a UI-only field and must never be written.
-const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_name_FAIR_merged', 'variable_coding_label', 'variable_coding_label_merged', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_coding_merged', 'value_labels_FAIR', 'value_label_FAIR_merged', 'value_coding_by', 'Val_FAIR_code_checked_by', 'proposed_value_label_en', 'value_coding_FAIR', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'item_number', 'fair_status', 'value_fair_status', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+const CLOUD_DB_COLUMNS = new Set(['id', 'Theme', 'Subdomain', 'Instrument', 'Instrument_version', 'variable_name_CBS', 'variable_name_FAIR', 'variable_coding_label', 'Var_FAIR_code_checked_by', 'checked_by', 'check_date', 'Var_portal_FAIR_colnames', 'Var_portal_variable_raw_name', 'Var_biobank', 'Var_platform_trials', 'Var_expertise_clinics', 'proposed_coding_label', 'proposed_code', 'reason_for_new_proposal', 'FAIR_code_reviewed_by', 'variable_label_NL', 'variable_label_EN', 'Var_label_portal', 'Var_label_biobank', 'Var_label_platform_trials', 'Var_label_expertise_clinics', 'values', 'value_labels_NL', 'value_labels_EN', 'value_coding', 'value_labels_FAIR', 'value_coding_by', 'Val_FAIR_code_checked_by', 'Val_portal', 'Val_biobank', 'Val_platform_trials', 'field_type_portal', 'field_type_biobank', 'measurement_unit', 'Dep_portal', 'Dep_biobank', 'Dep_platform_trials', 'source_merged', 'sources', 'start_date', 'stop_date', 'condition', 'item_number', 'fair_status', 'value_fair_status', 'copyright_status', 'change_log', 'is_deleted', 'created_at', 'updated_at', 'created_by', 'updated_by']);
 
 // Same whitelist but expressed in actual DB column names (reverse-mapped),
 // so membership tests after cloudDenormalizeRow's case conversion succeed.
@@ -3023,6 +3030,7 @@ function cloudDenormalizeRow(row) {
     if (k === 'custom_fields') continue;  // handled via flattened keys
     const targetKey = CLOUD_FIELD_CASE_REVERSE[k] || k;
     if (CLOUD_DB_MANAGED_FIELDS.has(targetKey)) continue;
+    if (CLOUD_RETIRED_COLUMNS.has(targetKey)) continue;   // v6.55: never written (not even into custom_fields)
     // Real DB column?
     if (CLOUD_DB_COLUMNS_DB.has(targetKey)) {
       let val = row[k];
@@ -3088,7 +3096,7 @@ function openCloudSuggestModal() {
     'variable_name_CBS',
     'variable_label_NL', 'variable_label_EN',
     'value_labels_NL', 'value_labels_EN',
-    'value_label_FAIR_merged'
+    'value_labels_FAIR'
   ];
   allowedFields.forEach(f => {
     if (f in v) {
@@ -3250,7 +3258,7 @@ const RV_COLUMNS = [
   { key: 'variable_label_EN',        cls: 'rv-col-label-en',  label: 'Variable label (EN)' },
   { key: 'value_labels_NL',          cls: 'rv-col-value-nl',  label: 'Value label (NL)' },
   { key: 'value_labels_EN',          cls: 'rv-col-value-en',  label: 'Value label (EN)' },
-  { key: 'variable_name_FAIR_merged', cls: 'rv-col-fair',      label: 'Standardized name (FAIR coding)' }
+  { key: 'variable_name_FAIR',       cls: 'rv-col-fair',      label: 'Standardized name (FAIR coding)' }
 ];
 
 // ---------- Helpers ----------
@@ -3589,11 +3597,26 @@ function rvAnswersTable(r) {
   });
   if (!parsedAny) return '';
   const head = '<tr><th>Code</th>' + used.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
-  const body = order.map(code => '<tr><td><span class="rv-vl-code">' + rvEscape(code) + '</span></td>' + used.map((c, i) => {
+  // v6.54: scale points without any text (e.g. 1–9 between "0 no pain" and
+  // "10 worst pain") are shown as one row "1 – 9".
+  const blank = code => maps.every(m => m[code] === undefined || m[code] === '');
+  const isInt = code => /^-?\d+$/.test(code);
+  const runs = []; let k = 0;
+  while (k < order.length) {
+    if (blank(order[k]) && isInt(order[k])) {
+      let e = k;
+      while (e + 1 < order.length && blank(order[e + 1]) && isInt(order[e + 1]) && Number(order[e + 1]) === Number(order[e]) + 1) e++;
+      if (e > k) { runs.push({ from: order[k], to: order[e] }); k = e + 1; continue; }
+    }
+    runs.push({ code: order[k] }); k++;
+  }
+  const body = runs.map(x => x.code === undefined
+    ? '<tr class="rv-ans-gap"><td><span class="rv-vl-code">' + rvEscape(x.from) + '–' + rvEscape(x.to) + '</span></td><td colspan="' + used.length + '">scale points without a label</td></tr>'
+    : (code => '<tr><td><span class="rv-vl-code">' + rvEscape(code) + '</span></td>' + used.map((c, i) => {
     const t = maps[i][code];
     if (t === undefined || t === '') return '<td class="rv-cell-empty">—</td>';
     return c.fair ? `<td class="rv-ans-fair">${rvFairLinks(t)}</td>` : `<td>${rvEscape(t)}</td>`;
-  }).join('') + '</tr>').join('');
+  }).join('') + '</tr>')(x.code)).join('');
   return `<table class="rv-ans">${head}${body}</table>`;
 }
 function rvFairSection(r) {
@@ -3606,8 +3629,7 @@ function rvFairSection(r) {
     const lbl = rvTxt(r, 'variable_coding_label_merged') || rvTxt(r, 'variable_coding_label');
     if (lbl) rows.push(['Name of the FAIR code', rvEscape(lbl)]);
   }
-  if (!rows.length) return '';
-  return `<div class="rv-md-section"><div class="rv-md-section-title">FAIR coding</div><table class="rv-md-table">${rows.map(([k, v]) => `<tr><td class="rv-md-key">${rvEscape(k)}</td><td class="rv-md-val">${v}</td></tr>`).join('')}</table></div>`;
+  return rows.map(([k, v]) => `<tr><td class="rv-md-key">${rvEscape(k)}</td><td class="rv-md-val">${v}</td></tr>`).join('');
 }
 // ====== END v6.54 ======
 function rvRenderDetail(r) {
@@ -3624,10 +3646,10 @@ function rvRenderDetail(r) {
   const answersTbl = rvAnswersTable(r);
   const groups = [
     ['Classification', ['Theme', 'Subdomain']],
-    ['Labels', ['variable_label_NL', 'variable_label_EN']],
+    ['Question', ['variable_label_NL', 'variable_label_EN']],
     ['Values', answersTbl ? [] : ['value_labels_NL', 'value_labels_EN']]
   ];
-  const sections = groups.map(([title, keys]) => {
+  let sections = groups.map(([title, keys]) => {
     const present = keys.filter(k => RV_COLUMNS.some(c => c.key === k) &&
       (k === 'variable_name_FAIR_merged'
         ? (rvFieldVisible(k) || rvFieldVisible('variable_name_FAIR'))
@@ -3643,7 +3665,9 @@ function rvRenderDetail(r) {
       const v = r[k];
       return !(v === undefined || v === null || String(v).trim() === '');
     });
-    if (!groupHasValue) return '';
+    // v6.54: the variable's own FAIR code belongs to the question
+    const fairRows = title === 'Question' ? rvFairSection(r) : '';
+    if (!groupHasValue && !fairRows) return '';
     const rowsHtml = present.map(k => {
       let valCell;
       if (k === 'value_labels_NL' || k === 'value_labels_EN') valCell = rvValueCell(r[k]);
@@ -3657,8 +3681,10 @@ function rvRenderDetail(r) {
       else { const val = rvColVal(r, k); valCell = `<td class="rv-md-val ${val ? '' : 'rv-cell-empty'}">${val ? rvEscape(val) : '—'}</td>`; }
       return `<tr><td class="rv-md-key">${rvEscape(rvColLabel(k))}</td>${valCell}</tr>`;
     }).join('');
-    return `<div class="rv-md-section"><div class="rv-md-section-title">${title}</div><table class="rv-md-table">${rowsHtml}</table></div>`;
-  }).join('') + (answersTbl ? `<div class="rv-md-section"><div class="rv-md-section-title">Answers</div>${answersTbl}</div>` : '') + rvFairSection(r);
+    return `<div class="rv-md-section"><div class="rv-md-section-title">${title}</div><table class="rv-md-table">${rowsHtml}${fairRows}</table></div>`;
+  });
+  if (answersTbl) sections.splice(2, 0, `<div class="rv-md-section"><div class="rv-md-section-title">Answers</div>${answersTbl}</div>`);
+  sections = sections.join('');
   return `<div class="rv-md-detail"><div class="rv-md-detail-inner">
     <div class="rv-md-detail-head">
       <span class="rv-md-detail-name">${rvEscape(r.variable_name_CBS || '')}${rvFxBadge(r)}</span>
@@ -4862,7 +4888,7 @@ const PENDING_PUBLIC_FIELDS = [
   { db: 'variable_label_en',       label: 'Variable label (EN)', jsKey: 'variable_label_EN' },
   { db: 'value_labels_nl',         label: 'Value label (NL)', jsKey: 'value_labels_NL' },
   { db: 'value_labels_en',         label: 'Value label (EN)', jsKey: 'value_labels_EN' },
-  { db: 'value_label_fair_merged', label: 'FAIR coding', jsKey: 'value_label_FAIR_merged' }
+  { db: 'value_labels_fair',       label: 'FAIR coding', jsKey: 'value_labels_FAIR' }
 ];
 
 function pcEscape(s) {
@@ -12501,7 +12527,7 @@ const SEARCH_STATE = {
 
 const SEARCH_PRESET_COMMON = [
   "variable_name_CBS",
-  "variable_name_FAIR_merged",
+  "variable_name_FAIR",
   "Instrument",
   "variable_label_EN",
   "value_labels_EN",
